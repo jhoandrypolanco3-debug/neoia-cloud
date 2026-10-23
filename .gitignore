@@ -12,3 +12,6 @@ config.json
 __pycache__/
 *.pyc
 *.pyo
+
+# Script local
+SUBIR-A-GITHUB.bat
