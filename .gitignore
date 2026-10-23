@@ -1,0 +1,14 @@
+# NeoIA — no subir a GitHub
+
+# Base de datos local (se regenera)
+neoia.db
+
+# Secretos (NUNCA subir)
+.env
+*.key
+config.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo

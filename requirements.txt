@@ -1,0 +1,3 @@
+# NeoIA — servidor de la nube
+# NO requiere dependencias externas: usa solo la biblioteca estandar de Python 3.12.
+# (Por eso el despliegue es instantaneo: no hay "pip install")

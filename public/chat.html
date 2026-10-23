@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeoIA — Tu asistente de IA</title>
+<style>
+  :root {
+    --bg: #212121;
+    --sidebar: #171717;
+    --panel: #2f2f2f;
+    --user: #2f2f2f;
+    --text: #ececec;
+    --dim: #8e8e8e;
+    --line: #3a3a3a;
+    --accent: #10a37f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px; line-height: 1.55; overflow: hidden;
+  }
+  .app { display: flex; height: 100vh; }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    width: 260px; flex-shrink: 0; background: var(--sidebar);
+    display: flex; flex-direction: column; border-right: 1px solid #2a2a2a;
+    transition: margin-left .2s;
+  }
+  .sidebar.hidden { margin-left: -260px; }
+  .sb-top { padding: 12px; }
+  .brand {
+    display: flex; align-items: center; gap: 9px; padding: 6px 8px 14px;
+    font-size: 15px; font-weight: 600; letter-spacing: .3px;
+  }
+  .brand .mark {
+    width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center;
+    background: linear-gradient(135deg, #10a37f, #37e6ff); color: #05221b; font-size: 15px; font-weight: 800;
+  }
+  .brand small { display: block; font-size: 10px; color: var(--dim); font-weight: 400; letter-spacing: 0; }
+  .new-chat {
+    width: 100%; display: flex; align-items: center; gap: 9px; padding: 10px 12px;
+    background: transparent; border: 1px solid var(--line); border-radius: 9px;
+    color: var(--text); font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .new-chat:hover { background: #212121; }
+  .sb-nav { flex: 1; overflow-y: auto; padding: 10px 8px; }
+  .sb-nav a {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
+    color: var(--text); text-decoration: none; font-size: 14px;
+  }
+  .sb-nav a:hover { background: #212121; }
+  .sb-nav .sec { font-size: 11px; color: var(--dim); padding: 14px 10px 6px; letter-spacing: .6px; }
+  .sb-foot { padding: 12px; border-top: 1px solid #2a2a2a; font-size: 12px; color: var(--dim); }
+
+  /* ---------- Main ---------- */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+  .topbar {
+    height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 16px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 8px; border: none; background: transparent;
+    color: var(--text); cursor: pointer; font-size: 16px; display: grid; place-items: center;
+  }
+  .icon-btn:hover { background: #2a2a2a; }
+  .model-name { font-size: 14px; font-weight: 500; }
+  .model-name span { color: var(--dim); font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .topbar .spacer { flex: 1; }
+
+  .messages { flex: 1; overflow-y: auto; padding: 24px 16px 8px; }
+  .thread { max-width: 760px; margin: 0 auto; }
+
+  .welcome { max-width: 520px; margin: 12vh auto 0; text-align: center; }
+  .welcome .big { font-size: 30px; font-weight: 600; margin-bottom: 10px; }
+  .welcome p { color: var(--dim); font-size: 14px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 26px; }
+  .chip {
+    background: transparent; border: 1px solid var(--line); color: var(--text);
+    padding: 9px 14px; border-radius: 999px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  .chip:hover { background: #2a2a2a; }
+
+  .msg { display: flex; gap: 12px; padding: 16px 0; }
+  .msg .avatar {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .msg.user .avatar { background: #5a5a5a; color: #fff; }
+  .msg.assistant .avatar { background: linear-gradient(135deg, #10a37f, #37e6ff); color: #05221b; }
+  .msg .body { padding-top: 3px; min-width: 0; }
+  .msg .who { font-size: 12px; color: var(--dim); margin-bottom: 3px; }
+  .msg .content { white-space: pre-wrap; word-wrap: break-word; font-size: 15px; }
+  .msg .content code {
+    background: #2a2a2a; padding: 1px 5px; border-radius: 4px;
+    font-family: Consolas, "Courier New", monospace; font-size: 13px;
+  }
+  .msg .content pre {
+    background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 9px; padding: 12px;
+    overflow-x: auto; margin: 9px 0; font-size: 13px;
+  }
+  .typing { color: var(--dim); font-size: 14px; }
+  .typing::after { content: "…"; animation: dots 1.2s infinite; }
+  @keyframes dots { 0%,20%{content:"."} 40%{content:".."} 60%,100%{content:"…"} }
+
+  /* ---------- Composer ---------- */
+  .composer-wrap { padding: 10px 16px 18px; }
+  .composer {
+    max-width: 760px; margin: 0 auto; position: relative;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+    padding: 10px 52px 10px 14px; display: flex; align-items: flex-end;
+  }
+  .composer:focus-within { border-color: #5a5a5a; }
+  .composer textarea {
+    flex: 1; resize: none; border: none; outline: none; background: transparent;
+    color: var(--text); font-family: inherit; font-size: 15px; line-height: 1.5;
+    max-height: 160px; min-height: 24px; padding: 6px 0;
+  }
+  .send-btn {
+    position: absolute; right: 9px; bottom: 9px; width: 34px; height: 34px; border-radius: 9px;
+    border: none; background: var(--accent); color: #fff; font-size: 16px; cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .send-btn:disabled { background: #444; cursor: default; }
+  .hint { max-width: 760px; margin: 8px auto 0; text-align: center; font-size: 11px; color: var(--dim); }
+
+  @media (max-width: 720px) {
+    .sidebar { position: fixed; z-index: 20; height: 100%; margin-left: -260px; }
+    .sidebar.open { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-top">
+      <div class="brand">
+        <span class="mark">N</span>
+        <div>NeoIA<small>Asistente de IA</small></div>
+      </div>
+      <button class="new-chat" id="new-chat">✎ Nuevo chat</button>
+    </div>
+    <nav class="sb-nav">
+      <div class="sec">ACCIONES</div>
+      <a href="#" data-prompt="Escribeme un OpMode de FTC para mover 4 motores mecanum">💻 Escribir código FTC</a>
+      <a href="#" data-prompt="Compila mi proyecto y dime si hay errores">⚙️ Compilar proyecto</a>
+      <a href="#" data-prompt="busca FTC SDK 2026">🔍 Buscar en internet</a>
+      <a href="#" data-prompt="¿Cuál es el precio de AAPL?">📈 Precio de acción</a>
+      <div class="sec">MÁS</div>
+      <a href="/index.html">🖥️ Modo avanzado (HUD)</a>
+      <a href="/landing.html">🚀 Página del producto</a>
+      <a href="/admin.html">⚙️ Panel de administrador</a>
+    </nav>
+    <div class="sb-foot"><span id="plan-badge">Plan: —</span><br>NeoIA · Hecho para equipos FTC</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="icon-btn" id="toggle-sb" title="Menú">☰</button>
+      <div class="model-name">NeoIA <span>· asistente</span></div>
+      <div class="spacer"></div>
+      <button class="icon-btn" id="clear-chat" title="Limpiar chat">🗑</button>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="thread" id="thread">
+        <div class="welcome" id="welcome">
+          <div class="big">¿En qué te ayudo?</div>
+          <p>Pregunta lo que quieras: código, búsquedas, tu robot FTC, o cualquier cosa.</p>
+          <div class="chips">
+            <button class="chip" data-prompt="Escribeme un OpMode de FTC que mueva 4 motores">💻 Código FTC</button>
+            <button class="chip" data-prompt="Explícame cómo funciona un servo">⚙️ Cómo funciona</button>
+            <button class="chip" data-prompt="busca FIRST Tech Challenge">🔍 Buscar</button>
+            <button class="chip" data-prompt="Dame 3 ideas para mi robot de FTC">💡 Ideas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="composer-wrap">
+      <div class="composer">
+        <textarea id="input" rows="1" placeholder="Pregunta lo que quieras…"></textarea>
+        <button class="send-btn" id="send" title="Enviar">➤</button>
+      </div>
+      <div class="hint">NeoIA puede cometer errores. Verifica la información importante.</div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const thread = $("thread"), messages = $("messages"), input = $("input"), send = $("send");
+  const welcome = $("welcome");
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  // Formato simple: bloques de codigo ```...``` y `inline`
+  function format(text) {
+    const parts = String(text || "").split(/```/);
+    let out = "";
+    parts.forEach((p, i) => {
+      if (i % 2 === 1) {
+        out += "<pre><code>" + esc(p.replace(/^\w*\n/, "")) + "</code></pre>";
+      } else {
+        out += esc(p).replace(/`([^`]+)`/g, "<code>$1</code>");
+      }
+    });
+    return out;
+  }
+
+  function addMessage(role, text) {
+    if (welcome) welcome.style.display = "none";
+    const d = document.createElement("div");
+    d.className = "msg " + role;
+    d.innerHTML =
+      '<div class="avatar">' + (role === "user" ? "Tú" : "N") + "</div>" +
+      '<div class="body"><div class="who">' + (role === "user" ? "Tú" : "NeoIA") + "</div>" +
+      '<div class="content">' + format(text) + "</div></div>";
+    thread.appendChild(d);
+    messages.scrollTop = messages.scrollHeight;
+    return d;
+  }
+
+  function addTyping() {
+    const d = document.createElement("div");
+    d.className = "msg assistant";
+    d.innerHTML = '<div class="avatar">N</div><div class="body"><div class="who">NeoIA</div><div class="typing"></div></div>';
+    thread.appendChild(d);
+    messages.scrollTop = messages.scrollHeight;
+    return d;
+  }
+
+  // Historial para respuestas rapidas (contexto de la conversacion)
+  const history = [];
+  // Solo estas ordenes usan el agente completo (con herramientas)
+  const ACTION_RE = /^(compila|build|abre|abrir|ejecuta|corre|guarda|edita|crea el archivo|escribe en|haz una mision|misión)\b/i;
+
+  async function ask(text) {
+    text = (text || "").trim();
+    if (!text) return;
+    addMessage("user", text);
+    input.value = "";
+    autoGrow();
+    send.disabled = true;
+    const typing = addTyping();
+    try {
+      // 1) Busqueda web
+      if (/^busca |^buscar |^search /i.test(text)) {
+        const q = text.replace(/^(busca|buscar|search)\s+/i, "");
+        const r = await fetch("/api/search", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: q }) }).then(x => x.json());
+        typing.remove();
+        const res = (r.results || []).map(x => "• " + (x.title || x.snippet || "")).join("\n");
+        addMessage("assistant", res || "Sin resultados.");
+        return;
+      }
+      // 2) Acciones en la computadora (agente con herramientas)
+      if (ACTION_RE.test(text)) {
+        const r = await fetch("/api/agent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: text }) }).then(x => x.json());
+        typing.remove();
+        addMessage("assistant", r.reply || r.error || "No pude responder.");
+        return;
+      }
+      // 3) RAPIDO: una sola llamada a DeepSeek (sin bucle de acciones)
+      history.push({ role: "user", content: text });
+      const r = await fetch("/api/chat", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history.slice(-14) }),
+      }).then(x => x.json());
+      typing.remove();
+      const reply = r.reply || r.error || "No pude responder.";
+      history.push({ role: "assistant", content: reply });
+      if (history.length > 30) history.splice(0, history.length - 30);
+      addMessage("assistant", reply);
+    } catch (e) {
+      typing.remove();
+      addMessage("assistant", "❌ Error de conexión: " + e.message);
+    } finally {
+      send.disabled = false;
+      input.focus();
+    }
+  }
+
+  function autoGrow() {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 160) + "px";
+  }
+
+  input.addEventListener("input", autoGrow);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(input.value); }
+  });
+  send.addEventListener("click", () => ask(input.value));
+
+  document.querySelectorAll(".chip, .sb-nav a[data-prompt]").forEach((b) => {
+    b.addEventListener("click", (e) => {
+      e.preventDefault();
+      ask(b.dataset.prompt || "");
+    });
+  });
+
+  $("new-chat").addEventListener("click", () => {
+    thread.innerHTML = "";
+    const w = document.createElement("div");
+    w.className = "welcome";
+    w.id = "welcome";
+    w.innerHTML = '<div class="big">¿En qué te ayudo?</div><p>Pregunta lo que quieras.</p>';
+    thread.appendChild(w);
+    input.focus();
+  });
+
+  $("clear-chat").addEventListener("click", () => { $("new-chat").click(); });
+
+  $("toggle-sb").addEventListener("click", () => {
+    $("sidebar").classList.toggle("open");
+  });
+
+  // Plan actual (Gratis / Pro / Equipo)
+  fetch("/api/plan-info").then(r => r.json()).then(p => {
+    const names = { free: "Gratis", pro: "Pro", team: "Equipo" };
+    const b = $("plan-badge");
+    if (b) b.textContent = "Plan: " + (names[p.plan] || p.plan);
+  }).catch(() => {});
+
+  input.focus();
+})();
+</script>
+</body>
+</html>
