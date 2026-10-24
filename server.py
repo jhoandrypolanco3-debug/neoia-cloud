@@ -1,15 +1,18 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # =============================================================
-# NeoIA â€” servidor para la NUBE (Render / Railway / Fly.io)
+# NeoIA - servidor para la NUBE (Render / Railway / Fly.io)
 # Version SEGURA: SOLO chat, imagenes, busqueda y planes.
 # NO tiene acceso a archivos, comandos ni a la PC del usuario.
 # Solo biblioteca estandar de Python (no requiere pip install).
 # =============================================================
-import json, os, re, sqlite3, urllib.request, urllib.parse, base64, time
+import json, os, re, sqlite3, urllib.request, urllib.parse, base64, time, secrets
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 
-VERSION = "1.1-imagenes-legal"
+VERSION = "1.2-admin"
+PORT = int(os.environ.get("PORT", 8080))
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "neoia-admin-2026").strip()
+ADMIN_TOKENS = set()   # sesiones activas del panel admin
 PORT = int(os.environ.get("PORT", 8080))
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "").strip()
 DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
@@ -121,6 +124,17 @@ class H(BaseHTTPRequestHandler):
             self._json(200, {"plan": mem_get("plan", "free"), "prices": PLAN_PRICES})
         elif r == "/api/stats":
             self._json(200, mem_get("stats", {}))
+        elif r == "/api/admin":
+            if self.headers.get("X-Admin-Token") not in ADMIN_TOKENS:
+                return self._json(401, {"error": "No autorizado"})
+            self._json(200, {
+                "plan": mem_get("plan", "free"),
+                "prices": PLAN_PRICES,
+                "stats": mem_get("stats", {}),
+                "version": VERSION,
+                "provider": bool(DEEPSEEK_API_KEY),
+                "model": DEEPSEEK_MODEL,
+            })
         else:
             self._static(r)
 
@@ -149,10 +163,20 @@ class H(BaseHTTPRequestHandler):
                 self._json(200, {"prompt": prompt, "image": img})
             except Exception as e:
                 self._json(500, {"error": str(e)})
-        elif r == "/api/plan":
+        elif r == "/api/admin/login":
+            pwd = (body.get("password") or "").strip()
+            if not pwd or pwd != ADMIN_PASSWORD:
+                return self._json(401, {"error": "Contrasena incorrecta"})
+            tok = secrets.token_hex(16)
+            ADMIN_TOKENS.add(tok)
+            self._json(200, {"token": tok})
+        elif r in ("/api/plan", "/api/admin/plan"):
+            if self.headers.get("X-Admin-Token") not in ADMIN_TOKENS:
+                return self._json(401, {"error": "Solo el administrador puede cambiar el plan."})
             p = (body.get("plan") or "").lower()
             if p not in PLAN_PRICES: return self._json(400, {"error": "Plan invalido."})
-            mem_set("plan", p); self._json(200, {"ok": True, "plan": p})
+            mem_set("plan", p); stats_inc("plan_change")
+            self._json(200, {"ok": True, "plan": p})
         else:
             self._json(404, {"error": "No encontrado"})
 

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeoIA — Panel de administrador</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root { --bg:#0b0f14; --panel:#141a21; --line:#233040; --text:#e6f0f7; --dim:#7d93a6;
+          --cyan:#37e6ff; --green:#39ff88; --green-rgb:57,255,136; --red:#ff5c5c; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif;
+         font-size:14px; line-height:1.55; padding:0 16px 60px; }
+  .wrap { max-width:980px; margin:0 auto; }
+  header { display:flex; align-items:center; gap:12px; padding:20px 0; border-bottom:1px solid var(--line); }
+  header h1 { font-size:20px; letter-spacing:.5px; }
+  header .tag { font-size:10px; color:#05221b; background:var(--cyan); padding:3px 9px; border-radius:99px; font-weight:700; }
+  header .spacer { flex:1; }
+  header a, header button { color:var(--cyan); text-decoration:none; font-size:13px; border:1px solid var(--line);
+             padding:7px 13px; border-radius:8px; background:transparent; cursor:pointer; font-family:inherit; }
+  header a:hover, header button:hover { border-color:var(--cyan); }
+
+  h2 { font-size:12px; letter-spacing:1.5px; color:var(--dim); margin:26px 0 10px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px; }
+  .grid { display:grid; gap:12px; }
+  .g3 { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+  .g4 { grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); }
+
+  /* login */
+  .login { max-width:400px; margin:12vh auto 0; text-align:center; }
+  .login h2 { font-size:22px; color:var(--text); margin:0 0 8px; letter-spacing:0; }
+  .login p { color:var(--dim); font-size:13px; margin-bottom:22px; }
+  .login input { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--line);
+                 background:var(--panel); color:var(--text); font-size:15px; font-family:inherit; margin-bottom:12px; }
+  .login input:focus { outline:none; border-color:var(--cyan); }
+  .login button { width:100%; padding:12px; border-radius:10px; border:none; background:var(--cyan);
+                  color:#04121a; font-weight:700; font-size:15px; cursor:pointer; font-family:inherit; }
+  .login button:hover { box-shadow:0 0 20px rgba(55,230,255,.5); }
+  .login .err { color:var(--red); font-size:13px; margin-top:12px; min-height:18px; }
+
+  /* plan */
+  .plan { transition:.2s; }
+  .plan:hover { border-color:#3a5470; }
+  .plan.active { border-color:var(--cyan); box-shadow:0 0 24px rgba(55,230,255,.2); }
+  .plan .name { font-size:15px; font-weight:700; }
+  .plan .price { font-size:30px; font-weight:800; margin:6px 0 2px; letter-spacing:-1px; }
+  .plan .price small { font-size:12px; color:var(--dim); font-weight:400; }
+  .plan button { width:100%; padding:9px; border-radius:8px; border:1px solid var(--cyan); margin-top:14px;
+                 background:transparent; color:var(--cyan); font-family:inherit; font-size:13px; cursor:pointer; }
+  .plan button:hover { background:rgba(55,230,255,.12); }
+  .plan.active button { background:var(--cyan); color:#04121a; font-weight:700; cursor:default; }
+
+  .stat { text-align:center; }
+  .stat .n { font-size:26px; font-weight:800; color:var(--cyan); }
+  .stat .l { font-size:10px; color:var(--dim); letter-spacing:.5px; }
+
+  .kv { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid #1c2530; font-size:13px; }
+  .kv:last-child { border-bottom:none; }
+  .kv span:first-child { color:var(--dim); }
+  .kv span:last-child { font-family:Consolas,monospace; font-size:12px; }
+  .ok { color:var(--green); } .bad { color:var(--red); }
+  #msg { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--cyan);
+         color:#04121a; padding:10px 20px; border-radius:99px; font-weight:700; font-size:13px;
+         opacity:0; transition:.3s; pointer-events:none; }
+  #msg.show { opacity:1; }
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>⚙️ NeoIA · Admin</h1>
+    <span class="tag">ADMIN</span>
+    <div class="spacer"></div>
+    <a href="/">← Chat</a>
+    <button id="logout" class="hidden">Salir</button>
+  </header>
+
+  <!-- LOGIN -->
+  <div class="login" id="login-view">
+    <h2>🔒 Acceso restringido</h2>
+    <p>Panel de administración de NeoIA. Escribe la contraseña.</p>
+    <input type="password" id="pwd" placeholder="Contraseña de administrador" autocomplete="current-password">
+    <button id="btn-login">Entrar</button>
+    <div class="err" id="login-err"></div>
+  </div>
+
+  <!-- PANEL -->
+  <div id="panel-view" class="hidden">
+    <h2>PLAN Y PAGOS</h2>
+    <div class="grid g3" id="plans"></div>
+
+    <h2>ESTADÍSTICAS</h2>
+    <div class="grid g4" id="stats"></div>
+
+    <h2>CONFIGURACIÓN</h2>
+    <div class="card" id="config"></div>
+  </div>
+</div>
+
+<div id="msg"></div>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const NAMES = { free: "Gratis", pro: "Pro", team: "Equipo" };
+  const DESC = {
+    free: ["Chat ilimitado", "3 imágenes/día", "Hologramas"],
+    pro:  ["Chat ilimitado", "50 imágenes/día", "Misiones", "Empleados"],
+    team: ["Chat ilimitado", "Imágenes ilimitadas", "Todo incluido"],
+  };
+  let token = sessionStorage.getItem("neoia_admin") || "";
+  let data = null;
+
+  function toast(t) {
+    const m = $("msg"); m.textContent = t; m.classList.add("show");
+    clearTimeout(m._t); m._t = setTimeout(() => m.classList.remove("show"), 2200);
+  }
+
+  function headers() {
+    const h = { "Content-Type": "application/json" };
+    if (token) h["X-Admin-Token"] = token;
+    return h;
+  }
+
+  async function login() {
+    const pwd = $("pwd").value;
+    $("login-err").textContent = "";
+    if (!pwd) { $("login-err").textContent = "Escribe la contraseña"; return; }
+    try {
+      const r = await fetch("/api/admin/login", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pwd }),
+      }).then(x => x.json());
+      if (r.error) { $("login-err").textContent = "❌ " + r.error; return; }
+      token = r.token;
+      sessionStorage.setItem("neoia_admin", token);
+      showPanel();
+    } catch (e) { $("login-err").textContent = "❌ Error de conexión"; }
+  }
+
+  function logout() {
+    token = ""; sessionStorage.removeItem("neoia_admin");
+    $("panel-view").classList.add("hidden");
+    $("login-view").classList.remove("hidden");
+    $("logout").classList.add("hidden");
+    $("pwd").value = "";
+  }
+
+  function renderPlans() {
+    const wrap = $("plans"); wrap.innerHTML = "";
+    Object.keys(data.prices).forEach((p) => {
+      const active = data.plan === p;
+      const d = document.createElement("div");
+      d.className = "card plan" + (active ? " active" : "");
+      d.innerHTML =
+        '<div class="name">' + (NAMES[p] || p) + "</div>" +
+        '<div class="price">$' + data.prices[p] + '<small>/mes</small></div>' +
+        "<ul style='list-style:none;margin:10px 0;font-size:12.5px;color:var(--dim)'>" +
+        DESC[p].map(x => "<li style='padding:3px 0'>✓ " + x + "</li>").join("") + "</ul>" +
+        '<button data-plan="' + p + '"' + (active ? " disabled" : "") + ">" +
+        (active ? "Plan actual" : "Cambiar") + "</button>";
+      wrap.appendChild(d);
+    });
+    wrap.querySelectorAll("button[data-plan]").forEach((b) => {
+      b.addEventListener("click", async () => {
+        b.disabled = true; b.textContent = "Cambiando...";
+        try {
+          const r = await fetch("/api/plan", {
+            method: "POST", headers: headers(),
+            body: JSON.stringify({ plan: b.dataset.plan }),
+          }).then(x => x.json());
+          if (r.error) { toast("❌ " + r.error); b.disabled = false; return; }
+          toast("✅ Plan cambiado a " + (NAMES[b.dataset.plan] || b.dataset.plan));
+          await load();
+        } catch (e) { toast("❌ " + e.message); b.disabled = false; }
+      });
+    });
+  }
+
+  function renderStats() {
+    const wrap = $("stats"); wrap.innerHTML = "";
+    const labels = { chat: "CHATS", image: "IMÁGENES", search: "BÚSQUEDAS", plan_change: "CAMBIOS PLAN" };
+    ["chat", "image", "search", "plan_change"].forEach((k) => {
+      const d = document.createElement("div");
+      d.className = "card stat";
+      d.innerHTML = '<div class="n">' + ((data.stats || {})[k] || 0) + '</div><div class="l">' + labels[k] + "</div>";
+      wrap.appendChild(d);
+    });
+  }
+
+  function renderConfig() {
+    const rows = [
+      ["Versión", data.version],
+      ["Modelo", data.model],
+      ["IA configurada", data.provider ? "SÍ ✅" : "NO ❌"],
+      ["Plan actual", NAMES[data.plan] || data.plan],
+    ];
+    $("config").innerHTML = rows.map(([k, v]) =>
+      '<div class="kv"><span>' + k + '</span><span>' + (v == null ? "—" : v) + "</span></div>").join("");
+  }
+
+  async function load() {
+    try {
+      const r = await fetch("/api/admin", { headers: headers() }).then(x => x.json());
+      if (r.error) { logout(); return; }
+      data = r;
+      renderPlans(); renderStats(); renderConfig();
+    } catch (e) { toast("❌ " + e.message); }
+  }
+
+  function showPanel() {
+    $("login-view").classList.add("hidden");
+    $("panel-view").classList.remove("hidden");
+    $("logout").classList.remove("hidden");
+    load();
+  }
+
+  $("btn-login").addEventListener("click", login);
+  $("pwd").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+  $("logout").addEventListener("click", logout);
+
+  if (token) showPanel();
+})();
+</script>
+</body>
+</html>
