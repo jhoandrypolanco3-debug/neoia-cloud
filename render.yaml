@@ -6,6 +6,7 @@ services:
     runtime: python
     plan: free
     region: oregon
+    autoDeploy: true
     buildCommand: "echo 'sin dependencias que instalar'"
     startCommand: "python server.py"
     healthCheckPath: /api/status
