@@ -56,19 +56,50 @@ def call_deepseek(messages):
     data = json.loads(urllib.request.urlopen(req, timeout=120).read().decode("utf-8"))
     return data["choices"][0]["message"]["content"]
 
-# ---------------- Busqueda ----------------
-def web_search(q):
+# ---------------- Busqueda (DuckDuckGo Lite) ----------------
+def web_search(q, n=6):
     try:
-        url = "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote(q)
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        html = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
+        url = "https://lite.duckduckgo.com/lite/?q=" + urllib.parse.quote(q)
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+        html = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", "replace")
+        links = re.findall(r"<a[^>]+class=['\"]result-link['\"][^>]*>(.*?)</a>", html, re.S)
+        hrefs = re.findall(r"<a[^>]+href=['\"]([^'\"]+)['\"][^>]*class=['\"]result-link['\"]", html)
+        snips = re.findall(r"<td[^>]+class=['\"]result-snippet['\"][^>]*>(.*?)</td>", html, re.S)
         out = []
-        for m in re.finditer(r'result__a[^>]*href="([^"]+)"[^>]*>(.*?)</a>', html, re.S):
-            title = re.sub(r"<[^>]+>", "", m.group(2)).strip()
-            if title: out.append({"title": title, "url": m.group(1), "snippet": ""})
-        return out[:8]
+        for i, t in enumerate(links[:n]):
+            titulo = re.sub(r"<[^>]+>", "", t).strip()
+            frag = re.sub(r"<[^>]+>", "", snips[i]).strip() if i < len(snips) else ""
+            if titulo:
+                out.append({"title": titulo, "url": hrefs[i] if i < len(hrefs) else "", "snippet": frag})
+        return out
     except Exception:
         return []
+
+# ---------------- Deteccion de preguntas que necesitan internet ----------------
+NEEDS_WEB = re.compile(
+    r"\b(cu[aá]ndo|cu[aá]nto|cu[aá]l es el|pr[oó]xim[oa]s?|hoy|ahora|actual(es)?|actualmente|"
+    r"noticias?|resultados?|gan[oó]|ganador|precio|cotizaci[oó]n|clima|partidos?|calendario|"
+    r"fecha|qui[eé]n (es|fue|gan)|temporada|estreno|reciente|ultimo|último|2026|2027)\b", re.I)
+
+def chat_answer(msgs):
+    """Responde SIEMPRE; si la pregunta es de actualidad, busca en internet primero."""
+    last = ""
+    if msgs:
+        try: last = msgs[-1].get("content") or ""
+        except Exception: last = ""
+    sysp = SYSTEM
+    if last and NEEDS_WEB.search(last):
+        try:
+            res = web_search(last, 6)
+            if res:
+                ctx = "\n".join("- %s | %s | %s" % (r["title"], r["snippet"], r["url"]) for r in res)
+                sysp = (SYSTEM + "\n\n=== DATOS ACTUALES DE INTERNET (consulta: " + last[:80] + ") ===\n"
+                        + ctx +
+                        "\n\nUsa estos datos para responder con la fecha/dato real. "
+                        "Si los datos no alcanzan, dilo y sugiere una fuente.")
+        except Exception:
+            pass
+    return call_deepseek([{"role": "system", "content": sysp}] + msgs)
 
 # ---------------- Imagenes ----------------
 def make_image(prompt, w=768, h=768):
@@ -147,7 +178,7 @@ class H(BaseHTTPRequestHandler):
                 if not m: return self._json(400, {"error": "Escribe un mensaje."})
                 msgs = [{"role": "user", "content": m}]
             try:
-                rep = call_deepseek([{"role": "system", "content": SYSTEM}] + msgs)
+                rep = chat_answer(msgs)
                 stats_inc("chat")
                 self._json(200, {"reply": rep})
             except Exception as e:
