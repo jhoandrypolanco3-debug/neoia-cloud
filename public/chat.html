@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NeoIA — Tu asistente de IA</title>
+<title>NeoIA â€” Tu asistente de IA</title>
 <style>
   :root {
     --bg: #212121;
@@ -103,8 +103,8 @@
     overflow-x: auto; margin: 9px 0; font-size: 13px;
   }
   .typing { color: var(--dim); font-size: 14px; }
-  .typing::after { content: "…"; animation: dots 1.2s infinite; }
-  @keyframes dots { 0%,20%{content:"."} 40%{content:".."} 60%,100%{content:"…"} }
+  .typing::after { content: "â€¦"; animation: dots 1.2s infinite; }
+  @keyframes dots { 0%,20%{content:"."} 40%{content:".."} 60%,100%{content:"â€¦"} }
 
   /* ---------- Composer ---------- */
   .composer-wrap { padding: 10px 16px 18px; }
@@ -125,7 +125,9 @@
     display: grid; place-items: center;
   }
   .send-btn:disabled { background: #444; cursor: default; }
-  .hint { max-width: 760px; margin: 8px auto 0; text-align: center; font-size: 11px; color: var(--dim); }
+  .hint { max-width: 760px; margin: 8px auto 0; text-align: center; font-size: 11px; color: var(--dim); line-height: 1.8; }
+  .hint a { color: var(--dim); text-decoration: none; }
+  .hint a:hover { color: var(--accent); text-decoration: underline; }
 
   @media (max-width: 720px) {
     .sidebar { position: fixed; z-index: 20; height: 100%; margin-left: -260px; }
@@ -141,40 +143,43 @@
         <span class="mark">N</span>
         <div>NeoIA<small>Asistente de IA</small></div>
       </div>
-      <button class="new-chat" id="new-chat">✎ Nuevo chat</button>
+      <button class="new-chat" id="new-chat">âœŽ Nuevo chat</button>
     </div>
     <nav class="sb-nav">
       <div class="sec">ACCIONES</div>
-      <a href="#" data-prompt="Escribeme un OpMode de FTC para mover 4 motores mecanum">💻 Escribir código FTC</a>
-      <a href="#" data-prompt="Compila mi proyecto y dime si hay errores">⚙️ Compilar proyecto</a>
-      <a href="#" data-prompt="busca FTC SDK 2026">🔍 Buscar en internet</a>
-      <a href="#" data-prompt="¿Cuál es el precio de AAPL?">📈 Precio de acción</a>
-      <div class="sec">MÁS</div>
-      <a href="/index.html">🖥️ Modo avanzado (HUD)</a>
-      <a href="/landing.html">🚀 Página del producto</a>
-      <a href="/admin.html">⚙️ Panel de administrador</a>
+      <a href="#" data-prompt="Escribeme un OpMode de FTC para mover 4 motores mecanum">ðŸ’» Escribir cÃ³digo FTC</a>
+      <a href="#" data-prompt="Compila mi proyecto y dime si hay errores">âš™ï¸ Compilar proyecto</a>
+      <a href="#" data-prompt="busca FTC SDK 2026">ðŸ” Buscar en internet</a>
+      <a href="#" data-prompt="Â¿CuÃ¡l es el precio de AAPL?">ðŸ“ˆ Precio de acciÃ³n</a>
+      <div class="sec">MÃS</div>
+      <a href="/landing.html">ðŸš€ PÃ¡gina del producto</a>
+      <div class="sec">LEGAL</div>
+      <a href="/terminos.html">ðŸ“„ TÃ©rminos y condiciones</a>
+      <a href="/privacidad.html">ðŸ”’ PolÃ­tica de privacidad</a>
     </nav>
-    <div class="sb-foot"><span id="plan-badge">Plan: —</span><br>NeoIA · Hecho para equipos FTC</div>
+    <div class="sb-foot"><span id="plan-badge">Plan: â€”</span><br>NeoIA Â· Hecho para equipos FTC</div>
   </aside>
 
   <main class="main">
     <div class="topbar">
-      <button class="icon-btn" id="toggle-sb" title="Menú">☰</button>
-      <div class="model-name">NeoIA <span>· asistente</span></div>
+      <button class="icon-btn" id="toggle-sb" title="MenÃº">â˜°</button>
+      <div class="model-name">NeoIA <span>Â· asistente</span></div>
       <div class="spacer"></div>
-      <button class="icon-btn" id="clear-chat" title="Limpiar chat">🗑</button>
+      <button class="icon-btn" id="clear-chat" title="Limpiar chat">ðŸ—‘</button>
     </div>
 
     <div class="messages" id="messages">
       <div class="thread" id="thread">
         <div class="welcome" id="welcome">
-          <div class="big">¿En qué te ayudo?</div>
-          <p>Pregunta lo que quieras: código, búsquedas, tu robot FTC, o cualquier cosa.</p>
+          <div class="big">Â¿En quÃ© te ayudo?</div>
+          <p>Pregunta lo que quieras: cÃ³digo, ciencia, bÃºsquedas, tu robot FTC, o cualquier cosa.</p>
           <div class="chips">
-            <button class="chip" data-prompt="Escribeme un OpMode de FTC que mueva 4 motores">💻 Código FTC</button>
-            <button class="chip" data-prompt="Explícame cómo funciona un servo">⚙️ Cómo funciona</button>
-            <button class="chip" data-prompt="busca FIRST Tech Challenge">🔍 Buscar</button>
-            <button class="chip" data-prompt="Dame 3 ideas para mi robot de FTC">💡 Ideas</button>
+            <button class="chip" data-prompt="Escribeme un OpMode de FTC que mueva 4 motores">ðŸ’» CÃ³digo FTC</button>
+            <button class="chip" data-prompt="ExplÃ­came cÃ³mo funciona un servo de FTC">âš™ï¸ CÃ³mo funciona</button>
+            <button class="chip" data-prompt="busca FIRST Tech Challenge 2026">ðŸ” Buscar</button>
+            <button class="chip" data-prompt="Dame 3 ideas para mejorar mi robot de FTC">ðŸ’¡ Ideas</button>
+            <button class="chip" data-prompt="ExplÃ­came la fotosÃ­ntesis de forma simple">ðŸ“š ExplÃ­came algo</button>
+            <button class="chip" data-prompt="AyÃºdame a preparar un pitch de 1 minuto para mi startup">ðŸš€ Pitch</button>
           </div>
         </div>
       </div>
@@ -182,10 +187,13 @@
 
     <div class="composer-wrap">
       <div class="composer">
-        <textarea id="input" rows="1" placeholder="Pregunta lo que quieras…"></textarea>
-        <button class="send-btn" id="send" title="Enviar">➤</button>
+        <textarea id="input" rows="1" placeholder="Pregunta lo que quierasâ€¦"></textarea>
+        <button class="send-btn" id="send" title="Enviar">âž¤</button>
       </div>
-      <div class="hint">NeoIA puede cometer errores. Verifica la información importante.</div>
+      <div class="hint">
+        NeoIA puede cometer errores Â· Verifica la informaciÃ³n importante<br>
+        <a href="/terminos.html">TÃ©rminos</a> Â· <a href="/privacidad.html">Privacidad</a> Â· <a href="/landing.html">Producto</a>
+      </div>
     </div>
   </main>
 </div>
@@ -218,8 +226,8 @@
     const d = document.createElement("div");
     d.className = "msg " + role;
     d.innerHTML =
-      '<div class="avatar">' + (role === "user" ? "Tú" : "N") + "</div>" +
-      '<div class="body"><div class="who">' + (role === "user" ? "Tú" : "NeoIA") + "</div>" +
+      '<div class="avatar">' + (role === "user" ? "TÃº" : "N") + "</div>" +
+      '<div class="body"><div class="who">' + (role === "user" ? "TÃº" : "NeoIA") + "</div>" +
       '<div class="content">' + format(text) + "</div></div>";
     thread.appendChild(d);
     messages.scrollTop = messages.scrollHeight;
@@ -238,7 +246,7 @@
   // Historial para respuestas rapidas (contexto de la conversacion)
   const history = [];
   // Solo estas ordenes usan el agente completo (con herramientas)
-  const ACTION_RE = /^(compila|build|abre|abrir|ejecuta|corre|guarda|edita|crea el archivo|escribe en|haz una mision|misión)\b/i;
+  const ACTION_RE = /^(compila|build|abre|abrir|ejecuta|corre|guarda|edita|crea el archivo|escribe en|haz una mision|misiÃ³n)\b/i;
 
   async function ask(text) {
     text = (text || "").trim();
@@ -254,7 +262,7 @@
         const q = text.replace(/^(busca|buscar|search)\s+/i, "");
         const r = await fetch("/api/search", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: q }) }).then(x => x.json());
         typing.remove();
-        const res = (r.results || []).map(x => "• " + (x.title || x.snippet || "")).join("\n");
+        const res = (r.results || []).map(x => "â€¢ " + (x.title || x.snippet || "")).join("\n");
         addMessage("assistant", res || "Sin resultados.");
         return;
       }
@@ -278,7 +286,7 @@
       addMessage("assistant", reply);
     } catch (e) {
       typing.remove();
-      addMessage("assistant", "❌ Error de conexión: " + e.message);
+      addMessage("assistant", "âŒ Error de conexiÃ³n: " + e.message);
     } finally {
       send.disabled = false;
       input.focus();
@@ -308,7 +316,7 @@
     const w = document.createElement("div");
     w.className = "welcome";
     w.id = "welcome";
-    w.innerHTML = '<div class="big">¿En qué te ayudo?</div><p>Pregunta lo que quieras.</p>';
+    w.innerHTML = '<div class="big">Â¿En quÃ© te ayudo?</div><p>Pregunta lo que quieras.</p>';
     thread.appendChild(w);
     input.focus();
   });
