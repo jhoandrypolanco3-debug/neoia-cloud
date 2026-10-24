@@ -92,24 +92,90 @@ def call_deepseek(messages):
     data = json.loads(urllib.request.urlopen(req, timeout=120).read().decode("utf-8"))
     return data["choices"][0]["message"]["content"]
 
-# ---------------- Busqueda (DuckDuckGo Lite) ----------------
+# ---------------- Busqueda (multi-fuente con respaldo) ----------------
+STOP = {"cuando","cuándo","es","el","la","los","las","un","una","de","del","que","qué","como","cómo",
+        "cuanto","cuánto","donde","dónde","quien","quién","por","para","en","y","o","a","al","se",
+        "su","sus","mi","me","te","lo","le","les","nos","hoy","ahora","proximo","próximo","proxima",
+        "próxima","sera","será","cual","cuál","hay","vas","va","tiene","tienen","puedo","puede"}
+
+def search_query(text):
+    """Convierte una pregunta en una consulta corta de busqueda."""
+    words = re.findall(r"[\wáéíóúñü]+", (text or "").lower())
+    keep = [w for w in words if w not in STOP and len(w) > 2]
+    return " ".join(keep[:12]) or (text or "")[:80]
+
+def _clean_html(s):
+    return re.sub(r"<[^>]+>", "", s or "").strip()
+
+def _search_ddg_post(q, n=6):
+    data = urllib.parse.urlencode({"q": q, "b": "", "kl": "es-es"}).encode()
+    req = urllib.request.Request("https://html.duckduckgo.com/html/", data=data, headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept-Language": "es-ES,es;q=0.9"})
+    html = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", "replace")
+    links = re.findall(r'class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', html, re.S)
+    snips = re.findall(r'class="result__snippet"[^>]*>(.*?)</a>', html, re.S)
+    out = []
+    for i, (href, t) in enumerate(links[:n]):
+        tt = _clean_html(t)
+        if tt:
+            out.append({"title": tt, "url": href, "snippet": _clean_html(snips[i]) if i < len(snips) else ""})
+    return out
+
+def _search_ddg_lite(q, n=6):
+    url = "https://lite.duckduckgo.com/lite/?q=" + urllib.parse.quote(q)
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+    html = urllib.request.urlopen(req, timeout=20).read().decode("utf-8", "replace")
+    links = re.findall(r"<a[^>]+class=['\"]result-link['\"][^>]*>(.*?)</a>", html, re.S)
+    hrefs = re.findall(r"<a[^>]+href=['\"]([^'\"]+)['\"][^>]*class=['\"]result-link['\"]", html)
+    snips = re.findall(r"<td[^>]+class=['\"]result-snippet['\"][^>]*>(.*?)</td>", html, re.S)
+    out = []
+    for i, t in enumerate(links[:n]):
+        tt = _clean_html(t)
+        if tt:
+            out.append({"title": tt, "url": hrefs[i] if i < len(hrefs) else "",
+                        "snippet": _clean_html(snips[i]) if i < len(snips) else ""})
+    return out
+
+def _search_bing(q, n=6):
+    url = "https://www.bing.com/search?q=" + urllib.parse.quote(q) + "&setlang=es"
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+        "Accept-Language": "es-ES,es;q=0.9,en;q=0.8"})
+    html = urllib.request.urlopen(req, timeout=20).read().decode("utf-8", "replace")
+    out = []
+    for b in re.findall(r'<li class="b_algo".*?</li>', html, re.S)[:n]:
+        m = re.search(r'<h2[^>]*>(.*?)</h2>', b, re.S)
+        h = re.search(r'<a[^>]+href="([^"]+)"', b)
+        p = re.search(r'<p[^>]*>(.*?)</p>', b, re.S)
+        if m:
+            out.append({"title": _clean_html(m.group(1)), "url": h.group(1) if h else "",
+                        "snippet": _clean_html(p.group(1)) if p else ""})
+    return out
+
+def _search_wiki(q, n=3):
+    url = ("https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch="
+           + urllib.parse.quote(q) + "&format=json&srlimit=" + str(n))
+    req = urllib.request.Request(url, headers={"User-Agent": "NeoIA/1.0"})
+    d = json.loads(urllib.request.urlopen(req, timeout=20).read().decode("utf-8"))
+    out = []
+    for x in (d.get("query", {}).get("search") or [])[:n]:
+        out.append({"title": x.get("title", ""),
+                    "url": "https://es.wikipedia.org/wiki/" + urllib.parse.quote((x.get("title") or "").replace(" ", "_")),
+                    "snippet": _clean_html(x.get("snippet", ""))})
+    return out
+
 def web_search(q, n=6):
-    try:
-        url = "https://lite.duckduckgo.com/lite/?q=" + urllib.parse.quote(q)
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
-        html = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", "replace")
-        links = re.findall(r"<a[^>]+class=['\"]result-link['\"][^>]*>(.*?)</a>", html, re.S)
-        hrefs = re.findall(r"<a[^>]+href=['\"]([^'\"]+)['\"][^>]*class=['\"]result-link['\"]", html)
-        snips = re.findall(r"<td[^>]+class=['\"]result-snippet['\"][^>]*>(.*?)</td>", html, re.S)
-        out = []
-        for i, t in enumerate(links[:n]):
-            titulo = re.sub(r"<[^>]+>", "", t).strip()
-            frag = re.sub(r"<[^>]+>", "", snips[i]).strip() if i < len(snips) else ""
-            if titulo:
-                out.append({"title": titulo, "url": hrefs[i] if i < len(hrefs) else "", "snippet": frag})
-        return out
-    except Exception:
-        return []
+    """Prueba DuckDuckGo POST -> DDG Lite -> Bing -> Wikipedia."""
+    for fn in (_search_ddg_post, _search_ddg_lite, _search_bing, _search_wiki):
+        try:
+            res = fn(q)
+            if res:
+                return res[:n]
+        except Exception:
+            continue
+    return []
 
 # ---------------- Deteccion de preguntas que necesitan internet ----------------
 NEEDS_WEB = re.compile(
@@ -126,7 +192,7 @@ def chat_answer(msgs):
     sysp = SYSTEM
     if last and NEEDS_WEB.search(last):
         try:
-            res = web_search(last, 6)
+            res = web_search(search_query(last), 6)
             if res:
                 ctx = "\n".join("- %s | %s | %s" % (r["title"], r["snippet"], r["url"]) for r in res)
                 sysp = (SYSTEM + "\n\n=== DATOS ACTUALES DE INTERNET (consulta: " + last[:80] + ") ===\n"
