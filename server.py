@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # =============================================================
-# NeoIA — servidor para la NUBE (Render / Railway / Fly.io)
+# NeoIA â€” servidor para la NUBE (Render / Railway / Fly.io)
 # Version SEGURA: SOLO chat, imagenes, busqueda y planes.
 # NO tiene acceso a archivos, comandos ni a la PC del usuario.
 # Solo biblioteca estandar de Python (no requiere pip install).
@@ -9,6 +9,7 @@ import json, os, re, sqlite3, urllib.request, urllib.parse, base64, time
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 
+VERSION = "1.1-imagenes-legal"
 PORT = int(os.environ.get("PORT", 8080))
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "").strip()
 DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
