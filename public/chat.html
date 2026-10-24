@@ -102,6 +102,8 @@
     background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 9px; padding: 12px;
     overflow-x: auto; margin: 9px 0; font-size: 13px;
   }
+  .gen-img { max-width: 100%; border-radius: 12px; border: 1px solid #3a3a3a; display: block; }
+  .img-caption { font-size: 12px; color: var(--dim); margin-top: 7px; }
   .typing { color: var(--dim); font-size: 14px; }
   .typing::after { content: "â€¦"; animation: dots 1.2s infinite; }
   @keyframes dots { 0%,20%{content:"."} 40%{content:".."} 60%,100%{content:"â€¦"} }
@@ -150,6 +152,7 @@
       <a href="#" data-prompt="Escribeme un OpMode de FTC para mover 4 motores mecanum">ðŸ’» Escribir cÃ³digo FTC</a>
       <a href="#" data-prompt="Compila mi proyecto y dime si hay errores">âš™ï¸ Compilar proyecto</a>
       <a href="#" data-prompt="busca FTC SDK 2026">ðŸ” Buscar en internet</a>
+      <a href="#" data-prompt="crea una imagen de un robot FTC futurista">ðŸŽ¨ Crear imagen</a>
       <a href="#" data-prompt="Â¿CuÃ¡l es el precio de AAPL?">ðŸ“ˆ Precio de acciÃ³n</a>
       <div class="sec">MÃS</div>
       <a href="/landing.html">ðŸš€ PÃ¡gina del producto</a>
@@ -177,6 +180,7 @@
             <button class="chip" data-prompt="Escribeme un OpMode de FTC que mueva 4 motores">ðŸ’» CÃ³digo FTC</button>
             <button class="chip" data-prompt="ExplÃ­came cÃ³mo funciona un servo de FTC">âš™ï¸ CÃ³mo funciona</button>
             <button class="chip" data-prompt="busca FIRST Tech Challenge 2026">ðŸ” Buscar</button>
+            <button class="chip" data-prompt="crea una imagen de una abeja robotica futurista">ðŸŽ¨ Crear imagen</button>
             <button class="chip" data-prompt="Dame 3 ideas para mejorar mi robot de FTC">ðŸ’¡ Ideas</button>
             <button class="chip" data-prompt="ExplÃ­came la fotosÃ­ntesis de forma simple">ðŸ“š ExplÃ­came algo</button>
             <button class="chip" data-prompt="AyÃºdame a preparar un pitch de 1 minuto para mi startup">ðŸš€ Pitch</button>
@@ -234,6 +238,19 @@
     return d;
   }
 
+  function addImageMessage(dataUrl, prompt) {
+    if (welcome) welcome.style.display = "none";
+    const d = document.createElement("div");
+    d.className = "msg assistant";
+    d.innerHTML =
+      '<div class="avatar">N</div><div class="body"><div class="who">NeoIA Â· imagen</div>' +
+      '<div class="content"><img class="gen-img" src="' + dataUrl + '" alt="' + esc(prompt) + '"></div>' +
+      '<div class="img-caption">ðŸŽ¨ ' + esc(prompt) + "</div></div>";
+    thread.appendChild(d);
+    messages.scrollTop = messages.scrollHeight;
+    return d;
+  }
+
   function addTyping() {
     const d = document.createElement("div");
     d.className = "msg assistant";
@@ -257,6 +274,28 @@
     send.disabled = true;
     const typing = addTyping();
     try {
+      // 0) IMAGENES: "crea una imagen de X", "dibuja X", "imagen de X"
+      const imgMatch = text.match(/^(?:crea|creame|genera|generame|haz|hazme|dibuja|dibujame|pinta|pintame)\s+(?:una?\s+)?(?:imagen|foto|dibujo|ilustracion|picture)\s+(?:de\s+|con\s+)?(.+)$/i)
+        || text.match(/^imagen\s+(?:de\s+|con\s+)?(.+)$/i);
+      if (imgMatch) {
+        const prompt = imgMatch[1].trim();
+        typing.remove();
+        const gen = addMessage("assistant", "ðŸŽ¨ Generando imagen: " + prompt + " ...");
+        try {
+          const r = await fetch("/api/image", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: prompt }),
+          }).then(x => x.json());
+          gen.remove();
+          if (r.error) addMessage("assistant", "âŒ " + r.error);
+          else if (r.image) addImageMessage(r.image, prompt);
+          else addMessage("assistant", "âŒ No se pudo generar la imagen.");
+        } catch (e) {
+          gen.remove();
+          addMessage("assistant", "âŒ Error: " + e.message);
+        }
+        return;
+      }
       // 1) Busqueda web
       if (/^busca |^buscar |^search /i.test(text)) {
         const q = text.replace(/^(busca|buscar|search)\s+/i, "");
