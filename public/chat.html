@@ -131,6 +131,63 @@
   .hint a { color: var(--dim); text-decoration: none; }
   .hint a:hover { color: var(--accent); text-decoration: underline; }
 
+  /* ---------- Conversaciones ---------- */
+  .conv-list { padding: 2px 0; }
+  .conv-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px;
+    font-size: 13px; color: var(--text); cursor: pointer;
+  }
+  .conv-item:hover { background: #212121; }
+  .conv-item.active { background: #2f2f2f; }
+  .conv-item .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .conv-item .del { opacity: 0; font-size: 12px; color: var(--dim); background: none; border: none; cursor: pointer; }
+  .conv-item:hover .del { opacity: 1; }
+  .conv-empty { font-size: 12px; color: var(--dim); padding: 6px 10px; }
+
+  /* ---------- Usuario ---------- */
+  #user-box { margin-bottom: 8px; }
+  .auth-btn {
+    width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line);
+    background: transparent; color: var(--text); font-family: inherit; font-size: 13px; cursor: pointer;
+  }
+  .auth-btn:hover { background: #212121; }
+  .user-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .user-av {
+    width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(135deg, #10a37f, #37e6ff); color: #05221b; font-weight: 800; font-size: 12px;
+  }
+  .user-row .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-row .out { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 14px; }
+
+  /* ---------- Modal ---------- */
+  .modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-box {
+    width: 100%; max-width: 380px; background: #1a1a1a; border: 1px solid var(--line);
+    border-radius: 16px; padding: 24px;
+  }
+  .modal-box h3 { font-size: 20px; margin-bottom: 4px; }
+  .modal-sub { font-size: 13px; color: var(--dim); margin-bottom: 18px; }
+  .modal-box input {
+    width: 100%; padding: 11px 13px; margin-bottom: 10px; border-radius: 10px;
+    border: 1px solid var(--line); background: #212121; color: var(--text);
+    font-family: inherit; font-size: 14px;
+  }
+  .modal-box input:focus { outline: none; border-color: var(--accent); }
+  .modal-box #auth-submit {
+    width: 100%; padding: 11px; border-radius: 10px; border: none; background: var(--accent);
+    color: #04121a; font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit; margin-top: 4px;
+  }
+  .modal-box .link {
+    width: 100%; background: none; border: none; color: var(--dim); font-family: inherit;
+    font-size: 12.5px; cursor: pointer; margin-top: 10px; text-decoration: underline;
+  }
+  .modal-box .link:hover { color: var(--accent); }
+  .modal-box .err { color: #ff5c5c; font-size: 12.5px; margin-top: 10px; min-height: 16px; text-align: center; }
+  .hidden { display: none !important; }
+
   @media (max-width: 720px) {
     .sidebar { position: fixed; z-index: 20; height: 100%; margin-left: -260px; }
     .sidebar.open { margin-left: 0; }
@@ -148,6 +205,8 @@
       <button class="new-chat" id="new-chat">✎ Nuevo chat</button>
     </div>
     <nav class="sb-nav">
+      <div class="sec">CONVERSACIONES</div>
+      <div id="conv-list" class="conv-list"></div>
       <div class="sec">ACCIONES</div>
       <a href="#" data-prompt="Escribeme un OpMode de FTC para mover 4 motores mecanum">💻 Escribir código FTC</a>
       <a href="#" data-prompt="Compila mi proyecto y dime si hay errores">⚙️ Compilar proyecto</a>
@@ -160,7 +219,10 @@
       <a href="/terminos.html">📄 Términos y condiciones</a>
       <a href="/privacidad.html">🔒 Política de privacidad</a>
     </nav>
-    <div class="sb-foot"><span id="plan-badge">Plan: —</span><br>NeoIA · Hecho para equipos FTC</div>
+    <div class="sb-foot">
+      <div id="user-box"></div>
+      <span id="plan-badge">Plan: —</span><br><span style="font-size:10px">NeoIA · FTC</span>
+    </div>
   </aside>
 
   <main class="main">
@@ -202,6 +264,21 @@
   </main>
 </div>
 
+<!-- Modal de cuenta -->
+<div class="modal hidden" id="auth-modal">
+  <div class="modal-box">
+    <h3 id="auth-title">Entrar</h3>
+    <p class="modal-sub" id="auth-sub">Inicia sesión para guardar tus conversaciones</p>
+    <input id="auth-email" type="email" placeholder="Email" autocomplete="email">
+    <input id="auth-pass" type="password" placeholder="Contraseña (mínimo 6)" autocomplete="current-password">
+    <input id="auth-name" type="text" placeholder="Tu nombre" class="hidden">
+    <button id="auth-submit">Entrar</button>
+    <button id="auth-switch" class="link">¿No tienes cuenta? Crear una</button>
+    <button id="auth-close" class="link close">Cerrar</button>
+    <div class="err" id="auth-err"></div>
+  </div>
+</div>
+
 <script>
 (function () {
   "use strict";
@@ -223,6 +300,149 @@
       }
     });
     return out;
+  }
+
+  // ---------- Cuenta y conversaciones ----------
+  let TOKEN = localStorage.getItem("neoia_token") || "";
+  let UNAME = "";
+  let CONV_ID = 0;
+  let authMode = "login";
+
+  function authHeaders() {
+    const h = { "Content-Type": "application/json" };
+    if (TOKEN) h["X-Auth-Token"] = TOKEN;
+    return h;
+  }
+
+  function toast(msg) {
+    let t = document.getElementById("toast");
+    if (!t) {
+      t = document.createElement("div");
+      t.id = "toast";
+      t.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#10a37f;color:#04121a;padding:10px 20px;border-radius:99px;font-weight:700;font-size:13px;z-index:99;opacity:0;transition:.3s;pointer-events:none";
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = "1";
+    clearTimeout(t._t);
+    t._t = setTimeout(() => { t.style.opacity = "0"; }, 2200);
+  }
+
+  function renderUser() {
+    const box = $("user-box");
+    if (!box) return;
+    if (TOKEN && UNAME) {
+      box.innerHTML = '<div class="user-row"><span class="user-av">' + esc((UNAME[0] || "N").toUpperCase()) +
+        '</span><span class="nm">' + esc(UNAME) + '</span><button class="out" id="btn-out" title="Cerrar sesión">⎋</button></div>';
+      $("btn-out").addEventListener("click", logout);
+    } else {
+      box.innerHTML = '<button class="auth-btn" id="btn-open-auth">👤 Entrar / Crear cuenta</button>';
+      $("btn-open-auth").addEventListener("click", () => openAuth("login"));
+    }
+  }
+
+  function openAuth(mode) {
+    authMode = mode;
+    $("auth-title").textContent = mode === "login" ? "Entrar" : "Crear cuenta";
+    $("auth-sub").textContent = mode === "login" ? "Inicia sesión para guardar tus conversaciones" : "Crea tu cuenta gratis en 10 segundos";
+    $("auth-name").classList.toggle("hidden", mode !== "register");
+    $("auth-submit").textContent = mode === "login" ? "Entrar" : "Crear cuenta";
+    $("auth-switch").textContent = mode === "login" ? "¿No tienes cuenta? Crear una" : "¿Ya tienes cuenta? Entrar";
+    $("auth-err").textContent = "";
+    $("auth-modal").classList.remove("hidden");
+    setTimeout(() => $("auth-email").focus(), 50);
+  }
+
+  function closeAuth() { $("auth-modal").classList.add("hidden"); }
+
+  async function submitAuth() {
+    const email = $("auth-email").value.trim();
+    const pass = $("auth-pass").value;
+    const name = $("auth-name").value.trim();
+    $("auth-err").textContent = "";
+    if (!email || !pass) { $("auth-err").textContent = "Completa email y contraseña"; return; }
+    const ep = authMode === "login" ? "/api/auth/login" : "/api/auth/register";
+    try {
+      const r = await fetch(ep, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, password: pass, name: name }),
+      }).then(x => x.json());
+      if (r.error) { $("auth-err").textContent = "❌ " + r.error; return; }
+      TOKEN = r.token; UNAME = r.user.name;
+      localStorage.setItem("neoia_token", TOKEN);
+      closeAuth(); renderUser(); loadConversations();
+      toast("✅ Hola, " + UNAME);
+    } catch (e) { $("auth-err").textContent = "❌ Error de conexión"; }
+  }
+
+  async function logout() {
+    try { await fetch("/api/auth/logout", { method: "POST", headers: authHeaders() }); } catch (e) {}
+    TOKEN = ""; UNAME = ""; CONV_ID = 0;
+    localStorage.removeItem("neoia_token");
+    renderUser(); renderConvs([]); newChat();
+    toast("Sesión cerrada");
+  }
+
+  function renderConvs(list) {
+    const el = $("conv-list");
+    if (!el) return;
+    if (!TOKEN) { el.innerHTML = '<div class="conv-empty">Inicia sesión para guardar</div>'; return; }
+    if (!list || !list.length) { el.innerHTML = '<div class="conv-empty">Sin conversaciones</div>'; return; }
+    el.innerHTML = "";
+    list.forEach((c) => {
+      const d = document.createElement("div");
+      d.className = "conv-item" + (c.id === CONV_ID ? " active" : "");
+      d.innerHTML = '<span class="t">' + esc(c.title || "Sin título") + '</span><button class="del" title="Borrar">🗑</button>';
+      d.addEventListener("click", (e) => { if (!e.target.classList.contains("del")) loadConversation(c.id); });
+      d.querySelector(".del").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          await fetch("/api/conversation/delete", { method: "POST", headers: authHeaders(), body: JSON.stringify({ id: c.id }) });
+          if (CONV_ID === c.id) newChat();
+          loadConversations();
+        } catch (err) {}
+      });
+      el.appendChild(d);
+    });
+  }
+
+  async function loadConversations() {
+    if (!TOKEN) { renderConvs([]); return; }
+    try {
+      const r = await fetch("/api/conversations", { headers: authHeaders() }).then(x => x.json());
+      renderConvs(r.conversations || []);
+    } catch (e) { renderConvs([]); }
+  }
+
+  async function loadConversation(id) {
+    try {
+      const r = await fetch("/api/conversation?id=" + id, { headers: authHeaders() }).then(x => x.json());
+      if (r.error) return;
+      CONV_ID = r.id;
+      thread.innerHTML = "";
+      (r.messages || []).forEach((m) => addMessage(m.role === "user" ? "user" : "assistant", m.content));
+      loadConversations();
+    } catch (e) {}
+  }
+
+  function newChat() {
+    CONV_ID = 0;
+    thread.innerHTML = "";
+    const w = document.createElement("div");
+    w.className = "welcome"; w.id = "welcome";
+    w.innerHTML = '<div class="big">¿En qué te ayudo?</div><p>Pregunta lo que quieras.</p>';
+    thread.appendChild(w);
+    input.focus();
+  }
+
+  async function initAuth() {
+    if (!TOKEN) { renderUser(); renderConvs([]); return; }
+    try {
+      const r = await fetch("/api/me", { headers: authHeaders() }).then(x => x.json());
+      if (r.error) { TOKEN = ""; localStorage.removeItem("neoia_token"); renderUser(); renderConvs([]); return; }
+      UNAME = r.user.name;
+      renderUser(); loadConversations();
+    } catch (e) { renderUser(); }
   }
 
   function addMessage(role, text) {
@@ -315,13 +535,14 @@
       // 3) RAPIDO: una sola llamada a DeepSeek (sin bucle de acciones)
       history.push({ role: "user", content: text });
       const r = await fetch("/api/chat", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history.slice(-14) }),
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({ messages: history.slice(-14), conversation_id: CONV_ID }),
       }).then(x => x.json());
       typing.remove();
       const reply = r.reply || r.error || "No pude responder.";
       history.push({ role: "assistant", content: reply });
       if (history.length > 30) history.splice(0, history.length - 30);
+      if (r.conversation_id) { CONV_ID = r.conversation_id; loadConversations(); }
       addMessage("assistant", reply);
     } catch (e) {
       typing.remove();
@@ -373,6 +594,14 @@
     if (b) b.textContent = "Plan: " + (names[p.plan] || p.plan);
   }).catch(() => {});
 
+  // ---------- Eventos de la cuenta ----------
+  if ($("auth-submit")) $("auth-submit").addEventListener("click", submitAuth);
+  if ($("auth-switch")) $("auth-switch").addEventListener("click", () => openAuth(authMode === "login" ? "register" : "login"));
+  if ($("auth-close")) $("auth-close").addEventListener("click", closeAuth);
+  if ($("auth-pass")) $("auth-pass").addEventListener("keydown", (e) => { if (e.key === "Enter") submitAuth(); });
+  if ($("auth-modal")) $("auth-modal").addEventListener("click", (e) => { if (e.target.id === "auth-modal") closeAuth(); });
+
+  initAuth();
   input.focus();
 })();
 </script>

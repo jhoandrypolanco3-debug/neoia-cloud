@@ -5,7 +5,7 @@
 # NO tiene acceso a archivos, comandos ni a la PC del usuario.
 # Solo biblioteca estandar de Python (no requiere pip install).
 # =============================================================
-import json, os, re, sqlite3, urllib.request, urllib.parse, base64, time, secrets
+import json, os, re, sqlite3, urllib.request, urllib.parse, base64, time, secrets, hashlib, hmac
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 
@@ -32,7 +32,43 @@ PLAN_PRICES = {"free": 0, "pro": 9, "team": 29}
 def db():
     c = sqlite3.connect(DB_PATH)
     c.execute("CREATE TABLE IF NOT EXISTS memory (key TEXT PRIMARY KEY, value TEXT)")
+    c.execute("""CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE,
+        pass_hash TEXT, name TEXT, created_at TEXT)""")
+    c.execute("""CREATE TABLE IF NOT EXISTS sessions (
+        token TEXT PRIMARY KEY, user_id INTEGER, created_at TEXT)""")
+    c.execute("""CREATE TABLE IF NOT EXISTS conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, title TEXT,
+        created_at TEXT, updated_at TEXT)""")
+    c.execute("""CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, conv_id INTEGER, role TEXT,
+        content TEXT, created_at TEXT)""")
     c.commit(); return c
+
+# ---------------- Cuentas de usuario ----------------
+def now_iso():
+    return datetime.utcnow().isoformat(timespec="seconds")
+
+def hash_password(pwd):
+    salt = secrets.token_hex(8)
+    h = hashlib.pbkdf2_hmac("sha256", pwd.encode("utf-8"), salt.encode("utf-8"), 120000).hex()
+    return salt + "$" + h
+
+def check_password(pwd, stored):
+    try:
+        salt, h = (stored or "").split("$", 1)
+        calc = hashlib.pbkdf2_hmac("sha256", pwd.encode("utf-8"), salt.encode("utf-8"), 120000).hex()
+        return hmac.compare_digest(calc, h)
+    except Exception:
+        return False
+
+def auth_user(handler):
+    tok = (handler.headers.get("X-Auth-Token") or "").strip()
+    if not tok: return None
+    c = db()
+    r = c.execute("SELECT u.id,u.email,u.name FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=?", (tok,)).fetchone()
+    c.close()
+    return r
 
 def mem_get(k, d=None):
     c = db(); r = c.execute("SELECT value FROM memory WHERE key=?", (k,)).fetchone(); c.close()
@@ -166,6 +202,31 @@ class H(BaseHTTPRequestHandler):
                 "provider": bool(DEEPSEEK_API_KEY),
                 "model": DEEPSEEK_MODEL,
             })
+        elif r == "/api/me":
+            u2 = auth_user(self)
+            if not u2: return self._json(401, {"error": "Inicia sesion"})
+            self._json(200, {"user": {"id": u2[0], "email": u2[1], "name": u2[2]}})
+        elif r == "/api/conversations":
+            u2 = auth_user(self)
+            if not u2: return self._json(401, {"error": "Inicia sesion"})
+            c = db()
+            rows = c.execute("SELECT id,title,updated_at FROM conversations WHERE user_id=? ORDER BY id DESC LIMIT 50", (u2[0],)).fetchall()
+            c.close()
+            self._json(200, {"conversations": [{"id": x[0], "title": x[1], "updated": x[2]} for x in rows]})
+        elif r == "/api/conversation":
+            u2 = auth_user(self)
+            if not u2: return self._json(401, {"error": "Inicia sesion"})
+            q = urllib.parse.parse_qs(u.query)
+            try: cid = int((q.get("id") or ["0"])[0] or 0)
+            except Exception: cid = 0
+            c = db()
+            row = c.execute("SELECT id,title FROM conversations WHERE id=? AND user_id=?", (cid, u2[0])).fetchone()
+            if not row:
+                c.close(); return self._json(404, {"error": "Conversacion no encontrada"})
+            msgs2 = c.execute("SELECT role,content FROM messages WHERE conv_id=? ORDER BY id", (cid,)).fetchall()
+            c.close()
+            self._json(200, {"id": row[0], "title": row[1],
+                             "messages": [{"role": m[0], "content": m[1]} for m in msgs2]})
         else:
             self._static(r)
 
@@ -180,9 +241,75 @@ class H(BaseHTTPRequestHandler):
             try:
                 rep = chat_answer(msgs)
                 stats_inc("chat")
-                self._json(200, {"reply": rep})
+                # Guardar la conversacion si el usuario inicio sesion
+                cid = 0
+                u2 = auth_user(self)
+                if u2:
+                    user_text = (msgs[-1].get("content") or "") if msgs else ""
+                    c = db()
+                    try: cid = int(body.get("conversation_id") or 0)
+                    except Exception: cid = 0
+                    if cid:
+                        owner = c.execute("SELECT id FROM conversations WHERE id=? AND user_id=?", (cid, u2[0])).fetchone()
+                        if not owner: cid = 0
+                    if not cid:
+                        title = user_text.strip().replace("\n", " ")[:60] or "Nueva conversacion"
+                        cur = c.execute("INSERT INTO conversations(user_id,title,created_at,updated_at) VALUES(?,?,?,?)",
+                                        (u2[0], title, now_iso(), now_iso()))
+                        cid = cur.lastrowid
+                    c.execute("INSERT INTO messages(conv_id,role,content,created_at) VALUES(?,?,?,?)", (cid, "user", user_text, now_iso()))
+                    c.execute("INSERT INTO messages(conv_id,role,content,created_at) VALUES(?,?,?,?)", (cid, "assistant", rep, now_iso()))
+                    c.execute("UPDATE conversations SET updated_at=? WHERE id=?", (now_iso(), cid))
+                    c.commit(); c.close()
+                self._json(200, {"reply": rep, "conversation_id": cid})
             except Exception as e:
                 self._json(502, {"reply": "Error de IA: " + str(e)})
+        elif r == "/api/auth/register":
+            email = (body.get("email") or "").strip().lower()
+            pwd = (body.get("password") or "").strip()
+            name = (body.get("name") or "").strip() or email.split("@")[0]
+            if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
+                return self._json(400, {"error": "Email invalido"})
+            if len(pwd) < 6:
+                return self._json(400, {"error": "La contrasena debe tener al menos 6 caracteres"})
+            c = db()
+            try:
+                c.execute("INSERT INTO users(email,pass_hash,name,created_at) VALUES(?,?,?,?)",
+                          (email, hash_password(pwd), name, now_iso()))
+                c.commit()
+            except sqlite3.IntegrityError:
+                c.close(); return self._json(400, {"error": "Ese email ya esta registrado"})
+            uid = c.execute("SELECT id FROM users WHERE email=?", (email,)).fetchone()[0]
+            tok = secrets.token_hex(24)
+            c.execute("INSERT INTO sessions(token,user_id,created_at) VALUES(?,?,?)", (tok, uid, now_iso()))
+            c.commit(); c.close()
+            stats_inc("register")
+            self._json(200, {"token": tok, "user": {"id": uid, "email": email, "name": name}})
+        elif r == "/api/auth/login":
+            email = (body.get("email") or "").strip().lower()
+            pwd = (body.get("password") or "").strip()
+            c = db()
+            row = c.execute("SELECT id,pass_hash,name FROM users WHERE email=?", (email,)).fetchone()
+            if not row or not check_password(pwd, row[1]):
+                c.close(); return self._json(401, {"error": "Email o contrasena incorrectos"})
+            tok = secrets.token_hex(24)
+            c.execute("INSERT INTO sessions(token,user_id,created_at) VALUES(?,?,?)", (tok, row[0], now_iso()))
+            c.commit(); c.close()
+            self._json(200, {"token": tok, "user": {"id": row[0], "email": email, "name": row[2]}})
+        elif r == "/api/auth/logout":
+            tok = (self.headers.get("X-Auth-Token") or "").strip()
+            c = db(); c.execute("DELETE FROM sessions WHERE token=?", (tok,)); c.commit(); c.close()
+            self._json(200, {"ok": True})
+        elif r == "/api/conversation/delete":
+            u2 = auth_user(self)
+            if not u2: return self._json(401, {"error": "Inicia sesion"})
+            try: cid = int(body.get("id") or 0)
+            except Exception: cid = 0
+            c = db()
+            c.execute("DELETE FROM messages WHERE conv_id=?", (cid,))
+            c.execute("DELETE FROM conversations WHERE id=? AND user_id=?", (cid, u2[0]))
+            c.commit(); c.close()
+            self._json(200, {"ok": True})
         elif r == "/api/search":
             res = web_search(body.get("query", "")); stats_inc("search")
             self._json(200, {"results": res})
