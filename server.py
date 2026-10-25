@@ -183,9 +183,30 @@ def _search_wiki(q, n=3):
                     "snippet": _clean_html(x.get("snippet", ""))})
     return out
 
+def _relevant(results, query):
+    """True si al menos algunos resultados contienen palabras de la consulta."""
+    words = [w for w in re.findall(r"\w+", (query or "").lower()) if len(w) > 3]
+    if not words or not results:
+        return bool(results)
+    hits = 0
+    for r in results:
+        blob = ((r.get("title") or "") + " " + (r.get("snippet") or "")).lower()
+        if any(w in blob for w in words):
+            hits += 1
+    return hits >= max(1, len(results) // 3)
+
 def web_search(q, n=6):
-    """Prueba DuckDuckGo POST -> DDG Lite -> Bing -> Wikipedia."""
+    """Prueba fuentes; descarta las que devuelvan resultados irrelevantes."""
+    # 1) Primera pasada: solo fuentes con resultados relevantes
     for fn in (_search_ddg_post, _search_ddg_lite, _search_bing, _search_wiki):
+        try:
+            res = fn(q)
+            if res and _relevant(res, q):
+                return res[:n]
+        except Exception:
+            continue
+    # 2) Si ninguna fue relevante, usar la primera que devuelva algo
+    for fn in (_search_bing, _search_ddg_post, _search_wiki):
         try:
             res = fn(q)
             if res:
