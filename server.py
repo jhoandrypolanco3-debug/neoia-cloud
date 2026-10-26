@@ -294,23 +294,28 @@ def chat_answer(msgs):
     return call_deepseek([{"role": "system", "content": sysp}] + msgs)
 
 # ---------------- Imagenes ----------------
-def make_image(prompt, w=768, h=768):
+def make_image(prompt, w=512, h=512):
+    """Pollinations con 'referrer' (obligatorio ahora) + variantes y reintentos rapidos."""
+    base = "https://image.pollinations.ai/prompt/" + urllib.parse.quote(prompt)
     last = ""
-    for attempt in range(4):
+    # turbo suele ser mas rapido; el resto son reintentos con seed distinta
+    variantes = [True, False, True, False]
+    for i, turbo in enumerate(variantes):
         try:
-            seed = int(time.time() * 1000) % 1000000 + attempt * 7
-            url = ("https://image.pollinations.ai/prompt/" + urllib.parse.quote(prompt) +
-                   "?width=%d&height=%d&nologo=true&seed=%d" % (w, h, seed))
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 NeoIA"})
-            data = urllib.request.urlopen(req, timeout=150).read()
+            seed = int(time.time() * 1000) % 1000000 + i * 7
+            extra = "&model=turbo" if turbo else ""
+            url = ("%s?width=%d&height=%d&nologo=true&seed=%d&referrer=neoia%s"
+                   % (base, w, h, seed, extra))
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0) NeoIA"})
+            data = urllib.request.urlopen(req, timeout=40).read()
             if len(data) >= 1000:
                 mime = "image/png" if data[:4] == b"\x89PNG" else "image/jpeg"
                 return "data:%s;base64,%s" % (mime, base64.b64encode(data).decode())
             last = "respuesta vacia"
         except Exception as e:
             last = str(e)
-        time.sleep(4 + attempt * 4)
-    raise RuntimeError("Servicio de imagenes saturado: " + last)
+        time.sleep(1)
+    raise RuntimeError("El generador de imagenes no responde ahora. Intenta de nuevo en un minuto.")
 
 # ---------------- HTTP ----------------
 class H(BaseHTTPRequestHandler):
