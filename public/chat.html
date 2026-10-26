@@ -106,6 +106,11 @@
   .img-caption { font-size: 12px; color: var(--dim); margin-top: 7px; }
   .typing { color: var(--dim); font-size: 14px; }
   .typing::after { content: "…"; animation: dots 1.2s infinite; }
+  .retry-btn {
+    margin-top: 10px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line);
+    background: transparent; color: var(--text); font-family: inherit; font-size: 13px; cursor: pointer;
+  }
+  .retry-btn:hover { border-color: var(--accent); color: var(--accent); }
   @keyframes dots { 0%,20%{content:"."} 40%{content:".."} 60%,100%{content:"…"} }
 
   /* ---------- Composer ---------- */
@@ -477,9 +482,17 @@
   function addTyping() {
     const d = document.createElement("div");
     d.className = "msg assistant";
-    d.innerHTML = '<div class="avatar">N</div><div class="body"><div class="who">NeoIA</div><div class="typing"></div></div>';
+    d.innerHTML = '<div class="avatar">N</div><div class="body"><div class="who">NeoIA</div><div class="typing">pensando</div></div>';
     thread.appendChild(d);
     messages.scrollTop = messages.scrollHeight;
+    // Mostrar el tiempo transcurrido para que el usuario sepa que sigue trabajando
+    const t0 = Date.now();
+    const el = d.querySelector(".typing");
+    const iv = setInterval(() => {
+      if (!d.isConnected) { clearInterval(iv); return; }
+      const s = Math.round((Date.now() - t0) / 1000);
+      el.textContent = "pensando (" + s + "s)";
+    }, 1000);
     return d;
   }
 
@@ -549,7 +562,12 @@
       addMessage("assistant", reply);
     } catch (e) {
       typing.remove();
-      addMessage("assistant", "❌ Error de conexión: " + e.message);
+      const msg = addMessage("assistant", "⚠️ No pude conectar con el servidor. Revisa tu conexión a internet.");
+      const btn = document.createElement("button");
+      btn.textContent = "🔄 Reintentar";
+      btn.className = "retry-btn";
+      btn.addEventListener("click", () => { msg.remove(); ask(text); });
+      msg.querySelector(".body").appendChild(btn);
     } finally {
       send.disabled = false;
       input.focus();

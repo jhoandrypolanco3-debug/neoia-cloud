@@ -5,15 +5,20 @@
 # NO tiene acceso a archivos, comandos ni a la PC del usuario.
 # Solo biblioteca estandar de Python (no requiere pip install).
 # =============================================================
-import json, os, re, sqlite3, urllib.request, urllib.parse, base64, time, secrets, hashlib, hmac
+import json, os, re, sys, sqlite3, urllib.request, urllib.parse, base64, time, secrets, hashlib, hmac
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 
-VERSION = "1.2-admin"
+VERSION = "1.3-seguro"
 PORT = int(os.environ.get("PORT", 8080))
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "neoia-admin-2026").strip()
-ADMIN_TOKENS = set()   # sesiones activas del panel admin
-PORT = int(os.environ.get("PORT", 8080))
+ADMIN_TOKENS = {}          # token -> epoch de expiracion
+ADMIN_TTL = 30 * 60        # 30 minutos
+RATE = {}                  # ip -> [timestamps]
+RATE_LIMIT = 30            # peticiones
+RATE_WINDOW = 60           # por minuto, por IP
+MAX_BODY = 64 * 1024       # 64 KB maximo por peticion
+MAX_MSG = 4000             # caracteres maximos por mensaje
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "").strip()
 DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 DEEPSEEK_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/chat/completions")
@@ -41,10 +46,42 @@ SYSTEM = (
     "REGLAS: 1) Da codigo COMPLETO (imports + clase + anotacion) listo para pegar. "
     "2) Explica en 2-3 lineas que hace y como configurarlo. "
     "3) Si faltan datos (nombres de motores, tipo de chasis, puerto), asume lo tipico y DILO. "
-    "4) Puedes responder otras preguntas, pero prioriza FTC. 5) Responde en espanol, claro y breve."
+    "4) Puedes responder otras preguntas, pero prioriza FTC. 5) Responde en espanol, claro y breve. "
+    "6) En esta version web NO tienes herramientas de ejecucion: nunca digas que compilaste, ejecutaste, "
+    "abriste archivos ni modificaste tu computadora. Si te lo piden, aclara que eso solo funciona en la version local. "
+    "7) Si no estas seguro de un dato (fecha, precio, version), dilo en vez de inventarlo."
 )
 
 PLAN_PRICES = {"free": 0, "pro": 9, "team": 29}
+
+# ---------------- Seguridad (tokens y limites) ----------------
+def admin_ok(token):
+    """True si el token de admin existe y no expiro."""
+    tok = (token or "").strip()
+    exp = ADMIN_TOKENS.get(tok)
+    if not exp:
+        return False
+    if exp < time.time():
+        ADMIN_TOKENS.pop(tok, None)
+        return False
+    return True
+
+def admin_add(token):
+    now = time.time()
+    for k in [k for k, v in ADMIN_TOKENS.items() if v < now]:
+        ADMIN_TOKENS.pop(k, None)
+    ADMIN_TOKENS[token] = now + ADMIN_TTL
+
+def rate_ok(ip):
+    """Limite simple de peticiones por IP y minuto."""
+    now = time.time()
+    arr = [t for t in RATE.get(ip, []) if now - t < RATE_WINDOW]
+    if len(arr) >= RATE_LIMIT:
+        RATE[ip] = arr
+        return False
+    arr.append(now)
+    RATE[ip] = arr
+    return True
 
 def db():
     c = sqlite3.connect(DB_PATH)
@@ -110,14 +147,14 @@ def call_deepseek(messages):
     return data["choices"][0]["message"]["content"]
 
 # ---------------- Busqueda (multi-fuente con respaldo) ----------------
-STOP = {"cuando","cuándo","es","el","la","los","las","un","una","de","del","que","qué","como","cómo",
-        "cuanto","cuánto","donde","dónde","quien","quién","por","para","en","y","o","a","al","se",
-        "su","sus","mi","me","te","lo","le","les","nos","hoy","ahora","proximo","próximo","proxima",
-        "próxima","sera","será","cual","cuál","hay","vas","va","tiene","tienen","puedo","puede"}
+STOP = {"cuando","cuÃ¡ndo","es","el","la","los","las","un","una","de","del","que","quÃ©","como","cÃ³mo",
+        "cuanto","cuÃ¡nto","donde","dÃ³nde","quien","quiÃ©n","por","para","en","y","o","a","al","se",
+        "su","sus","mi","me","te","lo","le","les","nos","hoy","ahora","proximo","prÃ³ximo","proxima",
+        "prÃ³xima","sera","serÃ¡","cual","cuÃ¡l","hay","vas","va","tiene","tienen","puedo","puede"}
 
 def search_query(text):
     """Convierte una pregunta en una consulta corta de busqueda."""
-    words = re.findall(r"[\wáéíóúñü]+", (text or "").lower())
+    words = re.findall(r"[\wÃ¡Ã©Ã­Ã³ÃºÃ±Ã¼]+", (text or "").lower())
     keep = [w for w in words if w not in STOP and len(w) > 2]
     return " ".join(keep[:12]) or (text or "")[:80]
 
@@ -232,9 +269,9 @@ def web_search(q, n=6):
 
 # ---------------- Deteccion de preguntas que necesitan internet ----------------
 NEEDS_WEB = re.compile(
-    r"\b(cu[aá]ndo|cu[aá]nto|cu[aá]l es el|pr[oó]xim[oa]s?|hoy|ahora|actual(es)?|actualmente|"
-    r"noticias?|resultados?|gan[oó]|ganador|precio|cotizaci[oó]n|clima|partidos?|calendario|"
-    r"fecha|qui[eé]n (es|fue|gan)|temporada|estreno|reciente|ultimo|último|2026|2027)\b", re.I)
+    r"\b(cu[aÃ¡]ndo|cu[aÃ¡]nto|cu[aÃ¡]l es el|pr[oÃ³]xim[oa]s?|hoy|ahora|actual(es)?|actualmente|"
+    r"noticias?|resultados?|gan[oÃ³]|ganador|precio|cotizaci[oÃ³]n|clima|partidos?|calendario|"
+    r"fecha|qui[eÃ©]n (es|fue|gan)|temporada|estreno|reciente|ultimo|Ãºltimo|2026|2027)\b", re.I)
 
 def chat_answer(msgs):
     """Responde SIEMPRE; si la pregunta es de actualidad, busca en internet primero."""
@@ -284,7 +321,14 @@ class H(BaseHTTPRequestHandler):
         self.end_headers(); self.wfile.write(b)
 
     def _body(self):
-        n = int(self.headers.get("Content-Length", 0) or 0)
+        """Lee el JSON del cuerpo. Devuelve None si es demasiado grande."""
+        try: n = int(self.headers.get("Content-Length", 0) or 0)
+        except Exception: n = 0
+        if n > MAX_BODY:
+            try: self.rfile.read(n)
+            except Exception: pass
+            return None
+        if n <= 0: return {}
         try: return json.loads(self.rfile.read(n) or b"{}")
         except Exception: return {}
 
@@ -303,15 +347,19 @@ class H(BaseHTTPRequestHandler):
 
     def do_GET(self):
         u = urllib.parse.urlparse(self.path); r = u.path
+        if r.startswith("/api/") and not rate_ok(self.client_address[0]):
+            return self._json(429, {"error": "Demasiadas peticiones. Espera un momento."})
         if r == "/api/status":
             self._json(200, {"name": "NeoIA", "cloud": True, "providerConfigured": bool(DEEPSEEK_API_KEY),
                              "model": DEEPSEEK_MODEL, "plan": mem_get("plan", "free")})
         elif r == "/api/plan-info":
             self._json(200, {"plan": mem_get("plan", "free"), "prices": PLAN_PRICES})
         elif r == "/api/stats":
+            if not admin_ok(self.headers.get("X-Admin-Token")):
+                return self._json(401, {"error": "No autorizado"})
             self._json(200, mem_get("stats", {}))
         elif r == "/api/admin":
-            if self.headers.get("X-Admin-Token") not in ADMIN_TOKENS:
+            if not admin_ok(self.headers.get("X-Admin-Token")):
                 return self._json(401, {"error": "No autorizado"})
             self._json(200, {
                 "plan": mem_get("plan", "free"),
@@ -350,13 +398,32 @@ class H(BaseHTTPRequestHandler):
             self._static(r)
 
     def do_POST(self):
-        u = urllib.parse.urlparse(self.path); r = u.path; body = self._body()
+        u = urllib.parse.urlparse(self.path); r = u.path
+        if r.startswith("/api/") and not rate_ok(self.client_address[0]):
+            return self._json(429, {"error": "Demasiadas peticiones. Espera un momento."})
+        body = self._body()
+        if body is None:
+            return self._json(413, {"error": "La peticion es demasiado grande."})
         if r in ("/api/chat", "/api/ai", "/api/agent"):
             msgs = body.get("messages")
             if not isinstance(msgs, list) or not msgs:
                 m = (body.get("message") or "").strip()
                 if not m: return self._json(400, {"error": "Escribe un mensaje."})
+                if len(m) > MAX_MSG:
+                    return self._json(400, {"error": "El mensaje es demasiado largo (maximo %d caracteres)." % MAX_MSG})
                 msgs = [{"role": "user", "content": m}]
+            else:
+                limpio = []
+                for x in msgs[-14:]:
+                    if not isinstance(x, dict): continue
+                    rol = x.get("role")
+                    if rol not in ("user", "assistant", "system"): continue
+                    cont = str(x.get("content") or "")[:MAX_MSG]
+                    if cont.strip():
+                        limpio.append({"role": rol, "content": cont})
+                if not limpio:
+                    return self._json(400, {"error": "Mensaje invalido."})
+                msgs = limpio
             try:
                 rep = chat_answer(msgs)
                 stats_inc("chat")
@@ -382,7 +449,8 @@ class H(BaseHTTPRequestHandler):
                     c.commit(); c.close()
                 self._json(200, {"reply": rep, "conversation_id": cid})
             except Exception as e:
-                self._json(502, {"reply": "Error de IA: " + str(e)})
+                print("ERROR chat:", type(e).__name__, file=sys.stderr)
+                self._json(502, {"reply": "La IA no respondio a tiempo. Intenta de nuevo en unos segundos."})
         elif r == "/api/auth/register":
             email = (body.get("email") or "").strip().lower()
             pwd = (body.get("password") or "").strip()
@@ -445,10 +513,10 @@ class H(BaseHTTPRequestHandler):
             if not pwd or pwd != ADMIN_PASSWORD:
                 return self._json(401, {"error": "Contrasena incorrecta"})
             tok = secrets.token_hex(16)
-            ADMIN_TOKENS.add(tok)
+            admin_add(tok)
             self._json(200, {"token": tok})
         elif r in ("/api/plan", "/api/admin/plan"):
-            if self.headers.get("X-Admin-Token") not in ADMIN_TOKENS:
+            if not admin_ok(self.headers.get("X-Admin-Token")):
                 return self._json(401, {"error": "Solo el administrador puede cambiar el plan."})
             p = (body.get("plan") or "").lower()
             if p not in PLAN_PRICES: return self._json(400, {"error": "Plan invalido."})
