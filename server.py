@@ -183,6 +183,21 @@ def _search_wiki(q, n=3):
                     "snippet": _clean_html(x.get("snippet", ""))})
     return out
 
+def _search_ddg_api(q, n=3):
+    """API oficial de DuckDuckGo (no la bloquean como a las paginas)."""
+    url = ("https://api.duckduckgo.com/?q=" + urllib.parse.quote(q)
+           + "&format=json&no_html=1&skip_disambig=1")
+    req = urllib.request.Request(url, headers={"User-Agent": "NeoIA/1.0"})
+    d = json.loads(urllib.request.urlopen(req, timeout=20).read().decode("utf-8"))
+    out = []
+    if d.get("AbstractText"):
+        out.append({"title": d.get("Heading") or q, "url": d.get("AbstractURL", ""),
+                    "snippet": d["AbstractText"]})
+    for t in (d.get("RelatedTopics") or []):
+        if isinstance(t, dict) and t.get("Text"):
+            out.append({"title": t["Text"][:80], "url": t.get("FirstURL", ""), "snippet": t["Text"][:220]})
+    return out[:n]
+
 def _relevant(results, query):
     """True si al menos algunos resultados contienen palabras de la consulta."""
     words = [w for w in re.findall(r"\w+", (query or "").lower()) if len(w) > 3]
@@ -198,7 +213,7 @@ def _relevant(results, query):
 def web_search(q, n=6):
     """Prueba fuentes; descarta las que devuelvan resultados irrelevantes."""
     # 1) Primera pasada: solo fuentes con resultados relevantes
-    for fn in (_search_ddg_post, _search_ddg_lite, _search_bing, _search_wiki):
+    for fn in (_search_ddg_post, _search_ddg_lite, _search_bing, _search_ddg_api, _search_wiki):
         try:
             res = fn(q)
             if res and _relevant(res, q):
@@ -206,7 +221,7 @@ def web_search(q, n=6):
         except Exception:
             continue
     # 2) Si ninguna fue relevante, usar la primera que devuelva algo
-    for fn in (_search_bing, _search_ddg_post, _search_wiki):
+    for fn in (_search_ddg_api, _search_bing, _search_ddg_post, _search_wiki):
         try:
             res = fn(q)
             if res:
