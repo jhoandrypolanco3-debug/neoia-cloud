@@ -3,7 +3,6 @@ Allow: /
 
 # Paginas privadas (no indexar)
 Disallow: /admin.html
-Disallow: /index.html
 Disallow: /api/
 
-Sitemap: /sitemap.xml
+Sitemap: https://neoia-351a.onrender.com/sitemap.xml

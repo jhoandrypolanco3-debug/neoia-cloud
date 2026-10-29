@@ -3,7 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NeoIA — Tu asistente de IA</title>
+<title>NeoIA — Asistente de IA para FTC y robótica</title>
+<meta name="description" content="NeoIA es el asistente de IA gratis para FIRST Tech Challenge: escribe código Java, arregla errores, busca en internet y crea imágenes. Proyecto del equipo BIOBUZZ 24096.">
+<meta name="keywords" content="NeoIA, BIOBUZZ JARVIS, asistente IA FTC, FIRST Tech Challenge, programar robot FTC, IA para robótica, código Java FTC">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="BIOBUZZ 24096">
+<meta name="theme-color" content="#040810">
+<link rel="canonical" href="https://neoia-351a.onrender.com/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NeoIA">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="NeoIA — Asistente de IA para FTC y robótica">
+<meta property="og:description" content="Escribe código FTC, arregla errores, busca en internet y crea imágenes con IA. Gratis.">
+<meta property="og:url" content="https://neoia-351a.onrender.com/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NeoIA — Asistente de IA para FTC">
+<meta name="twitter:description" content="Escribe código FTC, arregla errores y crea imágenes con IA. Gratis.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"NeoIA","alternateName":["BIOBUZZ JARVIS","NeoIA FTC"],"url":"https://neoia-351a.onrender.com/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"es","description":"Asistente de IA para equipos de FIRST Tech Challenge: escribe y depura codigo Java, busca en internet y crea imagenes.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Organization","name":"BIOBUZZ 24096","url":"https://neoia-351a.onrender.com/landing.html"}}
+</script>
 <style>
   :root {
     --bg: #212121;
@@ -75,7 +94,7 @@
   .thread { max-width: 760px; margin: 0 auto; }
 
   .welcome { max-width: 520px; margin: 12vh auto 0; text-align: center; }
-  .welcome .big { font-size: 30px; font-weight: 600; margin-bottom: 10px; }
+  .welcome .big { font-size: 30px; font-weight: 600; margin: 0 0 10px; }
   .welcome p { color: var(--dim); font-size: 14px; }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 26px; }
   .chip {
@@ -244,8 +263,8 @@
     <div class="messages" id="messages">
       <div class="thread" id="thread">
         <div class="welcome" id="welcome">
-          <div class="big">¿En qué te ayudo?</div>
-          <p>Pregunta lo que quieras: código, ciencia, búsquedas, tu robot FTC, o cualquier cosa.</p>
+          <h1 class="big">¿En qué te ayudo?</h1>
+          <p>NeoIA responde lo que quieras: código, ciencia, búsquedas, tu robot FTC, o cualquier cosa.</p>
           <div class="chips">
             <button class="chip" data-prompt="Hazme un OpMode de FTC completo para un chasis mecanum con 4 motores, controlado con los sticks">🤖 OpMode Mecanum</button>
             <button class="chip" data-prompt="Hazme un autónomo de FTC que avance 1 metro usando encoders y se detenga">📦 Autónomo encoders</button>
