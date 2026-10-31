@@ -515,7 +515,7 @@ class H(BaseHTTPRequestHandler):
                 self._json(500, {"error": str(e)})
         elif r == "/api/admin/login":
             pwd = (body.get("password") or "").strip()
-            if not pwd or pwd != ADMIN_PASSWORD:
+            if not pwd or not hmac.compare_digest(pwd, ADMIN_PASSWORD):
                 return self._json(401, {"error": "Contrasena incorrecta"})
             tok = secrets.token_hex(16)
             admin_add(tok)
