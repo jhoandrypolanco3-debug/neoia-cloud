@@ -3,31 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NeoIA — Copiloto de IA para robots FTC | Programación y hologramas</title>
-<meta name="description" content="NeoIA es el asistente de inteligencia artificial para equipos de FIRST Tech Challenge (FTC). Escribe código Java, compila, depura errores y crea hologramas con voz y manos. Gratis para empezar.">
-<meta name="keywords" content="NeoIA, BIOBUZZ JARVIS, IA para FTC, FIRST Tech Challenge, programar robot FTC, copiloto IA robotica, asistente IA FTC, hologramas robot">
+<title>NeoIA — Copiloto de IA para robots FTC | BIOBUZZ 24096</title>
+<meta name="description" content="NeoIA es el asistente de inteligencia artificial para equipos de FIRST Tech Challenge (FTC). Escribe código Java, depura errores, calcula cinemática Mecanum y optimiza rutinas para INTO THE DEEP.">
+<meta name="keywords" content="NeoIA, BIOBUZZ 24096, IA para FTC, FIRST Tech Challenge, programar robot FTC, copiloto IA robotica, asistente IA FTC, INTO THE DEEP, Java Robot">
 <meta name="robots" content="index, follow">
-<meta name="author" content="NeoIA">
+<meta name="author" content="NeoIA - BIOBUZZ 24096">
 <meta name="theme-color" content="#040810">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NeoIA">
 <meta property="og:title" content="NeoIA — Copiloto de IA para robots FTC">
-<meta property="og:description" content="Escribe código FTC, compila, depura y crea hologramas con IA. La herramienta que todo equipo de robótica necesita.">
+<meta property="og:description" content="Escribe código FTC de competición, depura errores y optimiza tu robot para la temporada INTO THE DEEP con IA.">
 <meta property="og:url" content="https://neoia-351a.onrender.com/landing.html">
 <link rel="canonical" href="https://neoia-351a.onrender.com/landing.html">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="NeoIA — Copiloto de IA para robots FTC">
-<meta name="twitter:description" content="Escribe código FTC, compila, depura y crea hologramas con IA.">
+<meta name="twitter:description" content="Escribe código FTC, compila y depura con IA especializada.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "NeoIA",
-  "alternateName": "BIOBUZZ JARVIS",
+  "alternateName": "BIOBUZZ NeoIA",
   "applicationCategory": "DeveloperApplication",
-  "operatingSystem": "Windows",
-  "description": "Asistente de inteligencia artificial para equipos de FIRST Tech Challenge: escribe y depura código Java, compila con Gradle, crea hologramas y controla por voz.",
+  "operatingSystem": "All",
+  "description": "Asistente de inteligencia artificial para equipos de FIRST Tech Challenge: escribe y depura código Java, calcula cinemática Mecanum y ayuda en la temporada INTO THE DEEP.",
   "offers": [
     {"@type": "Offer", "name": "Gratis", "price": "0", "priceCurrency": "USD"},
     {"@type": "Offer", "name": "Pro", "price": "9", "priceCurrency": "USD"},
@@ -36,7 +36,7 @@
 }
 </script>
 <style>
-  :root { --bg:#040810; --panel:#0a1420; --line:#14324a; --cyan:#37e6ff; --green:#39ff88; --text:#d7ecf7; --dim:#6f93a9; }
+  :root { --bg:#040810; --panel:#0a1420; --line:#14324a; --cyan:#37e6ff; --green:#39ff88; --amber:#f59e0b; --text:#d7ecf7; --dim:#6f93a9; }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { background:radial-gradient(1200px 700px at 50% -10%, #0a2333 0%, var(--bg) 60%); color:var(--text);
          font-family:"Segoe UI", system-ui, sans-serif; line-height:1.6; overflow-x:hidden; }
@@ -56,32 +56,34 @@
   .btn-solid:hover { box-shadow:0 0 26px rgba(55,230,255,.6); }
 
   /* hero */
-  header.hero { padding:90px 0 70px; text-align:center; position:relative; }
-  .badge { display:inline-block; font-size:12px; letter-spacing:2px; color:var(--cyan); border:1px solid var(--line);
-           padding:6px 14px; border-radius:999px; margin-bottom:22px; background:rgba(55,230,255,.06); }
-  h1 { font-size:clamp(34px, 6vw, 62px); line-height:1.1; letter-spacing:-1px; }
+  header.hero { padding:80px 0 60px; text-align:center; position:relative; }
+  .badge { display:inline-flex; align-items:center; gap:8px; font-size:12px; letter-spacing:1.5px; color:var(--cyan); border:1px solid var(--line);
+           padding:6px 16px; border-radius:999px; margin-bottom:22px; background:rgba(55,230,255,.06); font-weight:600; }
+  .badge-amber { color:var(--amber); border-color:rgba(245,158,11,.3); background:rgba(245,158,11,.08); }
+  h1 { font-size:clamp(32px, 5.5vw, 58px); line-height:1.15; letter-spacing:-1px; }
   h1 span { color:var(--cyan); text-shadow:0 0 30px rgba(55,230,255,.55); }
-  .sub { max-width:720px; margin:22px auto 0; font-size:18px; color:var(--dim); }
-  .cta { margin-top:34px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
-  .hero-visual { margin:60px auto 0; width:min(760px, 92%); height:220px; border-radius:16px;
+  .sub { max-width:740px; margin:20px auto 0; font-size:17px; color:var(--dim); }
+  .cta { margin-top:30px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .hero-visual { margin:50px auto 0; width:min(760px, 92%); height:200px; border-radius:16px;
     background:linear-gradient(180deg, rgba(55,230,255,.10), rgba(4,8,16,0)); border:1px solid var(--line);
     display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
   .grid-lines { position:absolute; inset:0; background-image:linear-gradient(rgba(55,230,255,.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(55,230,255,.08) 1px, transparent 1px); background-size:34px 34px; }
-  .orb { width:90px; height:90px; border-radius:50%; border:2px solid var(--cyan);
+  .orb { width:80px; height:80px; border-radius:50%; border:2px solid var(--cyan);
     box-shadow:0 0 40px rgba(55,230,255,.7), inset 0 0 30px rgba(55,230,255,.35); animation:pulse 2.6s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{transform:scale(1); opacity:.9} 50%{transform:scale(1.08); opacity:1} }
 
   /* sections */
-  section { padding:74px 0; border-top:1px solid rgba(20,50,74,.5); }
-  h2 { text-align:center; font-size:clamp(26px, 4vw, 38px); margin-bottom:12px; }
-  .section-sub { text-align:center; color:var(--dim); max-width:640px; margin:0 auto 46px; }
+  section { padding:70px 0; border-top:1px solid rgba(20,50,74,.5); }
+  h2 { text-align:center; font-size:clamp(24px, 3.8vw, 36px); margin-bottom:10px; }
+  .section-sub { text-align:center; color:var(--dim); max-width:640px; margin:0 auto 40px; font-size:15px; }
   .grid { display:grid; gap:18px; }
   .g3 { grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); }
+  .g2 { grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); }
   .card { background:linear-gradient(180deg, rgba(10,20,32,.9), rgba(6,12,20,.9)); border:1px solid var(--line);
-          border-radius:14px; padding:26px; transition:.2s; }
-  .card:hover { border-color:rgba(55,230,255,.55); box-shadow:0 0 26px rgba(55,230,255,.15); transform:translateY(-3px); }
-  .card .ico { font-size:26px; margin-bottom:14px; }
+          border-radius:14px; padding:24px; transition:.2s; }
+  .card:hover { border-color:rgba(55,230,255,.55); box-shadow:0 0 24px rgba(55,230,255,.15); transform:translateY(-3px); }
+  .card .ico { font-size:26px; margin-bottom:12px; }
   .card h3 { font-size:17px; margin-bottom:8px; color:var(--cyan); }
   .card p { font-size:14px; color:var(--dim); }
 
@@ -102,9 +104,10 @@
 
 <nav>
   <div class="wrap">
-    <div class="logo">◈ <span>BIOBUZZ</span> <b>JARVIS</b></div>
+    <div class="logo">◈ <span>BIOBUZZ</span> <b>NeoIA</b></div>
     <div class="nav-links">
       <a href="#features">Funciones</a>
+      <a href="#editions">Ediciones</a>
       <a href="#pricing">Precios</a>
       <a href="#why">¿Por qué?</a>
     </div>
@@ -114,13 +117,13 @@
 
 <header class="hero">
   <div class="wrap">
-    <div class="badge">IA PARA EQUIPOS DE ROBÓTICA</div>
+    <div class="badge badge-amber">🌊 ESPECIAL TEMPORADA INTO THE DEEP · BIOBUZZ 24096</div>
     <h1>Tu robot, con un <span>copiloto de IA</span><br>que sí entiende FTC.</h1>
-    <p class="sub">Escribe, compila, depura y aprende. JARVIS conoce el SDK de FTC, controla tu proyecto
-      y convierte ideas en código que funciona — con voz, visión y hologramas.</p>
+    <p class="sub">Escribe código Java de competición, depura errores de Android Studio y calcula trayectorias Mecanum. NeoIA conoce el SDK oficial de FIRST Tech Challenge y convierte tus estrategias en código listo para el REV Control Hub.</p>
     <div class="cta">
       <a class="btn btn-solid" href="/">Empezar gratis</a>
-      <a class="btn" href="#features">Ver funciones</a>
+      <a class="btn" href="https://github.com/jhoandrypolanco3-debug/neoia-cloud" target="_blank">Repositorio GitHub 🌐</a>
+      <a class="btn" href="#editions">Ver Ediciones</a>
     </div>
     <div class="hero-visual">
       <div class="grid-lines"></div>
@@ -129,43 +132,76 @@
   </div>
 </header>
 
+<section id="editions">
+  <div class="wrap">
+    <h2>Dos Formas de Trabajar: Cloud y Local</h2>
+    <p class="section-sub">Flexibilidad total para programar en la escuela, el taller o en plena arena de competencia.</p>
+    <div class="grid g2">
+      <div class="card" style="border-color:rgba(55,230,255,.4);">
+        <div class="ico">🌐</div>
+        <h3>NeoIA Cloud (Web SaaS)</h3>
+        <p style="margin-bottom:12px;">Acceso inmediato desde cualquier navegador web sin instalar nada. Ideal para todo el equipo durante reuniones, diseño y consultas rápidas.</p>
+        <ul style="list-style:none;font-size:13px;color:var(--dim);margin-bottom:16px;">
+          <li style="padding:4px 0;">✓ Potenciado por DeepSeek en la nube</li>
+          <li style="padding:4px 0;">✓ Generación de OpModes @TeleOp y @Autonomous</li>
+          <li style="padding:4px 0;">✓ Soporte móvil y de escritorio</li>
+        </ul>
+        <a class="btn btn-solid" href="/" style="display:block;text-align:center;">Usar Versión Cloud</a>
+      </div>
+
+      <div class="card" style="border-color:rgba(57,255,136,.4);">
+        <div class="ico">💻</div>
+        <h3>NeoIA Edge (100% Offline)</h3>
+        <p style="margin-bottom:12px;">Diseñado para la cancha del torneo donde <b>no hay internet</b>. Corre en tu PC local con modelos de alta velocidad y escribe archivos físicos directamente.</p>
+        <ul style="list-style:none;font-size:13px;color:var(--dim);margin-bottom:16px;">
+          <li style="padding:4px 0;">✓ 100% Offline (Ollama en local)</li>
+          <li style="padding:4px 0;">✓ Agente con guardado directo de archivos .java</li>
+          <li style="padding:4px 0;">✓ Guardián estricto de almacenamiento (&le; 5 GB)</li>
+          <li style="padding:4px 0;">✓ Control remoto por QR en Wi-Fi local</li>
+        </ul>
+        <a class="btn" href="https://github.com/jhoandrypolanco3-debug/local-ai-nexus" target="_blank" style="display:block;text-align:center;">Ver Versión Offline en GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="features">
   <div class="wrap">
-    <h2>Todo lo que un equipo necesita</h2>
-    <p class="section-sub">Una sola herramienta para programar, entender y competir mejor.</p>
+    <h2>Todo lo que tu equipo necesita para ganar</h2>
+    <p class="section-sub">Herramientas especializadas pensadas por y para estudiantes de robótica.</p>
     <div class="grid g3">
-      <div class="card"><div class="ico">🤖</div><h3>Código FTC real</h3><p>Genera y edita OpModes, corrige errores del build y explica cada cambio en español.</p></div>
-      <div class="card"><div class="ico">⚙️</div><h3>Compila por ti</h3><p>Ejecuta Gradle, lee los errores y vuelve a compilar hasta que funciona.</p></div>
-      <div class="card"><div class="ico">🔮</div><h3>Hologramas 3D</h3><p>Convierte fotos o ideas en modelos holográficos que reaccionan a tu robot.</p></div>
-      <div class="card"><div class="ico">🎙</div><h3>Voz y manos</h3><p>Habla con JARVIS o controla el holograma con la cámara. Sin teclado.</p></div>
-      <div class="card"><div class="ico">🧠</div><h3>Red neuronal propia</h3><p>Reconoce piezas de FTC y te ayuda a configurar el hardware sin errores.</p></div>
-      <div class="card"><div class="ico">🎯</div><h3>Misiones autónomas</h3><p>Dale un objetivo y JARVIS lo ejecuta paso a paso en tu computadora.</p></div>
+      <div class="card"><div class="ico">🤖</div><h3>Código Java FTC Real</h3><p>Genera y edita OpModes completos con LinearOpMode, HardwareMap y configuraciones listas para Android Studio.</p></div>
+      <div class="card"><div class="ico">🌊</div><h3>Especial INTO THE DEEP</h3><p>Plantillas para colgar en la High Chamber del Submersible, recolectar Samples y scoring en Net Zone.</p></div>
+      <div class="card"><div class="ico">⚡</div><h3>Chasis Mecanum & Encoders</h3><p>Cálculo de COUNTS_PER_CM, normalización de potencias y giros con IMU o sensores de color REV.</p></div>
+      <div class="card"><div class="ico">🎙️</div><h3>Voz Bidireccional</h3><p>Dicta tus ideas por el micrófono y escucha las explicaciones con síntesis de voz natural.</p></div>
+      <div class="card"><div class="ico">📊</div><h3>Diagramas de Estrategia</h3><p>Visualiza en vivo el flujo de decisiones autónomas y máquinas de estados con diagramas interactivos.</p></div>
+      <div class="card"><div class="ico">🛠️</div><h3>Depurador de Errores</h3><p>Diagnóstica al instante errores como 'Unable to find device', 'Cannot resolve symbol' o problemas de Gradle.</p></div>
     </div>
   </div>
 </section>
 
 <section id="pricing">
   <div class="wrap">
-    <h2>Precios simples</h2>
-    <p class="section-sub">Empieza gratis. Escala cuando tu equipo crezca.</p>
+    <h2>Precios transparentes</h2>
+    <p class="section-sub">Empieza gratis. Escala cuando tu equipo lo requiera.</p>
     <div class="grid g3">
       <div class="card price-card">
         <h3>Gratis</h3>
         <div class="price-tag">$0<small>/mes</small></div>
-        <ul><li>Editor y terminal</li><li>Compilar con Gradle</li><li>Chat con IA (límite diario)</li><li>Hologramas básicos</li></ul>
+        <ul><li>Editor y terminal</li><li>Generación de OpModes básicos</li><li>Chat con IA para FTC</li><li>Documentación y plantillas</li></ul>
         <a class="btn" href="/" style="width:100%;text-align:center;">Empezar</a>
       </div>
       <div class="card price-card featured">
         <h3>Pro <span style="font-size:11px;color:var(--cyan);border:1px solid var(--cyan);padding:2px 8px;border-radius:99px;margin-left:6px;">POPULAR</span></h3>
         <div class="price-tag">$9<small>/mes</small></div>
-        <ul><li>Todo lo de Gratis</li><li>IA sin límites</li><li>Misiones autónomas</li><li>Crear imágenes</li><li>Voz y control por mano</li></ul>
+        <ul><li>Todo lo de Gratis</li><li>IA ilimitada</li><li>Plantillas avanzadas INTO THE DEEP</li><li>Análisis de logs de Android Studio</li><li>Soporte para visión y AprilTags</li></ul>
         <a class="btn btn-solid" href="/" style="width:100%;text-align:center;">Probar Pro</a>
       </div>
       <div class="card price-card">
         <h3>Equipo</h3>
         <div class="price-tag">$29<small>/mes</small></div>
-        <ul><li>Todo lo de Pro</li><li>Hasta 10 miembros</li><li>Historial compartido</li><li>Soporte prioritario</li></ul>
-        <a class="btn" href="/" style="width:100%;text-align:center;">Contactar</a>
+        <ul><li>Todo lo de Pro</li><li>Hasta 10 integrantes del equipo</li><li>Historial de código compartido</li><li>Soporte técnico prioritario</li></ul>
+        <a class="btn" href="mailto:jhoandrypolanco3@gmail.com" style="width:100%;text-align:center;">Contactar</a>
       </div>
     </div>
   </div>
@@ -173,24 +209,25 @@
 
 <section id="why">
   <div class="wrap">
-    <h2>¿Por qué JARVIS?</h2>
-    <p class="section-sub">Porque programar un robot de FTC no debería ser tan difícil.</p>
+    <h2>¿Por qué NeoIA?</h2>
+    <p class="section-sub">Porque programar un robot de competencia no debería ser un misterio.</p>
     <div class="grid g3">
-      <div class="card"><h3>🎓 Hecho para estudiantes</h3><p>Sin jerga innecesaria. Explica, no solo escribe código.</p></div>
-      <div class="card"><h3>🇪🇸 En tu idioma</h3><p>Todo en español, desde el primer día.</p></div>
-      <div class="card"><h3>🔒 Local y privado</h3><p>Tu código no sale de tu computadora. Sin sorpresas.</p></div>
+      <div class="card"><h3>🎓 Hecho por estudiantes</h3><p>Diseñado desde la experiencia real de cancha con el equipo BIOBUZZ 24096.</p></div>
+      <div class="card"><h3>🇪🇸 100% en tu idioma</h3><p>Respuestas, explicaciones y documentación claras en español.</p></div>
+      <div class="card"><h3>🔒 Código seguro y privado</h3><p>Tus estrategias y algoritmos se mantienen seguros dentro de tu equipo.</p></div>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <div class="logo">◈ <span>BIOBUZZ</span> <b>JARVIS</b></div>
-    <p>© 2026 BIOBUZZ JARVIS · Hecho para equipos de FTC</p>
+    <div class="logo">◈ <span>BIOBUZZ</span> <b>NeoIA</b></div>
+    <p>© 2026 NeoIA · Desarrollado por y para el equipo BIOBUZZ 24096 (FIRST Tech Challenge)</p>
     <p style="margin-top:10px">
       <a href="/terminos.html" style="color:#37e6ff">Términos</a> ·
       <a href="/privacidad.html" style="color:#37e6ff">Privacidad</a> ·
-      <a href="mailto:jhoandrypolanco3@gmail.com" style="color:#37e6ff">Contacto</a>
+      <a href="mailto:jhoandrypolanco3@gmail.com" style="color:#37e6ff">Contacto</a> ·
+      <a href="https://github.com/jhoandrypolanco3-debug" target="_blank" style="color:#37e6ff">GitHub</a>
     </p>
   </div>
 </footer>
