@@ -342,7 +342,12 @@ class H(BaseHTTPRequestHandler):
         except Exception: return {}
 
     def _static(self, path):
-        name = "chat.html" if path == "/" else path.lstrip("/")
+        if path in ("/", "/index.html"):
+            name = "landing.html"
+        elif path in ("/chat", "/app", "/console"):
+            name = "chat.html"
+        else:
+            name = path.lstrip("/")
         p = os.path.join(PUBLIC, name)
         if not os.path.abspath(p).startswith(os.path.abspath(PUBLIC)) or not os.path.isfile(p):
             self.send_error(404); return
