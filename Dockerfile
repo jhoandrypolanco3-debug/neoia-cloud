@@ -2,8 +2,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Copia el servidor y las paginas
+# Copia el servidor, el nucleo modular y las paginas
 COPY server.py ./
+COPY core ./core
 COPY public ./public
 
 ENV PYTHONUNBUFFERED=1

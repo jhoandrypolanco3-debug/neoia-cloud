@@ -18,3 +18,6 @@ services:
         sync: false
       - key: DEEPSEEK_MODEL
         value: "deepseek-chat"
+      # Duracion de las sesiones de usuario (dias)
+      - key: SESSION_TTL_DAYS
+        value: "30"

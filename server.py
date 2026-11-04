@@ -7,13 +7,19 @@
 # =============================================================
 import json, os, re, sys, sqlite3, urllib.request, urllib.parse, base64, time, secrets, hashlib, hmac
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-from datetime import datetime
+from datetime import datetime, timedelta
 
-VERSION = "1.3-seguro"
+from core import router as core_router
+from core import agents as core_agents
+from core.providers import ProviderError
+
+VERSION = "2.0-core"
 PORT = int(os.environ.get("PORT", 8080))
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "neoia-admin-2026").strip()
 ADMIN_TOKENS = {}          # token -> epoch de expiracion
 ADMIN_TTL = 30 * 60        # 30 minutos
+SESSION_TTL_DAYS = int(os.environ.get("SESSION_TTL_DAYS", "30"))
+SESSION_TOUCH = 3600       # actualiza last_used como mucho 1 vez por hora
 RATE = {}                  # ip -> [timestamps]
 RATE_LIMIT = 30            # peticiones
 RATE_WINDOW = 60           # por minuto, por IP
@@ -23,6 +29,20 @@ DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "").strip()
 DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 DEEPSEEK_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/chat/completions")
 PUBLIC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")
+
+# Cabeceras de seguridad aplicadas a todas las respuestas.
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+    "Content-Security-Policy": (
+        "default-src 'self'; script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+        "connect-src 'self'; object-src 'none'; base-uri 'none'; "
+        "frame-ancestors 'none'"
+    ),
+}
 DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "neoia.db"))
 
 SYSTEM = (
@@ -87,7 +107,10 @@ def rate_ok(ip):
     RATE[ip] = arr
     return True
 
+_SCHEMA_READY = False
+
 def db():
+    global _SCHEMA_READY
     c = sqlite3.connect(DB_PATH)
     c.execute("CREATE TABLE IF NOT EXISTS memory (key TEXT PRIMARY KEY, value TEXT)")
     c.execute("""CREATE TABLE IF NOT EXISTS users (
@@ -101,6 +124,13 @@ def db():
     c.execute("""CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT, conv_id INTEGER, role TEXT,
         content TEXT, created_at TEXT)""")
+    # Migracion ligera: columna para expirar sesiones. Se ejecuta una sola vez.
+    if not _SCHEMA_READY:
+        try:
+            c.execute("ALTER TABLE sessions ADD COLUMN last_used TEXT")
+        except sqlite3.OperationalError:
+            pass
+        _SCHEMA_READY = True
     c.commit(); return c
 
 # ---------------- Cuentas de usuario ----------------
@@ -121,12 +151,42 @@ def check_password(pwd, stored):
         return False
 
 def auth_user(handler):
+    """Devuelve (id, email, nombre) si el token es valido y no ha expirado."""
     tok = (handler.headers.get("X-Auth-Token") or "").strip()
     if not tok: return None
     c = db()
-    r = c.execute("SELECT u.id,u.email,u.name FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=?", (tok,)).fetchone()
+    r = c.execute("SELECT u.id,u.email,u.name,s.created_at,s.last_used FROM sessions s "
+                  "JOIN users u ON u.id=s.user_id WHERE s.token=?", (tok,)).fetchone()
+    if not r:
+        c.close(); return None
+
+    uid, email, name, created, last_used = r
+    ref = last_used or created
+    try:
+        ref_dt = datetime.fromisoformat(ref)
+    except Exception:
+        ref_dt = datetime.utcnow()
+
+    # Sesion caducada: se borra y se rechaza.
+    if datetime.utcnow() - ref_dt > timedelta(days=SESSION_TTL_DAYS):
+        try:
+            c.execute("DELETE FROM sessions WHERE token=?", (tok,)); c.commit()
+        except Exception:
+            pass
+        c.close()
+        return None
+
+    # Toque perezoso: no escribir en cada peticion.
+    try:
+        stale = (not last_used) or (
+            (datetime.utcnow() - datetime.fromisoformat(last_used)).total_seconds() > SESSION_TOUCH)
+        if stale:
+            c.execute("UPDATE sessions SET last_used=? WHERE token=?", (now_iso(), tok)); c.commit()
+    except Exception:
+        pass
+
     c.close()
-    return r
+    return (uid, email, name)
 
 def mem_get(k, d=None):
     c = db(); r = c.execute("SELECT value FROM memory WHERE key=?", (k,)).fetchone(); c.close()
@@ -140,15 +200,9 @@ def stats_inc(k):
     s = mem_get("stats", {}) or {}; s[k] = s.get(k, 0) + 1; mem_set("stats", s)
 
 # ---------------- IA ----------------
-def call_deepseek(messages):
-    if not DEEPSEEK_API_KEY:
-        raise RuntimeError("Falta DEEPSEEK_API_KEY en las variables de entorno")
-    body = {"model": DEEPSEEK_MODEL, "messages": messages, "temperature": 0.5, "max_tokens": 1500}
-    req = urllib.request.Request(DEEPSEEK_URL, data=json.dumps(body).encode("utf-8"),
-                                 headers={"Content-Type": "application/json",
-                                          "Authorization": "Bearer " + DEEPSEEK_API_KEY})
-    data = json.loads(urllib.request.urlopen(req, timeout=120).read().decode("utf-8"))
-    return data["choices"][0]["message"]["content"]
+def call_deepseek(messages, task="chat"):
+    """Compatibilidad: ahora todo pasa por el router del CORE."""
+    return core_router.complete(messages, task=task)
 
 # ---------------- Busqueda (multi-fuente con respaldo) ----------------
 STOP = {"cuando","cuÃ¡ndo","es","el","la","los","las","un","una","de","del","que","quÃ©","como","cÃ³mo",
@@ -277,13 +331,13 @@ NEEDS_WEB = re.compile(
     r"noticias?|resultados?|gan[oÃ³]|ganador|precio|cotizaci[oÃ³]n|clima|partidos?|calendario|"
     r"fecha|qui[eÃ©]n (es|fue|gan)|temporada|estreno|reciente|ultimo|Ãºltimo|2026|2027)\b", re.I)
 
-def chat_answer(msgs):
+def chat_answer(msgs, agent_id=None):
     """Responde SIEMPRE; si la pregunta es de actualidad, busca en internet primero."""
     last = ""
     if msgs:
         try: last = msgs[-1].get("content") or ""
         except Exception: last = ""
-    sysp = SYSTEM
+    sysp = core_agents.system_for(agent_id, SYSTEM)
     if last and NEEDS_WEB.search(last):
         try:
             res = web_search(search_query(last), 6)
@@ -295,7 +349,8 @@ def chat_answer(msgs):
                         "Si los datos no alcanzan, dilo y sugiere una fuente.")
         except Exception:
             pass
-    return call_deepseek([{"role": "system", "content": sysp}] + msgs)
+    return core_router.complete([{"role": "system", "content": sysp}] + msgs,
+                                task=core_agents.task_for(agent_id, "chat"))
 
 # ---------------- Imagenes ----------------
 def make_image(prompt, w=512, h=512):
@@ -323,10 +378,16 @@ def make_image(prompt, w=512, h=512):
 
 # ---------------- HTTP ----------------
 class H(BaseHTTPRequestHandler):
+    def _secure_headers(self):
+        for k, v in SECURITY_HEADERS.items():
+            self.send_header(k, v)
+
     def _json(self, code, obj):
         b = json.dumps(obj, ensure_ascii=False).encode("utf-8")
-        self.send_response(code); self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*"); self.send_header("Content-Length", str(len(b)))
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(b)))
+        self._secure_headers()
         self.end_headers(); self.wfile.write(b)
 
     def _body(self):
@@ -357,15 +418,20 @@ class H(BaseHTTPRequestHandler):
                 ".txt": "text/plain; charset=utf-8", ".xml": "application/xml"}.get(ext, "text/plain")
         b = open(p, "rb").read()
         self.send_response(200); self.send_header("Content-Type", mime)
-        self.send_header("Content-Length", str(len(b))); self.end_headers(); self.wfile.write(b)
+        self.send_header("Content-Length", str(len(b)))
+        self._secure_headers()
+        self.end_headers(); self.wfile.write(b)
 
     def do_GET(self):
         u = urllib.parse.urlparse(self.path); r = u.path
         if r.startswith("/api/") and not rate_ok(self.client_address[0]):
             return self._json(429, {"error": "Demasiadas peticiones. Espera un momento."})
         if r == "/api/status":
-            self._json(200, {"name": "NeoIA", "cloud": True, "providerConfigured": bool(DEEPSEEK_API_KEY),
+            self._json(200, {"name": "NeoIA", "version": VERSION, "cloud": True,
+                             "providerConfigured": core_router.resolve("chat")[0].configured,
                              "model": DEEPSEEK_MODEL, "plan": mem_get("plan", "free")})
+        elif r == "/api/agents":
+            self._json(200, {"agents": core_agents.public_list()})
         elif r == "/api/plan-info":
             self._json(200, {"plan": mem_get("plan", "free"), "prices": PLAN_PRICES})
         elif r == "/api/stats":
@@ -382,6 +448,8 @@ class H(BaseHTTPRequestHandler):
                 "version": VERSION,
                 "provider": bool(DEEPSEEK_API_KEY),
                 "model": DEEPSEEK_MODEL,
+                "providers": core_router.status(),
+                "agents": core_agents.public_list(),
             })
         elif r == "/api/me":
             u2 = auth_user(self)
@@ -439,7 +507,7 @@ class H(BaseHTTPRequestHandler):
                     return self._json(400, {"error": "Mensaje invalido."})
                 msgs = limpio
             try:
-                rep = chat_answer(msgs)
+                rep = chat_answer(msgs, body.get("agent"))
                 stats_inc("chat")
                 # Guardar la conversacion si el usuario inicio sesion
                 cid = 0
@@ -462,6 +530,10 @@ class H(BaseHTTPRequestHandler):
                     c.execute("UPDATE conversations SET updated_at=? WHERE id=?", (now_iso(), cid))
                     c.commit(); c.close()
                 self._json(200, {"reply": rep, "conversation_id": cid})
+            except ProviderError as e:
+                # Mensaje ya curado: es seguro mostrarlo.
+                print("ERROR proveedor:", type(e).__name__, file=sys.stderr)
+                self._json(503, {"error": str(e)})
             except Exception as e:
                 print("ERROR chat:", type(e).__name__, file=sys.stderr)
                 self._json(502, {"reply": "La IA no respondio a tiempo. Intenta de nuevo en unos segundos."})
@@ -521,7 +593,8 @@ class H(BaseHTTPRequestHandler):
                 img = make_image(prompt); stats_inc("image")
                 self._json(200, {"prompt": prompt, "image": img})
             except Exception as e:
-                self._json(500, {"error": str(e)})
+                print("ERROR imagen:", type(e).__name__, file=sys.stderr)
+                self._json(500, {"error": "No se pudo generar la imagen ahora. Intenta de nuevo."})
         elif r == "/api/admin/login":
             pwd = (body.get("password") or "").strip()
             if not pwd or not hmac.compare_digest(pwd, ADMIN_PASSWORD):
@@ -542,6 +615,17 @@ class H(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass  # silencio en produccion
 
+# ---------------- Registro de agentes del CORE ----------------
+core_agents.register(core_agents.Agent(
+    id="general",
+    name="NeoIA",
+    description="Asistente general con especialidad en FIRST Tech Challenge",
+    task="chat",
+    system=SYSTEM,
+))
+
 if __name__ == "__main__":
-    print("NeoIA nube en puerto %d | IA: %s" % (PORT, "SI" if DEEPSEEK_API_KEY else "NO"))
+    _p = core_router.resolve("chat")[0]
+    print("NeoIA %s en puerto %d | proveedor: %s | configurado: %s"
+          % (VERSION, PORT, _p.name, "SI" if _p.configured else "NO"))
     ThreadingHTTPServer(("0.0.0.0", PORT), H).serve_forever()

@@ -2,6 +2,8 @@
 
 # Base de datos local (se regenera)
 neoia.db
+.tmp_*.db
+*.db-journal
 
 # Secretos (NUNCA subir)
 .env
