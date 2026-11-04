@@ -8,6 +8,7 @@ y verifica el comportamiento real. Devuelve codigo 1 si algo falla.
 """
 import json
 import os
+import re
 import sqlite3
 import subprocess
 import sys
@@ -131,6 +132,13 @@ def main():
         check("portada sirve HTML", st == 200 and "<html" in body.lower())
         check("favicon accesible", req("/favicon.svg")[0] == 200)
         check("sitemap accesible", req("/sitemap.xml")[0] == 200)
+
+        print("\n-- Sin dependencias externas (el CSP las bloquearia) --")
+        for pagina in ("/", "/landing.html", "/admin.html"):
+            st, hd, body = req(pagina)
+            externos = re.findall(r'src="https?://', body)
+            check("%s no carga scripts externos" % pagina, not externos, str(externos[:3]))
+        check("tailwind servido localmente", req("/vendor/tailwind.js")[0] == 200)
 
     finally:
         proc.terminate()
