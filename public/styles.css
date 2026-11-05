@@ -1,0 +1,1315 @@
+/* ==========================================
+   Ecosistema 5 Tiers - Estilos Holográficos & 3D
+   ========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #05070f;
+  --bg-secondary: #0a0e1c;
+  --bg-card: rgba(10, 14, 28, 0.85);
+  --cyan-glow: #06b6d4;
+  --indigo-glow: #6366f1;
+  --purple-glow: #a855f7;
+  --amber-glow: #f59e0b;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-primary);
+  color: #f1f5f9;
+  background-image: 
+    radial-gradient(circle at 50% 5%, rgba(6, 182, 212, 0.12) 0%, transparent 55%),
+    radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 15% 75%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Glassmorphism */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.glass-input {
+  background: rgba(10, 14, 28, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: all 0.2s ease;
+}
+.glass-input:focus {
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.25);
+  outline: none;
+}
+
+/* Hero Infographic Frame */
+.infographic-frame {
+  position: relative;
+  background: radial-gradient(circle at center, rgba(13, 20, 38, 0.9) 0%, rgba(5, 7, 15, 0.98) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 
+    0 20px 60px -15px rgba(0, 0, 0, 0.8),
+    0 0 35px -5px rgba(6, 182, 212, 0.15);
+}
+
+.infographic-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 1.5rem;
+  box-shadow: inset 0 0 40px rgba(6, 182, 212, 0.05);
+}
+
+/* Hotspot Overlays */
+.tier-hotspot {
+  position: absolute;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+}
+
+.tier-hotspot:hover {
+  background: rgba(6, 182, 212, 0.12);
+  border-color: rgba(6, 182, 212, 0.5);
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+/* Pulse animation */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6)); }
+  50% { opacity: 0.6; transform: scale(1.15); filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.9)); }
+}
+
+.pulse-online {
+  animation: pulse-glow 2.5s infinite ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(5, 7, 15, 0.7);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.6);
+}
+
+
+
+/* ==========================================
+   CASA DE AGENTES - SALA VIRTUAL CIBERNÉTICA
+   (Inspirada en el Enjambre Multi-Agente 2026)
+   ========================================== */
+.cyber-floor {
+  background-color: #020617;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(6, 182, 212, 0.18), transparent 70%),
+    linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+  background-size: 100% 100%, 36px 36px, 36px 36px;
+  position: relative;
+}
+
+.skyline-backdrop {
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.2) 0%, rgba(2, 6, 23, 0.9) 100%),
+              radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.15) 0%, transparent 60%);
+  border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.robot-pod {
+  background: radial-gradient(circle at 50% 15%, rgba(6, 182, 212, 0.18) 0%, rgba(4, 10, 24, 0.95) 75%);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.robot-pod::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #06b6d4, transparent);
+  transition: all 0.5s ease;
+}
+
+.robot-pod:hover::after {
+  left: 100%;
+}
+
+.robot-pod:hover {
+  border-color: rgba(6, 182, 212, 0.8);
+  box-shadow: 0 0 35px rgba(6, 182, 212, 0.3), inset 0 0 25px rgba(6, 182, 212, 0.15);
+  transform: translateY(-5px);
+}
+
+.robot-pod.active-speaker {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 40px rgba(245, 158, 11, 0.4), inset 0 0 25px rgba(245, 158, 11, 0.2);
+  animation: podPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes podPulse {
+  0%, 100% { transform: translateY(-4px) scale(1.02); }
+  50% { transform: translateY(-4px) scale(1.04); }
+}
+
+.typing-dot {
+  animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* Hotspots interactivos sobre la foto del Cuartel con Movimiento Real */
+.hq-hotspot {
+  position: absolute;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 25;
+}
+
+.hq-hotspot:hover {
+  transform: translate(-50%, -50%) scale(1.22);
+}
+
+.robot-floating {
+  animation: robotFloat 3.2s ease-in-out infinite;
+}
+
+.robot-floating-alt {
+  animation: robotFloatAlt 3.8s ease-in-out infinite;
+}
+
+@keyframes robotFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes robotFloatAlt {
+  0%, 100% { transform: translateY(-5px); }
+  50% { transform: translateY(2px); }
+}
+
+.hotspot-glow {
+  box-shadow: 0 0 20px currentColor, 0 0 35px currentColor;
+  animation: hotspotPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes hotspotPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; filter: drop-shadow(0 0 8px currentColor); }
+  50% { transform: scale(1.25); opacity: 1; filter: drop-shadow(0 0 16px currentColor); }
+}
+
+/* Rayo Láser Central que baja del techo */
+.laser-pillar {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 58%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(6, 182, 212, 0.45) 0%, rgba(6, 182, 212, 0.1) 45%, transparent 75%);
+  pointer-events: none;
+  animation: laserFlicker 2.4s ease-in-out infinite alternate;
+  z-index: 10;
+}
+
+@keyframes laserFlicker {
+  0% { opacity: 0.55; transform: translateX(-50%) scaleX(0.9); }
+  100% { opacity: 0.95; transform: translateX(-50%) scaleX(1.1); }
+}
+
+/* Ondas de choque en el apretón de manos */
+.energy-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid #06b6d4;
+  pointer-events: none;
+  animation: rippleOut 2.2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.energy-ripple:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.energy-ripple:nth-child(3) {
+  animation-delay: 1.4s;
+}
+
+@keyframes rippleOut {
+  0% { width: 10px; height: 10px; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { width: 180px; height: 180px; opacity: 0; transform: translate(-50%, -50%) scale(2); }
+}
+
+/* Líneas de circuito animadas sobre el suelo de la foto */
+.photo-circuit-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.floor-data-stream {
+  stroke-dasharray: 10 14;
+  animation: streamFlow 1.8s linear infinite;
+}
+
+@keyframes streamFlow {
+  from { stroke-dashoffset: 48; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Escáner holográfico sobre el HUD de los robots */
+.hud-scanner {
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-scanner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #06b6d4, #ffffff, #06b6d4, transparent);
+  animation: scanBar 1.6s ease-in-out infinite;
+}
+
+@keyframes scanBar {
+  0% { transform: translateY(-10px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(35px); opacity: 0; }
+}
+
+/* Pasos del Pipeline de Ejecución */
+.pipeline-step {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.pipeline-step.active {
+  border-color: #06b6d4 !important;
+  background: rgba(6, 182, 212, 0.18) !important;
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
+  transform: scale(1.03);
+}
+
+.pipeline-step.completed {
+  border-color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+}
+
+.pipeline-connector {
+  stroke-dasharray: 6 4;
+  animation: flowLine 1.5s linear infinite;
+}
+
+@keyframes flowLine {
+  from { stroke-dashoffset: 20; }
+  to { stroke-dashoffset: 0; }
+}
+
+.circuit-line {
+  stroke-dasharray: 8 6;
+  animation: circuitFlow 2.5s linear infinite;
+}
+
+@keyframes circuitFlow {
+  from { stroke-dashoffset: 28; }
+  to { stroke-dashoffset: 0; }
+}
+
+.hologram-screen {
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.15) 0%, rgba(3, 7, 18, 0.6) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+.swarm-user-msg {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(30, 27, 75, 0.7) 100%);
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);
+}
+
+.swarm-agent-msg {
+  background: rgba(11, 19, 38, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tag-pill {
+  transition: all 0.2s ease;
+}
+
+.tag-pill:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.2);
+}
+
+
+/* ============================================================
+   OFICINA DE ROBOTS EN MOVIMIENTO (LIVING ROBOT OFFICE SIMULATOR)
+   ============================================================ */
+
+.office-stage-container {
+  position: relative;
+  width: 100%;
+  min-height: 460px;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background-color: #030712;
+}
+
+/* Robot en Movimiento Caminando (Carrier Bot con Cajas) */
+.carrier-bot-entity {
+  position: absolute;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+  animation: carrierPatrol 14s infinite ease-in-out;
+}
+
+.carrier-bot-entity:hover {
+  filter: brightness(1.25) drop-shadow(0 0 15px rgba(6, 182, 212, 0.8));
+}
+
+@keyframes carrierPatrol {
+  0% { left: 16%; top: 52%; transform: scaleX(1); }
+  45% { left: 42%; top: 56%; transform: scaleX(1); }
+  50% { left: 42%; top: 56%; transform: scaleX(-1); }
+  95% { left: 16%; top: 52%; transform: scaleX(-1); }
+  100% { left: 16%; top: 52%; transform: scaleX(1); }
+}
+
+/* Patrulla del Rover / Testing Agent con Orugas */
+.rover-bot-entity {
+  position: absolute;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  animation: roverDrive 13s infinite ease-in-out;
+}
+
+.rover-bot-entity:hover {
+  filter: brightness(1.25) drop-shadow(0 0 15px rgba(245, 158, 11, 0.8));
+}
+
+@keyframes roverDrive {
+  0% { left: 66%; top: 56%; transform: scaleX(1); }
+  45% { left: 85%; top: 60%; transform: scaleX(1); }
+  50% { left: 85%; top: 60%; transform: scaleX(-1); }
+  95% { left: 66%; top: 56%; transform: scaleX(-1); }
+  100% { left: 66%; top: 56%; transform: scaleX(1); }
+}
+
+/* AutoGen Architect paseando */
+.architect-bot-entity {
+  position: absolute;
+  z-index: 22;
+  cursor: pointer;
+  animation: architectPacing 11s infinite ease-in-out;
+}
+
+@keyframes architectPacing {
+  0% { left: 24%; top: 22%; }
+  50% { left: 33%; top: 25%; }
+  100% { left: 24%; top: 22%; }
+}
+
+/* Piernas que caminan alternadas */
+.leg-left {
+  transform-origin: top center;
+  animation: legSwing 0.6s infinite alternate ease-in-out;
+}
+.leg-right {
+  transform-origin: top center;
+  animation: legSwing 0.6s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes legSwing {
+  0% { transform: rotate(-24deg); }
+  100% { transform: rotate(24deg); }
+}
+
+/* Orugas / Ruedas del Rover */
+.tread-track {
+  stroke-dasharray: 4 3;
+  animation: treadScroll 0.4s linear infinite;
+}
+
+@keyframes treadScroll {
+  from { stroke-dashoffset: 14; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Brazos escribiendo a toda velocidad */
+.typing-arm-left {
+  transform-origin: top left;
+  animation: armTypeLeft 0.22s infinite alternate ease-in-out;
+}
+.typing-arm-right {
+  transform-origin: top right;
+  animation: armTypeRight 0.25s infinite alternate ease-in-out;
+}
+
+@keyframes armTypeLeft {
+  0% { transform: rotate(0deg) translateY(0); }
+  100% { transform: rotate(-10deg) translateY(-3px); }
+}
+@keyframes armTypeRight {
+  0% { transform: rotate(0deg) translateY(0); }
+  100% { transform: rotate(10deg) translateY(-4px); }
+}
+
+/* Cubos de datos apilados que transporta el robot */
+.stacked-data-cube {
+  animation: cubeBobbing 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes cubeBobbing {
+  0% { transform: translateY(0px) scale(1); }
+  100% { transform: translateY(-4px) scale(1.03); }
+}
+
+/* Chispas de soldadura eléctrica del robot de mantenimiento */
+.sparkle-burst {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fef08a;
+  box-shadow: 0 0 10px #f59e0b, 0 0 20px #eab308;
+  animation: sparkFlicker 0.35s infinite alternate;
+}
+
+@keyframes sparkFlicker {
+  0% { opacity: 0.2; transform: scale(0.5) translate(0, 0); }
+  50% { opacity: 1; transform: scale(1.6) translate(3px, -4px); }
+  100% { opacity: 0.1; transform: scale(0.3) translate(-2px, 2px); }
+}
+
+/* Cono de escáner láser del Rover hacia el suelo */
+.rover-scanner-beam {
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  width: 70px;
+  height: 55px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at top, rgba(6, 182, 212, 0.5) 0%, rgba(6, 182, 212, 0) 75%);
+  clip-path: polygon(38% 0%, 62% 0%, 100% 100%, 0% 100%);
+  animation: beamSweep 1.8s infinite alternate ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes beamSweep {
+  0% { transform: translateX(-50%) rotate(-14deg); opacity: 0.4; }
+  100% { transform: translateX(-50%) rotate(14deg); opacity: 0.9; }
+}
+
+/* Partículas de código que flotan desde la laptop de LangChain */
+.floating-code-particle {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: #34d399;
+  text-shadow: 0 0 6px rgba(52, 211, 153, 0.85);
+  pointer-events: none;
+  animation: codeFloatUp 2.8s linear infinite;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+@keyframes codeFloatUp {
+  0% { opacity: 0; transform: translateY(0px) scale(0.8); }
+  20% { opacity: 0.95; }
+  80% { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(-55px) scale(1.05); }
+}
+
+/* Bocadillo de Diálogo / Pensamiento del Robot en la Oficina */
+.office-speech-bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 15, 30, 0.96);
+  border: 1px solid rgba(6, 182, 212, 0.65);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.8), 0 0 16px rgba(6, 182, 212, 0.35);
+  backdrop-filter: blur(12px);
+  padding: 6px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a5f3fc;
+  z-index: 60;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: bubblePop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.office-speech-bubble:hover {
+  transform: translateX(-50%) scale(1.06);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.office-speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(6, 182, 212, 0.85) transparent transparent transparent;
+}
+
+@keyframes bubblePop {
+  0% { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.75); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+/* Arcos de electricidad en el apretón de manos */
+.electric-spark-center {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.75) 0%, rgba(56, 189, 248, 0) 70%);
+  animation: electricPulse 1s infinite alternate;
+  pointer-events: none;
+  z-index: 18;
+}
+
+@keyframes electricPulse {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.4; }
+  100% { transform: translate(-50%, -50%) scale(1.45); opacity: 0.95; }
+}
+
+/* Modos de velocidad de la oficina */
+.office-paused * {
+  animation-play-state: paused !important;
+}
+
+.office-turbo .carrier-bot-entity {
+  animation-duration: 6s !important;
+}
+.office-turbo .rover-bot-entity {
+  animation-duration: 5s !important;
+}
+.office-turbo .architect-bot-entity {
+  animation-duration: 4s !important;
+}
+
+/* Saludo al hacer clic */
+.robot-waving {
+  animation: robotWave 0.6s ease 3 !important;
+}
+
+@keyframes robotWave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  75% { transform: rotate(15deg); }
+}
+
+
+/* ============================================================
+   ROBOTS Y ELEMENTOS DEL FONDO EN MOVIMIENTO (BACKGROUND ROBOTS)
+   ============================================================ */
+
+/* Animación de respiración / vida de robots del fondo */
+.bg-robot-idle {
+  animation: bgIdleBreath 3s infinite ease-in-out;
+}
+.bg-robot-idle-alt {
+  animation: bgIdleBreath 3.5s infinite ease-in-out reverse;
+}
+
+@keyframes bgIdleBreath {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Brazos apilando / moviendo cajas en el fondo */
+.bg-arm-stacking {
+  transform-origin: top left;
+  animation: bgArmStack 2.2s infinite ease-in-out;
+}
+
+@keyframes bgArmStack {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(-8deg); }
+}
+
+/* Tableta holográfica con pulso de luz */
+.bg-tablet-glow {
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.7);
+  animation: tabletFlicker 2s infinite alternate;
+}
+
+@keyframes tabletFlicker {
+  0% { opacity: 0.7; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1.02); }
+}
+
+/* Escáner láser vertical sobre la pila de cubos de la izquierda */
+.cube-stack-scanner-ring {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #38bdf8, #ffffff, #38bdf8, transparent);
+  box-shadow: 0 0 10px #38bdf8;
+  animation: cubeScanRing 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes cubeScanRing {
+  0% { top: 0%; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Pantalla holográfica del robot naranja del fondo */
+.orange-bot-hud {
+  position: absolute;
+  top: -15px;
+  left: -20px;
+  width: 60px;
+  height: 40px;
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.6);
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  animation: hudFloat 2.8s infinite alternate ease-in-out;
+}
+
+@keyframes hudFloat {
+  0% { transform: translateY(0px) rotate(1deg); }
+  100% { transform: translateY(-4px) rotate(-1deg); }
+}
+
+/* Radar circular holográfico del escritorio del operador (derecha) */
+.operator-radar-screen {
+  position: absolute;
+  top: -55px;
+  left: -35px;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(6, 182, 212, 0.7);
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+  animation: radarSpin 6s linear infinite;
+  pointer-events: none;
+}
+
+.operator-radar-screen::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  animation: radarPulse 2s infinite alternate;
+}
+
+@keyframes radarSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes radarPulse {
+  0% { transform: scale(0.85); opacity: 0.5; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Gráficos de barras holográficos dinámicos en pantallas traseras */
+.holo-bar-graph {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 18px;
+}
+
+.holo-bar {
+  width: 3px;
+  background: #38bdf8;
+  border-radius: 1px;
+  animation: barBounce 1.4s infinite alternate ease-in-out;
+}
+
+@keyframes barBounce {
+  0% { height: 20%; opacity: 0.4; }
+  50% { height: 85%; opacity: 1; }
+  100% { height: 45%; opacity: 0.7; }
+}
+
+/* Teclado del operador tecleando */
+.typing-fingers-anim {
+  animation: fingersRapid 0.18s infinite alternate;
+}
+
+@keyframes fingersRapid {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
+}
+
+/* Rayo láser conector de datos que viaja por el fondo */
+.bg-data-laser-beam {
+  stroke-dasharray: 6 6;
+  animation: laserStreamMove 1.2s linear infinite;
+}
+
+@keyframes laserStreamMove {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Placa de robot del fondo discreta e interactiva */
+.bg-bot-tag {
+  opacity: 0.75;
+  transition: all 0.2s ease;
+}
+
+.bg-bot-tag:hover {
+  opacity: 1;
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.8));
+}
+
+
+/* ============================================================
+   ROBOT DE ESPALDAS CON PANTALLA Y ENSAMBLADOR DE CUBOS
+   ============================================================ */
+
+.back-robot-entity {
+  animation: backRobotBreathing 3.6s infinite ease-in-out;
+  transform-origin: bottom center;
+}
+
+@keyframes backRobotBreathing {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(0.8deg); }
+}
+
+/* Pantalla de la espalda con núcleo de energía circular giratorio */
+.back-screen-core {
+  position: absolute;
+  top: 36%;
+  left: 30%;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: rgba(6, 182, 212, 0.35);
+  border: 1.5px solid rgba(56, 189, 248, 0.95);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.9), inset 0 0 8px rgba(6, 182, 212, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.back-screen-dial {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px dashed #38bdf8;
+  animation: backDialSpin 3.5s linear infinite;
+}
+
+@keyframes backDialSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Cabeza del robot girando e inspeccionando los cubos */
+.back-robot-head {
+  transform-origin: bottom center;
+  animation: headInspectCubes 4.2s infinite ease-in-out;
+}
+
+@keyframes headInspectCubes {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  35% { transform: rotate(-6deg) translateY(2px); }
+  70% { transform: rotate(4deg) translateY(-1px); }
+}
+
+/* Brazo derecho extendido tocando la pantalla y los cubos */
+.back-robot-arm-tap {
+  transform-origin: top left;
+  animation: armTapHoloScreen 2.2s infinite ease-in-out;
+}
+
+@keyframes armTapHoloScreen {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  40% { transform: rotate(-7deg) translateX(4px); }
+  50% { transform: rotate(-8deg) translateX(6px); }
+  75% { transform: rotate(-2deg) translateX(1px); }
+}
+
+/* Onda de choque al tocar la pantalla holográfica */
+.holo-touch-ripple {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(56, 189, 248, 0.9);
+  animation: holoTouchPulse 1.8s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes holoTouchPulse {
+  0% { transform: scale(0.2); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* Pantalla holográfica flotante frente a él */
+.floating-holo-screen-station {
+  position: absolute;
+  top: 55%;
+  left: 21%;
+  width: 68px;
+  height: 52px;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.28) 0%, rgba(3, 7, 18, 0.8) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.85);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+  z-index: 24;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: holoFloatSubtle 3s infinite alternate ease-in-out;
+}
+
+@keyframes holoFloatSubtle {
+  0% { transform: translateY(0px) rotate(-1deg); }
+  100% { transform: translateY(-5px) rotate(1deg); }
+}
+
+/* Robot compañero que está enfrente debatiendo */
+.partner-robot-entity {
+  animation: partnerDebating 3.4s infinite ease-in-out;
+  transform-origin: bottom center;
+}
+
+@keyframes partnerDebating {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-1.5deg); }
+}
+
+.partner-gesturing-hands {
+  animation: partnerHandsTalk 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes partnerHandsTalk {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(9deg) translateY(-3px); }
+}
+
+
+/* ============================================================
+   EFECTOS VIVOS EXACTOS SOBRE EL ROBOT DE LA FOTO Y SUS CUBOS
+   ============================================================ */
+
+/* 1. Núcleo Activo sobre la Pantalla de su Espalda */
+.photo-robot-back-screen {
+  position: absolute;
+  top: 64.2%;
+  left: 12.2%;
+  width: 4.6%;
+  height: 8.8%;
+  border-radius: 4px;
+  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.45) 0%, rgba(3, 7, 18, 0.7) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.9);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.95), inset 0 0 10px rgba(6, 182, 212, 0.6);
+  z-index: 28;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  pointer-events: auto;
+  animation: backScreenBreath 3.2s infinite ease-in-out;
+}
+
+@keyframes backScreenBreath {
+  0%, 100% { opacity: 0.85; transform: scale(1); filter: brightness(1); }
+  50% { opacity: 1; transform: scale(1.04); filter: brightness(1.35) drop-shadow(0 0 10px rgba(6, 182, 212, 0.8)); }
+}
+
+.photo-robot-back-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(56, 189, 248, 0.25) 3px, transparent 4px);
+  animation: scanlinesRoll 1.4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanlinesRoll {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100%); }
+}
+
+.photo-robot-back-dial {
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  border: 1.5px dashed #38bdf8;
+  animation: dialSpinClockwise 3s linear infinite;
+}
+
+@keyframes dialSpinClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 2. Módulo Auditivo / Oído Cian Luminoso */
+.photo-robot-ear-disc {
+  position: absolute;
+  top: 57.6%;
+  left: 16.6%;
+  width: 1.8%;
+  height: 2.8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #38bdf8 0%, rgba(6, 182, 212, 0.6) 60%, transparent 100%);
+  box-shadow: 0 0 12px #38bdf8, 0 0 24px rgba(6, 182, 212, 0.8);
+  z-index: 28;
+  pointer-events: none;
+  animation: earDiscPulse 2.2s infinite alternate ease-in-out;
+}
+
+@keyframes earDiscPulse {
+  0% { transform: scale(0.9); opacity: 0.65; }
+  100% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 14px #38bdf8); }
+}
+
+/* 3. Haz Láser de Escaneo desde su Cabeza hacia los Cubos */
+.photo-robot-eye-scan-beam {
+  position: absolute;
+  top: 58.5%;
+  left: 17.8%;
+  width: 7%;
+  height: 1.5px;
+  background: linear-gradient(90deg, #38bdf8, rgba(56, 189, 248, 0.8), transparent);
+  box-shadow: 0 0 8px #38bdf8;
+  transform-origin: left center;
+  transform: rotate(24deg);
+  z-index: 27;
+  pointer-events: none;
+  animation: eyeLaserSweep 3.5s infinite ease-in-out;
+}
+
+@keyframes eyeLaserSweep {
+  0%, 100% { transform: rotate(20deg); opacity: 0.4; }
+  50% { transform: rotate(32deg); opacity: 0.95; }
+}
+
+/* 4. Traza de Energía y Toque en su Brazo Derecho */
+.photo-robot-arm-tracer {
+  position: absolute;
+  top: 67%;
+  left: 17.5%;
+  width: 6.5%;
+  height: 5%;
+  z-index: 29;
+  pointer-events: none;
+}
+
+.photo-arm-touch-point {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 10px #38bdf8, 0 0 20px #06b6d4;
+  animation: touchRippleBurst 1.8s infinite ease-in-out;
+}
+
+@keyframes touchRippleBurst {
+  0% { transform: translateY(-50%) scale(0.5); opacity: 0.3; }
+  45% { transform: translateY(-50%) scale(1.4); opacity: 1; }
+  55% { transform: translateY(-50%) scale(1.5); opacity: 1; }
+  100% { transform: translateY(-50%) scale(0.5); opacity: 0.3; }
+}
+
+/* 5. Pantalla Holográfica Flotante sobre los Cubos */
+.photo-holo-screen-overlay {
+  position: absolute;
+  top: 50.8%;
+  left: 20.2%;
+  width: 8.8%;
+  height: 11.5%;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.35) 0%, rgba(3, 7, 18, 0.82) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.85);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.6), inset 0 0 12px rgba(6, 182, 212, 0.4);
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  z-index: 30;
+  pointer-events: auto;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: holoScreenFloat 3.4s infinite alternate ease-in-out;
+}
+
+@keyframes holoScreenFloat {
+  0% { transform: translateY(0px) rotate(-0.5deg); }
+  100% { transform: translateY(-4px) rotate(0.8deg); }
+}
+
+/* Onda sinusoidal / osciloscopio en la pantalla */
+.holo-sine-wave {
+  width: 100%;
+  height: 12px;
+  background-image: repeating-linear-gradient(90deg, #38bdf8 0, #38bdf8 2px, transparent 2px, transparent 6px);
+  animation: waveScroll 1s linear infinite;
+  opacity: 0.85;
+}
+
+@keyframes waveScroll {
+  from { background-position: 0 0; }
+  to { background-position: 24px 0; }
+}
+
+/* 6. Escaneo Láser y Costuras Luminosas sobre la Pila de Cubos */
+.photo-cubes-active-grid {
+  position: absolute;
+  top: 61.5%;
+  left: 19.8%;
+  width: 7.8%;
+  height: 19.5%;
+  z-index: 26;
+  pointer-events: none;
+  border: 1px dashed rgba(6, 182, 212, 0.5);
+  border-radius: 4px;
+  box-shadow: inset 0 0 15px rgba(6, 182, 212, 0.3);
+}
+
+.photo-cube-laser-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #38bdf8, #ffffff, #38bdf8, transparent);
+  box-shadow: 0 0 10px #38bdf8, 0 0 20px #06b6d4;
+  animation: cubeLaserSweepCycle 2.4s infinite ease-in-out;
+}
+
+@keyframes cubeLaserSweepCycle {
+  0% { top: 0%; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Partícula de datos que flota desde los cubos */
+.cube-data-spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+  animation: sparkRise 2s infinite ease-out;
+}
+
+@keyframes sparkRise {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-35px) scale(1.2); }
+}
+
+
+/* ============================================================
+   MODO MÚSICA & BAILE FELIZ PARA LOS TRABAJADORES (OFFICE PARTY)
+   ============================================================ */
+
+/* Animación de baile / groove para los robots cuando hay música */
+.office-music-active .photo-robot-back-screen {
+  animation: rgbDiscoPulse 1.2s infinite alternate !important;
+  box-shadow: 0 0 25px rgba(236, 72, 153, 0.9), 0 0 35px rgba(168, 85, 247, 0.7) !important;
+}
+
+@keyframes rgbDiscoPulse {
+  0% { border-color: #06b6d4; filter: hue-rotate(0deg); }
+  50% { border-color: #ec4899; filter: hue-rotate(140deg); }
+  100% { border-color: #10b981; filter: hue-rotate(280deg); }
+}
+
+/* Robots cabeceando y bailando al ritmo */
+.office-music-active .back-robot-entity,
+.office-music-active .architect-bot-entity,
+.office-music-active .rover-bot-entity,
+.office-music-active #office-robot-langchain,
+.office-music-active .partner-robot-entity {
+  animation: robotHappyDance 0.8s infinite alternate ease-in-out !important;
+}
+
+@keyframes robotHappyDance {
+  0% { transform: translateY(0px) rotate(-3deg); }
+  50% { transform: translateY(-6px) rotate(0deg) scale(1.03); }
+  100% { transform: translateY(0px) rotate(3deg); }
+}
+
+/* Notas musicales flotantes en la sala */
+.floating-music-note {
+  position: absolute;
+  font-size: 14px;
+  color: #f472b6;
+  text-shadow: 0 0 10px rgba(244, 114, 182, 0.9);
+  pointer-events: none;
+  z-index: 40;
+  animation: noteFloatUp 2.5s infinite linear;
+}
+
+@keyframes noteFloatUp {
+  0% { opacity: 0; transform: translateY(0) translateX(0) scale(0.6) rotate(0deg); }
+  20% { opacity: 1; }
+  80% { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-60px) translateX(15px) scale(1.3) rotate(25deg); }
+}
+
+/* Luces disco en los circuitos del suelo */
+.office-music-active .floor-data-stream {
+  stroke: url(#partyCircuitGrad) !important;
+  stroke-width: 3.5px !important;
+  animation: partyCircuitRush 0.8s linear infinite !important;
+}
+
+@keyframes partyCircuitRush {
+  from { stroke-dashoffset: 40; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Banner de la radio musical */
+.music-radio-bar {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(168, 85, 247, 0.2) 50%, rgba(6, 182, 212, 0.15) 100%);
+  border: 1px solid rgba(236, 72, 153, 0.35);
+}
+
+
+/* ============================================================
+   REACCIONES Y CELEBRACIÓN FIESTA DE ROBOTS
+   ============================================================ */
+
+/* Salto de alegría de los robots */
+.robot-jump-happy {
+  animation: robotJumpCelebration 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2 alternate !important;
+}
+
+@keyframes robotJumpCelebration {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-16px) scale(1.15) rotate(4deg); filter: drop-shadow(0 0 15px #ec4899); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Confeti flotante que explota */
+.confetti-particle {
+  position: absolute;
+  font-size: 16px;
+  pointer-events: none;
+  z-index: 50;
+  animation: confettiExplode 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes confettiExplode {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.4) rotate(0deg); }
+  50% { opacity: 1; transform: translate(var(--tx, 20px), var(--ty, -50px)) scale(1.3) rotate(180deg); }
+  100% { opacity: 0; transform: translate(var(--tx, 20px), var(--ty, -80px)) scale(0.8) rotate(360deg); }
+}
+
+/* Bocadillos de reacción enérgica */
+.reaction-pop-badge {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.8);
+  border: 1.5px solid #ffffff;
+  z-index: 60;
+  animation: reactionBadgePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes reactionBadgePop {
+  0% { transform: translateX(-50%) scale(0.3); opacity: 0; }
+  100% { transform: translateX(-50%) scale(1.08); opacity: 1; }
+}
+
+/* Onda expansiva de fiesta en el suelo */
+.party-floor-ripple {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #ec4899;
+  animation: partyFloorExpand 1.5s infinite ease-out;
+  pointer-events: none;
+  z-index: 15;
+}
+
+@keyframes partyFloorExpand {
+  0% { width: 40px; height: 40px; opacity: 1; border-color: #ec4899; }
+  50% { border-color: #a855f7; }
+  100% { width: 320px; height: 320px; opacity: 0; border-color: #06b6d4; }
+}

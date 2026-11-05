@@ -126,14 +126,18 @@
       </p>
 
       <div class="mt-10 flex flex-wrap justify-center gap-4">
-        <a href="#demo" class="px-7 py-3.5 rounded-xl text-sm font-bold text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 shadow-xl shadow-cyan-500/25 transition transform hover:-translate-y-0.5 flex items-center space-x-2">
-          <i data-lucide="play-circle" class="w-5 h-5"></i>
-          <span>Probar Generador en Vivo</span>
+        <a href="/office.html" class="px-7 py-3.5 rounded-xl text-sm font-bold text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 shadow-xl shadow-cyan-500/25 transition transform hover:-translate-y-0.5 flex items-center space-x-2">
+          <i data-lucide="building-2" class="w-5 h-5"></i>
+          <span>🏢 Entrar a la Oficina de Agentes</span>
         </a>
-        <a href="http://localhost:3333" target="_blank" class="px-7 py-3.5 rounded-xl text-sm font-bold text-white bg-slate-900/90 hover:bg-slate-800 border border-white/10 hover:border-cyan-500/40 shadow-lg transition flex items-center space-x-2">
+        <button onclick="handleOpenLocalNexus()" class="px-7 py-3.5 rounded-xl text-sm font-bold text-white bg-slate-900/90 hover:bg-slate-800 border border-white/10 hover:border-cyan-500/40 shadow-lg transition flex items-center space-x-2 cursor-pointer">
           <i data-lucide="laptop" class="w-5 h-5 text-cyan-400"></i>
           <span>Abrir Local Nexus (Desktop :3333)</span>
-        </a>
+        </button>
+        <button onclick="handleOpenAndroidStudio()" class="px-7 py-3.5 rounded-xl text-sm font-bold text-emerald-300 bg-emerald-950/70 hover:bg-emerald-900/90 border border-emerald-500/40 shadow-lg transition flex items-center space-x-2 cursor-pointer">
+          <i data-lucide="play-circle" class="w-5 h-5 text-emerald-400"></i>
+          <span>🚀 Abrir Android Studio</span>
+        </button>
       </div>
 
       <!-- Live Connectivity Metric -->
@@ -642,6 +646,39 @@ public class AutoDisparar extends LinearOpMode {
         window.location.href = '/chat.html';
       } catch (err) {
         alert('Error: ' + err.message);
+      }
+    }
+
+    // Manejador inteligente de apertura de Local Nexus y Android Studio
+    async function handleOpenLocalNexus() {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 1200);
+        await fetch('http://localhost:3333/api/health', { signal: controller.signal, mode: 'no-cors' });
+        clearTimeout(timeout);
+        window.open('http://localhost:3333', '_blank');
+      } catch (e) {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          window.location.href = 'http://localhost:3333';
+        } else {
+          // Si el servidor local en la PC del usuario no está activo, entra a la oficina cloud directamente
+          window.open('/office.html', '_blank');
+        }
+      }
+    }
+
+    async function handleOpenAndroidStudio() {
+      try {
+        const res = await fetch('http://localhost:3333/api/open-app', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ app: 'androidstudio' })
+        });
+        const data = await res.json();
+        alert(data.message || '🚀 ¡Android Studio abierto en tu PC!');
+      } catch (err) {
+        // Si no responde localmente, redirige a Local Nexus
+        window.open('http://localhost:3333', '_blank');
       }
     }
 

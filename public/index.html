@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local AI Nexus - Ecosistema de IA de 5 Capas & Agente FTC</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Marked.js para Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Mermaid.js para Diagramas de Robótica -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <!-- PDF.js para Lectura RAG de Documentos -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- QRCode.js para Acceso Móvil -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            dark: {
+              950: '#070a12',
+              900: '#0d1222',
+              800: '#141c33',
+              700: '#1e294b'
+            }
+          }
+        }
+      }
+    };
+    // Initialize Mermaid
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  </script>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-white/10 glass-panel sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+          <i data-lucide="layers" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">
+              Local AI Nexus & Agente PC
+            </h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              5-Tier Architecture
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Panel Central de IA, Robótica FTC, Voz & RAG Local</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls in Header -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Enlace a la Web Corporativa -->
+        <a href="https://neoia-351a.onrender.com/" target="_blank" class="hidden sm:flex px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-semibold items-center space-x-1.5 transition shadow-sm" title="Visitar la web corporativa de NeoIA Robotics Technologies">
+          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+          <span>Web Corporativa NeoIA</span>
+        </a>
+        <!-- Instagram Oficial -->
+        <a href="https://www.instagram.com/cicada_3301_.py/" target="_blank" class="hidden sm:flex px-3 py-1.5 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 border border-pink-500/30 text-xs font-semibold items-center space-x-1.5 transition shadow-sm" title="Instagram Oficial (@cicada_3301_.py)">
+          <i data-lucide="instagram" class="w-3.5 h-3.5 text-pink-400"></i>
+          <span>@cicada_3301_.py</span>
+        </a>
+
+        <!-- YouTube Oficial & Conexión -->
+        <button onclick="openYouTubeModal()" id="btn-header-youtube" class="hidden sm:flex px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-semibold items-center space-x-1.5 transition shadow-sm group" title="Canal Oficial de YouTube: MS painr (@JhoandryPolanco-p3j)">
+          <i data-lucide="youtube" class="w-3.5 h-3.5 text-red-400 group-hover:scale-110 transition"></i>
+          <span id="header-youtube-text">MS painr (@JhoandryPolanco-p3j)</span>
+        </button>
+        <!-- 5 GB Storage Guard -->
+        <div id="storage-guard-widget" class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-white/10 text-xs shadow-inner" title="Límite estricto de 5 GB para modelos">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Cuota: <strong id="storage-used-text" class="text-white">2.15</strong> / 5.0 GB</span>
+          <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div id="storage-progress-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 43%;"></div>
+          </div>
+        </div>
+
+        <!-- TTS Voice Toggle -->
+        <button onclick="toggleVoiceAudio()" id="btn-toggle-tts" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-xs flex items-center space-x-1.5 border border-white/10" title="Activar/Desactivar lectura por voz">
+          <i data-lucide="volume-2" class="w-4 h-4 text-cyan-400" id="tts-icon"></i>
+          <span class="hidden sm:inline" id="tts-text">Voz: OFF</span>
+        </button>
+
+        <!-- QR Mobile Remote Access -->
+        <button onclick="openQRModal()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition text-xs flex items-center space-x-1.5 border border-white/10" title="Controlar desde el Celular">
+          <i data-lucide="qr-code" class="w-4 h-4 text-purple-400"></i>
+          <span class="hidden sm:inline">Celular QR</span>
+        </button>
+
+        <!-- Modo PC Apagada (24/7 Cloud) -->
+        <button onclick="openCloud247Modal()" class="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 text-xs font-bold items-center space-x-1.5 transition shadow-sm hidden md:flex animate-pulse" title="Trabajar con la PC apagada desde la nube 24/7">
+          <i data-lucide="power-off" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Modo PC Apagada 24/7</span>
+        </button>
+
+        <!-- NeoIA Cloud Link -->
+        <a href="https://neoia-351a.onrender.com/" target="_blank" class="p-2 px-3 rounded-lg bg-gradient-to-r from-cyan-600/30 to-blue-600/30 hover:from-cyan-500/40 hover:to-blue-500/40 text-cyan-300 hover:text-white transition text-xs flex items-center space-x-1.5 border border-cyan-500/30 shadow-sm" title="Abrir NeoIA Cloud en Render">
+          <i data-lucide="cloud" class="w-4 h-4 text-cyan-400"></i>
+          <span class="hidden sm:inline font-semibold">NeoIA Cloud 🌐</span>
+        </a>
+
+        <button id="btn-refresh-all" onclick="scanAllServices()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center space-x-1 text-xs border border-white/10" title="Reescanear conexiones">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 overflow-x-auto scrollbar-none border-t border-white/5">
+      <button onclick="switchTab('map')" id="tab-map" class="tab-btn active px-4 py-3 text-sm font-medium border-b-2 border-cyan-400 text-cyan-300 flex items-center space-x-2 transition">
+        <i data-lucide="workflow" class="w-4 h-4 text-cyan-400"></i>
+        <span>Mapa del Ecosistema (5 Tiers)</span>
+      </button>
+
+      <button onclick="switchTab('house')" id="tab-house" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2 transition">
+        <i data-lucide="home" class="w-4 h-4 text-amber-400"></i>
+        <span>Casa de Agentes (Swarm)</span>
+        <span id="house-agents-count" class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">4 Activos</span>
+      </button>
+
+      <button onclick="switchTab('agent')" id="tab-agent" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2 transition">
+        <i data-lucide="cpu" class="w-4 h-4 text-emerald-400"></i>
+        <span>🤖 Agente Autónomo & FTC</span>
+      </button>
+
+      <button onclick="switchTab('chat')" id="tab-chat" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2 transition">
+        <i data-lucide="message-square" class="w-4 h-4"></i>
+        <span>Chat & Voz</span>
+      </button>
+
+      <button onclick="switchTab('diagrams')" id="tab-diagrams" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2 transition">
+        <i data-lucide="git-branch" class="w-4 h-4 text-amber-400"></i>
+        <span>📊 Diagramas de Estrategia</span>
+      </button>
+
+      <button onclick="switchTab('catalog')" id="tab-catalog" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2 transition">
+        <i data-lucide="box" class="w-4 h-4 text-purple-400"></i>
+        <span>📚 Catálogo de 20 Modelos</span>
+      </button>
+
+      <button onclick="switchTab('radar')" id="tab-radar" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-2 transition">
+        <i data-lucide="radar" class="w-4 h-4"></i>
+        <span>Radar de Puertos</span>
+        <span id="active-services-count" class="ml-1 text-[11px] px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300">1</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Body -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- ================= VIEW 1: MAPA DEL ECOSISTEMA (5 TIERS) ================= -->
+    <div id="view-map" class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="network" class="w-5 h-5 text-cyan-400"></i>
+            Ecosistema de IA Local — Arquitectura de 5 Capas
+          </h2>
+          <p class="text-sm text-slate-400">
+            Haz clic en cualquier capa interactiva o explora los 20 modelos locales listados abajo.
+          </p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-online"></span>
+            Flujo de Datos Activo
+          </span>
+        </div>
+      </div>
+
+      <!-- EXACT 3D ISOMETRIC INFOGRAPHIC HERO WITH INTERACTIVE HOTSPOTS -->
+      <div class="infographic-frame relative">
+        <img src="architecture.png" alt="Arquitectura del Ecosistema Local de 5 Capas" class="w-full h-auto object-cover select-none">
+
+        <!-- Tier 1 Hotspot (Top left / UI) -->
+        <div onclick="switchTab('chat')" class="tier-hotspot top-[6%] left-[2%] w-[45%] h-[24%]" title="Tier 1: Client & UI - Haz clic para abrir el Chat">
+          <div class="absolute top-2 left-2 px-2.5 py-1 rounded bg-cyan-950/80 text-cyan-300 font-mono text-[10px] border border-cyan-400/40 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 pulse-online"></span>
+            <span>TIER 1: CLIENT & UI (Clic para abrir)</span>
+          </div>
+        </div>
+
+        <!-- Tier 2 Hotspot (Middle-left / Gateway & LiteLLM Proxy) -->
+        <div onclick="switchTab('radar')" class="tier-hotspot top-[28%] left-[2%] w-[48%] h-[18%]" title="Tier 2: Gateway & Routing (Puerto 3333) - Haz clic para ver el Radar">
+          <div class="absolute top-2 left-2 px-2.5 py-1 rounded bg-indigo-950/80 text-indigo-300 font-mono text-[10px] border border-indigo-400/40 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+            <span>TIER 2: GATEWAY & ROUTING (Proxy 3333)</span>
+          </div>
+        </div>
+
+        <!-- Tier 3 Hotspot (Center / Specialized Models) -->
+        <div onclick="switchTab('agent')" class="tier-hotspot top-[44%] left-[2%] w-[70%] h-[25%]" title="Tier 3: Specialized Models - Haz clic para el Agente FTC">
+          <div class="absolute top-2 left-2 px-2.5 py-1 rounded bg-purple-950/80 text-purple-300 font-mono text-[10px] border border-purple-400/40 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-purple-400 pulse-online"></span>
+            <span>TIER 3: SPECIALIZED MODELS (FTC Coder & Llama)</span>
+          </div>
+        </div>
+
+        <!-- Tier 4 Hotspot (Bottom-left / Vector Store & Memory) -->
+        <div onclick="switchTab('agent')" class="tier-hotspot top-[68%] left-[2%] w-[45%] h-[28%]" title="Tier 4: Vector Store & Memory - Base de Conocimiento FTC">
+          <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded bg-amber-950/80 text-amber-300 font-mono text-[10px] border border-amber-400/40 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>TIER 4: VECTOR STORE & MEMORY (RAG & Reglas FTC)</span>
+          </div>
+        </div>
+
+        <!-- Tier 5 Hotspot (Bottom-right / Compute Hardware) -->
+        <div onclick="switchTab('radar')" class="tier-hotspot top-[56%] right-[2%] w-[50%] h-[40%]" title="Tier 5: Compute Hardware - Motor Ollama en tu PC">
+          <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded bg-emerald-950/80 text-emerald-300 font-mono text-[10px] border border-emerald-400/40 flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-online"></span>
+            <span>TIER 5: COMPUTE HARDWARE (Ollama 11434 & GPU)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Interactive Action Bar Below Infographic -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2">
+        <button onclick="switchTab('agent')" class="glass-panel p-4 rounded-xl border border-white/10 hover:border-cyan-400/50 text-left transition flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+            <i data-lucide="bot" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-white group-hover:text-cyan-300 transition">Agente Autónomo FTC</h4>
+            <p class="text-[11px] text-slate-400">Escribir código Java y guardarlo</p>
+          </div>
+        </button>
+
+        <button onclick="switchTab('chat')" class="glass-panel p-4 rounded-xl border border-white/10 hover:border-indigo-400/50 text-left transition flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+            <i data-lucide="mic" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Chat con Voz en Vivo</h4>
+            <p class="text-[11px] text-slate-400">Habla con tu IA en español</p>
+          </div>
+        </button>
+
+        <button onclick="switchTab('diagrams')" class="glass-panel p-4 rounded-xl border border-white/10 hover:border-amber-400/50 text-left transition flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <i data-lucide="git-branch" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-white group-hover:text-amber-300 transition">Diagramas de Estrategia</h4>
+            <p class="text-[11px] text-slate-400">Rutas autónomas de robótica</p>
+          </div>
+        </button>
+
+        <button onclick="openQRModal()" class="glass-panel p-4 rounded-xl border border-white/10 hover:border-purple-400/50 text-left transition flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+            <i data-lucide="smartphone" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-white group-hover:text-purple-300 transition">Acceso Móvil QR</h4>
+            <p class="text-[11px] text-slate-400">Controla desde tu teléfono</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- TIER 3 DETAILED EXPANSION: ALL 20 CURATED MODELS -->
+      <div class="glass-panel p-6 rounded-2xl border border-white/10 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono">TIER 3 EXPANDIDO</span>
+            <h3 class="text-base font-bold text-white">Los 20 Modelos de tu Ecosistema Local</h3>
+          </div>
+          <span class="text-xs text-slate-400">Listos para instalar o alternar</span>
+        </div>
+        <div id="tier3-20-models-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 2: AGENTE AUTÓNOMO ================= -->
+    
+    <!-- ================= VIEW: CASA DE AGENTES (SWARM WORKSPACE) ================= -->
+    <div id="view-house" class="hidden space-y-6">
+      
+      <!-- Cabecera de la Oficina de Agentes -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl glass-panel border border-white/10 shadow-2xl">
+        <div class="flex items-center space-x-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-600 via-amber-500 to-emerald-400 p-0.5 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+              <i data-lucide="bot" class="w-6 h-6 text-cyan-400"></i>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-xl font-black text-white">Oficina Virtual de Agentes (Enjambre 2026)</h2>
+              <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-xs font-mono font-semibold flex items-center space-x-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Interconectados</span>
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Instala frameworks y agentes (AutoGen, LangChain, LlamaIndex, SuperAGI). Trabajan y se coordinan en un mismo proyecto.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <div class="text-right hidden md:block">
+            <div class="text-[11px] text-slate-400">Proyecto Compartido:</div>
+            <div class="text-xs font-bold font-mono text-amber-400">BioBuzzFTC12 (TeamCode)</div>
+          </div>
+          <button onclick="openInstallAgentModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-amber-400 via-orange-400 to-cyan-400 hover:from-amber-300 hover:to-cyan-300 transition shadow-lg shadow-amber-500/20 flex items-center space-x-1.5">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Instalar Nuevo Agente</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SALA VIRTUAL: PLANO CIBERNÉTICO DE LA OFICINA (Visual Idéntico a la Foto 2026) -->
+      <div class="cyber-floor p-5 sm:p-7 rounded-3xl border border-cyan-500/30 shadow-2xl relative overflow-hidden space-y-6">
+        
+        <!-- Barra de Control Superior -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-3 relative z-10 pb-4 border-b border-white/10">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-cyan-500/20 text-lg">
+              🏢
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h3 class="text-sm font-black text-white tracking-wider uppercase font-mono">Cuartel Central de Agentes IA 2026</h3>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Multi-Agent Pipeline Activo
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-400">Frameworks colaborativos trabajando en el mismo proyecto FTC (BIOBUZZ 24096)</p>
+            </div>
+          </div>
+
+          <!-- Toggles y Botón de Ejecución de la Oficina -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="toggleOfficeMotion()" id="btn-toggle-office-motion" class="px-2.5 py-1.5 rounded-xl bg-cyan-950/70 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-500/30 text-[11px] font-mono flex items-center space-x-1.5 transition shadow-sm" title="Pausar o reanudar el movimiento de los robots en la oficina">
+              <span id="office-motion-icon">🏃‍♂️</span>
+              <span id="office-motion-text">Oficina: Activa en Vivo</span>
+            </button>
+            <button onclick="toggleOfficeSpeed()" id="btn-toggle-office-speed" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/10 text-[11px] font-mono flex items-center space-x-1.5 transition" title="Alternar entre velocidad normal y hora pico (sprint de código)">
+              <span id="office-speed-icon">⚡</span>
+              <span id="office-speed-text">Ritmo: Normal</span>
+            </button>
+            <button onclick="gatherAllRobotsInCenter()" id="btn-gather-robots" class="px-2.5 py-1.5 rounded-xl bg-purple-950/70 hover:bg-purple-900/80 text-purple-300 border border-purple-500/30 text-[11px] font-mono flex items-center space-x-1.5 transition" title="Llamar a todos los robots al centro para reunión de equipo">
+              <span>🤝</span>
+              <span>Reunión de Equipo</span>
+            </button>
+            <button onclick="toggleSwarmAudio()" id="btn-toggle-swarm-audio" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/10 text-[11px] font-mono flex items-center space-x-1.5 transition">
+              <span id="swarm-audio-icon">🔊</span>
+              <span id="swarm-audio-text">Audio: ON</span>
+            </button>
+            <button onclick="toggleOfficeMusicParty()" id="btn-toggle-music-party" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-red-500/20 hover:from-pink-500/30 hover:to-red-500/30 text-pink-300 border border-pink-500/40 text-[11px] font-mono flex items-center space-x-1.5 transition shadow-sm" title="¡Poner música para que los robots trabajadores se pongan felices y bailen!">
+              <span id="music-party-icon">🎵</span>
+              <span id="music-party-text">Música Feliz Trabajadores</span>
+            </button>
+            <button onclick="openYouTubeModal()" class="px-2.5 py-1.5 rounded-xl bg-red-950/70 hover:bg-red-900/80 text-red-300 border border-red-500/30 text-[11px] font-mono flex items-center space-x-1.5 transition shadow-sm" title="Abrir Canal de YouTube MS painr">
+              <span class="text-red-400">▶️</span>
+              <span>MS painr</span>
+            </button>
+            <button onclick="openAndroidStudioWithCreatedCode()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/30 to-teal-500/30 hover:from-emerald-500/40 hover:to-teal-500/40 text-emerald-300 border border-emerald-500/50 text-[11px] font-mono flex items-center space-x-1.5 transition shadow-sm font-bold" title="Abrir Android Studio con el código creado por los agentes">
+              <span>🚀</span>
+              <span>Abrir Studio con Código</span>
+            </button>
+            <button onclick="openCloud247Modal()" class="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900/90 text-emerald-300 border border-emerald-500/40 text-[11px] font-mono flex items-center space-x-1.5 transition shadow-sm" title="Trabajar con la PC apagada (Servidor en la Nube 24/7)">
+              <span>☁️</span>
+              <span>Modo PC Apagada (24/7)</span>
+            </button>
+            <button onclick="runMultiAgentPipeline()" id="btn-run-pipeline" class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-amber-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/25 transition flex items-center space-x-1.5">
+              <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+              <span>Iniciar Pipeline</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ESCENARIO DE LA OFICINA EN MOVIMIENTO (LIVING ROBOT OFFICE SIMULATOR) -->
+        <div id="office-stage" class="office-stage-container border border-cyan-500/30 shadow-2xl select-none relative group">
+          <!-- Fondo Real de la Foto del Cuartel General -->
+          <img src="/agent-house-hq.jpg" alt="Cuartel Central de Agentes 2026" class="w-full h-[440px] sm:h-[500px] md:h-[560px] object-cover object-center filter brightness-95 group-hover:brightness-100 transition duration-500">
+          
+          <!-- Capa de Gradiente Holográfica -->
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/25 pointer-events-none"></div>
+
+          <!-- Rayo Láser Central que baja del techo -->
+          <div class="laser-pillar"></div>
+
+          <!-- Ondas de choque en el apretón de manos central -->
+          <div style="top: 55%; left: 50%;" class="absolute pointer-events-none z-10">
+            <div class="energy-ripple"></div>
+            <div class="energy-ripple"></div>
+            <div class="energy-ripple"></div>
+            <div class="electric-spark-center"></div>
+          </div>
+
+          <!-- Líneas de Circuito Animadas sobre el Suelo de la Foto -->
+          <svg class="photo-circuit-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="photoCircuitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" />
+                <stop offset="50%" stop-color="#f59e0b" />
+                <stop offset="100%" stop-color="#10b981" />
+              </linearGradient>
+              <linearGradient id="partyCircuitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ec4899" />
+                <stop offset="50%" stop-color="#a855f7" />
+                <stop offset="100%" stop-color="#06b6d4" />
+              </linearGradient>
+            </defs>
+            <line x1="50%" y1="55%" x2="12%" y2="28%" stroke="url(#photoCircuitGrad)" stroke-width="2.5" class="floor-data-stream opacity-70" />
+            <line x1="50%" y1="55%" x2="27%" y2="30%" stroke="url(#photoCircuitGrad)" stroke-width="2.5" class="floor-data-stream opacity-70" />
+            <line x1="50%" y1="55%" x2="43%" y2="28%" stroke="url(#photoCircuitGrad)" stroke-width="2.5" class="floor-data-stream opacity-70" />
+            <line x1="50%" y1="55%" x2="54%" y2="28%" stroke="url(#photoCircuitGrad)" stroke-width="2.5" class="floor-data-stream opacity-70" />
+            <line x1="50%" y1="55%" x2="69%" y2="30%" stroke="url(#photoCircuitGrad)" stroke-width="2.5" class="floor-data-stream opacity-70" />
+            <line x1="50%" y1="55%" x2="88%" y2="30%" stroke="url(#photoCircuitGrad)" stroke-width="2.5" class="floor-data-stream opacity-70" />
+            <line x1="50%" y1="55%" x2="22%" y2="68%" stroke="url(#photoCircuitGrad)" stroke-width="2" class="floor-data-stream opacity-60" />
+            <line x1="50%" y1="55%" x2="82%" y2="65%" stroke="url(#photoCircuitGrad)" stroke-width="2" class="floor-data-stream opacity-60" />
+          </svg>
+
+          <!-- ==============================================
+               ROBOTS DEL FONDO Y ESTACIONES EN MOVIMIENTO
+               ============================================== -->
+
+          <!-- B1. ROBOT APILADOR DE CAJAS DEL FONDO (Izquierda) -->
+          <div id="office-bg-stacker" onclick="clickOfficeRobot('Stacker Bot', 'bg-stacker')" style="top: 24%; left: 20%;" class="absolute z-15 flex flex-col items-center cursor-pointer bg-bot-tag group/stk" title="Asistente de Fondo: Clasificando cajas y telemetría">
+            <div id="bubble-bg-stacker" class="office-speech-bubble" style="display:none;" onclick="event.stopPropagation(); clickOfficeRobot('Stacker Bot', 'bg-stacker')">
+              📦 Stacker: "Ordenando paquetes de telemetría..."
+            </div>
+            <!-- Brazo móvil y cubo holográfico -->
+            <div class="relative bg-robot-idle flex flex-col items-center">
+              <span class="w-3.5 h-3.5 rounded-full bg-cyan-400 hotspot-glow border border-white"></span>
+              <div class="w-4 h-3 bg-cyan-400/60 border border-white/60 rounded-sm bg-arm-stacking mt-0.5 shadow-md shadow-cyan-400/50"></div>
+            </div>
+            <span class="mt-1 px-1.5 py-0.5 rounded bg-slate-950/85 text-cyan-300 font-mono text-[8px] font-bold border border-cyan-500/40 backdrop-blur-sm shadow flex items-center gap-0.5">
+              <span>📦</span> Stacker
+            </span>
+          </div>
+
+          <!-- B2. ROBOT ANALISTA DEL PASILLO (Detrás de AutoGen) -->
+          <div id="office-bg-hallway" onclick="clickOfficeRobot('Analyst Bot', 'bg-analyst')" style="top: 24%; left: 34%;" class="absolute z-15 flex flex-col items-center cursor-pointer bg-bot-tag group/hlw" title="Analista de Estrategia FTC">
+            <div id="bubble-bg-analyst" class="office-speech-bubble" style="display:none;" onclick="event.stopPropagation(); clickOfficeRobot('Analyst Bot', 'bg-analyst')">
+              📊 Analyst: "Calculando trayectoria hacia la canasta..."
+            </div>
+            <div class="bg-robot-idle-alt flex flex-col items-center">
+              <span class="w-3.5 h-3.5 rounded-full bg-indigo-400 hotspot-glow border border-white"></span>
+              <!-- Tableta luminosa con pulso -->
+              <div class="w-4 h-2.5 bg-indigo-500/70 border border-indigo-300 rounded-sm bg-tablet-glow mt-0.5"></div>
+            </div>
+            <span class="mt-1 px-1.5 py-0.5 rounded bg-slate-950/85 text-indigo-300 font-mono text-[8px] font-bold border border-indigo-500/40 backdrop-blur-sm shadow flex items-center gap-0.5">
+              <span>📊</span> Analista
+            </span>
+          </div>
+
+          <!-- B3. TÉCNICO DEL NÚCLEO LÁSER (Detrás del Apretón de Manos) -->
+          <div id="office-bg-coretech" onclick="clickOfficeRobot('Core Tech', 'bg-core')" style="top: 23%; left: 45%;" class="absolute z-15 flex flex-col items-center cursor-pointer bg-bot-tag group/core" title="Supervisor del Núcleo Central de Datos">
+            <div id="bubble-bg-core" class="office-speech-bubble" style="display:none;" onclick="event.stopPropagation(); clickOfficeRobot('Core Tech', 'bg-core')">
+              ⚡ Core Tech: "Haz láser a 10Gbps estable..."
+            </div>
+            <div class="bg-robot-idle flex flex-col items-center">
+              <span class="w-3.5 h-3.5 rounded-full bg-cyan-300 hotspot-glow border border-white"></span>
+              <div class="w-2.5 h-2.5 bg-cyan-400/80 rounded-full animate-ping mt-0.5"></div>
+            </div>
+            <span class="mt-1 px-1.5 py-0.5 rounded bg-slate-950/85 text-cyan-200 font-mono text-[8px] font-bold border border-cyan-400/40 backdrop-blur-sm shadow flex items-center gap-0.5">
+              <span>⚡</span> Núcleo
+            </span>
+          </div>
+
+          <!-- B4. ANALISTA DE TELEMETRÍA EN CUBÍCULO (Detrás de SuperAGI) -->
+          <div id="office-bg-cubicle" onclick="clickOfficeRobot('Telemetry Bot', 'bg-telemetry')" style="top: 24%; left: 59%;" class="absolute z-15 flex flex-col items-center cursor-pointer bg-bot-tag group/cub" title="Monitoreo de Telemetría 50Hz">
+            <div id="bubble-bg-telemetry" class="office-speech-bubble" style="display:none;" onclick="event.stopPropagation(); clickOfficeRobot('Telemetry Bot', 'bg-telemetry')">
+              📈 Telemetry: "Frecuencia de loop a 50Hz perfecta..."
+            </div>
+            <div class="bg-robot-idle-alt flex flex-col items-center">
+              <span class="w-3.5 h-3.5 rounded-full bg-purple-400 hotspot-glow border border-white"></span>
+              <!-- Gráfico de barras animado -->
+              <div class="holo-bar-graph mt-0.5">
+                <div class="holo-bar" style="animation-delay: 0.1s;"></div>
+                <div class="holo-bar" style="animation-delay: 0.4s;"></div>
+                <div class="holo-bar" style="animation-delay: 0.25s;"></div>
+                <div class="holo-bar" style="animation-delay: 0.6s;"></div>
+              </div>
+            </div>
+            <span class="mt-1 px-1.5 py-0.5 rounded bg-slate-950/85 text-purple-300 font-mono text-[8px] font-bold border border-purple-500/40 backdrop-blur-sm shadow flex items-center gap-0.5">
+              <span>📈</span> 50Hz Loop
+            </span>
+          </div>
+
+          <!-- B5. ROBOT NARANJA DEL FONDO CON TABLETA HOLOGRÁFICA (Sensor Bus) -->
+          <div id="office-bg-orange" onclick="clickOfficeRobot('Sensor Engineer', 'bg-orange')" style="top: 35%; left: 66%;" class="absolute z-20 flex flex-col items-center cursor-pointer bg-bot-tag group/org" title="Ingeniero de Sensores I2C y CAN">
+            <div id="bubble-bg-orange" class="office-speech-bubble" style="display:none;" onclick="event.stopPropagation(); clickOfficeRobot('Sensor Engineer', 'bg-orange')">
+              🟧 Sensor Bot: "Bus CAN & I2C respondiendo a 1ms..."
+            </div>
+            <!-- Pantalla flotante HUD holográfica -->
+            <div class="relative bg-robot-idle flex flex-col items-center">
+              <span class="w-4 h-4 rounded-full bg-amber-400 hotspot-glow border-2 border-white"></span>
+              <div class="orange-bot-hud flex flex-col justify-between p-1">
+                <div class="flex items-center justify-between text-[6px] font-mono text-cyan-300 font-bold">
+                  <span>CAN BUS</span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                </div>
+                <div class="w-full bg-cyan-400/20 h-1 rounded-full overflow-hidden">
+                  <div class="bg-cyan-400 h-full w-4/5 animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+            <span class="mt-1 px-2 py-0.5 rounded-lg bg-slate-950/90 text-amber-300 font-mono text-[9px] font-bold border border-amber-500/50 backdrop-blur-md shadow-xl flex items-center gap-1">
+              <span>🟧</span> Sensor Bus
+            </span>
+          </div>
+
+          <!-- ============================================================
+               ROBOT DE ESPALDAS EXACTO DE LA FOTO (TOTALMENTE ANIMADO)
+               ============================================================ -->
+
+          <!-- 1. Pantalla Activa en su Espalda (Núcleo Giratorio + Scanlines) -->
+          <div id="office-robot-backscreen" onclick="clickOfficeRobot('Core Assembler', 'robot-backscreen')" class="photo-robot-back-screen group/bk" title="Robot de Espaldas: Clic para interactuar con el Ensamblador Core">
+            <div class="photo-robot-back-dial"></div>
+          </div>
+
+          <!-- Bocadillo de Diálogo Dinámico sobre su cabeza -->
+          <div id="bubble-robot-backscreen" style="top: 48%; left: 14%;" class="office-speech-bubble" onclick="event.stopPropagation(); clickOfficeRobot('Core Assembler', 'robot-backscreen')">
+            🤖 Core Assembler: "Tocando pantalla y auditando memoria..."
+          </div>
+
+          <!-- 2. Oído / Módulo Auditivo Cian Luminoso que pulsa -->
+          <div class="photo-robot-ear-disc"></div>
+
+          <!-- 3. Haz Láser de Escaneo desde su Cabeza hacia los Cubos -->
+          <div class="photo-robot-eye-scan-beam"></div>
+
+          <!-- 4. Traza de Toque Táctil en su Brazo Derecho -->
+          <div class="photo-robot-arm-tracer">
+            <div class="photo-arm-touch-point"></div>
+          </div>
+
+          <!-- 5. Pantalla Holográfica Flotante sobre los Cubos en la Foto -->
+          <div id="office-holo-terminal" onclick="clickOfficeRobot('Core Assembler', 'robot-backscreen')" class="photo-holo-screen-overlay" title="Pantalla Holográfica de Telemetría">
+            <div class="flex items-center justify-between text-[7px] font-mono text-cyan-300 font-bold border-b border-cyan-500/40 pb-0.5">
+              <span>FTC DIAG</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            </div>
+            <!-- Onda sinusoidal animada -->
+            <div class="holo-sine-wave"></div>
+            <div class="flex items-center justify-between text-[6px] font-mono">
+              <span class="text-slate-300">RAM: 142MB</span>
+              <span class="text-emerald-400 font-bold">50Hz OK</span>
+            </div>
+          </div>
+
+          <!-- 6. Escaneo Láser y Partículas sobre la Pila de Cubos en la Foto -->
+          <div class="photo-cubes-active-grid">
+            <div class="photo-cube-laser-sweep"></div>
+            <div class="cube-data-spark" style="bottom: 10%; left: 30%; animation-delay: 0.2s;"></div>
+            <div class="cube-data-spark" style="bottom: 40%; right: 25%; animation-delay: 1.1s;"></div>
+            <div class="cube-data-spark" style="bottom: 70%; left: 50%; animation-delay: 0.7s;"></div>
+          </div>
+
+          <!-- 7. Placa Identificadora limpia (debajo, sin tapar el brazo ni los cubos) -->
+          <div onclick="clickOfficeRobot('Core Assembler', 'robot-backscreen')" style="top: 86%; left: 12%;" class="absolute z-30 cursor-pointer">
+            <span class="px-2 py-0.5 rounded-lg bg-slate-950/95 text-cyan-300 font-mono text-[9px] font-bold border border-cyan-400/60 backdrop-blur-md shadow-xl flex items-center gap-1 hover:scale-110 transition">
+              <span>🤖</span> Core Assembler
+            </span>
+          </div>
+
+          <!-- 8. Robot Compañero que está enfrente debatiendo -->
+          <div id="office-robot-partner" onclick="clickOfficeRobot('Partner Bot', 'robot-partner')" style="top: 50%; left: 32%;" class="absolute z-22 flex flex-col items-center cursor-pointer group/pt" title="Co-Programador: Clic para hablar con el robot colaborador">
+            <div id="bubble-robot-partner" class="office-speech-bubble" style="display:none;" onclick="event.stopPropagation(); clickOfficeRobot('Partner Bot', 'robot-partner')">
+              🤖 Co-Programador: "¡Bloque de cinemática validado e integrado!"
+            </div>
+            <div class="partner-robot-entity flex flex-col items-center">
+              <div class="relative flex items-center justify-center">
+                <span class="w-4 h-4 rounded-full bg-slate-200 border-2 border-cyan-400 shadow-md"></span>
+                <span class="absolute w-2 h-1 bg-cyan-400 rounded-full animate-pulse"></span>
+              </div>
+              <div class="w-8 h-13 bg-slate-300 rounded-md border border-cyan-400/60 shadow mt-0.5 relative flex items-center justify-center">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 hotspot-glow"></span>
+                <!-- Manos gesticulando -->
+                <div class="partner-gesturing-hands absolute -left-2 top-3 w-3 h-1.5 bg-slate-400 rounded-full border border-cyan-400"></div>
+                <div class="partner-gesturing-hands absolute -right-2 top-3 w-3 h-1.5 bg-slate-400 rounded-full border border-cyan-400"></div>
+              </div>
+              <div class="flex space-x-1.5 -mt-0.5">
+                <div class="w-2 h-7 bg-slate-500 rounded-b"></div>
+                <div class="w-2 h-7 bg-slate-600 rounded-b"></div>
+              </div>
+            </div>
+            <span class="mt-1 px-1.5 py-0.5 rounded bg-slate-950/90 text-cyan-200 font-mono text-[8px] font-bold border border-cyan-500/40 backdrop-blur-sm shadow flex items-center gap-0.5 group-hover/pt:scale-110 transition">
+              <span>🤝</span> Co-Programador
+            </span>
+          </div>
+
+          <!-- B7. OPERADOR EN ESCRITORIO CON RADAR HOLOGRÁFICO (Extremo Derecho) -->
+          <div id="office-bg-operator" onclick="clickOfficeRobot('Driver Station Operator', 'bg-operator')" style="top: 64%; left: 90%;" class="absolute z-20 flex flex-col items-center cursor-pointer group/opr" title="Operador del Driver Station FTC">
+            <div id="bubble-bg-operator" class="office-speech-bubble" style="display:none;" onclick="event.stopPropagation(); clickOfficeRobot('Driver Station Operator', 'bg-operator')">
+              🖥️ Driver Station: "Control Hub conectado a 5GHz Wi-Fi..."
+            </div>
+            <div class="relative flex flex-col items-center">
+              <span class="w-4 h-4 rounded-full bg-emerald-400 hotspot-glow border-2 border-white"></span>
+              <!-- Radar circular holográfico gigante rotando -->
+              <div class="operator-radar-screen"></div>
+              <!-- Dedos tecleando en el teclado -->
+              <div class="w-6 h-2 bg-slate-700 rounded-sm mt-1 border border-slate-500 typing-fingers-anim"></div>
+            </div>
+            <span class="mt-1 px-2 py-0.5 rounded-lg bg-slate-950/90 text-emerald-300 font-mono text-[9px] font-bold border border-emerald-500/50 backdrop-blur-md shadow-xl flex items-center gap-1">
+              <span>🖥️</span> Driver Station
+            </span>
+          </div>
+
+          <!-- ==============================================
+               ROBOTS Y AGENTES PRINCIPALES CON MOVIMIENTO REAL
+               ============================================== -->
+
+          <!-- 1. LANGCHAIN (Programador Master Mecanografiando) -->
+          <div id="office-robot-langchain" onclick="clickOfficeRobot('LangChain', 'agent-langchain')" style="top: 19%; left: 11%;" class="absolute z-20 flex flex-col items-center cursor-pointer group/rc" title="LangChain: Clic para hablar con el programador">
+            <div id="bubble-langchain" class="office-speech-bubble" onclick="event.stopPropagation(); clickOfficeRobot('LangChain', 'agent-langchain')">
+              💻 LangChain: "Escribiendo TeleOpBioBuzzTeam.java..."
+            </div>
+            <!-- Laptop con código flotante -->
+            <div class="relative flex items-center justify-center">
+              <span class="w-5 h-5 rounded-full bg-emerald-400 hotspot-glow border-2 border-white"></span>
+              <div class="floating-code-particle" style="top: -20px; left: -10px;">public class TeleOp...</div>
+              <div class="floating-code-particle" style="top: -35px; right: -15px; animation-delay: 1.2s;">PIDF.calculate()</div>
+              <div class="floating-code-particle" style="top: -50px; left: 5px; animation-delay: 2.1s;">shooter.setVelocity(1200)</div>
+            </div>
+            <!-- Placa de Identificación -->
+            <span class="mt-1 px-2.5 py-1 rounded-lg bg-slate-950/90 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-500/50 backdrop-blur-md shadow-xl hud-scanner group-hover/rc:scale-110 transition flex items-center gap-1">
+              <span>💻</span> LangChain (Coding)
+            </span>
+          </div>
+
+          <!-- 2. AUTOGEN (Arquitecto Paseando y Planificando) -->
+          <div id="office-robot-autogen" onclick="clickOfficeRobot('AutoGen', 'agent-autogen')" class="architect-bot-entity flex flex-col items-center group/ra" title="AutoGen: Clic para hablar con el arquitecto">
+            <div id="bubble-autogen" class="office-speech-bubble" onclick="event.stopPropagation(); clickOfficeRobot('AutoGen', 'agent-autogen')">
+              🧠 AutoGen: "Diseñando estrategia de 50 pts FTC..."
+            </div>
+            <div class="relative flex items-center justify-center">
+              <span class="w-5 h-5 rounded-full bg-cyan-400 hotspot-glow border-2 border-white"></span>
+              <!-- Holograma de estrategia rotativo -->
+              <div class="absolute -top-7 w-8 h-8 border border-cyan-400/50 rounded-full animate-spin border-dashed pointer-events-none"></div>
+            </div>
+            <span class="mt-1 px-2.5 py-1 rounded-lg bg-slate-950/90 text-cyan-300 font-mono text-[10px] font-bold border border-cyan-500/50 backdrop-blur-md shadow-xl hud-scanner group-hover/ra:scale-110 transition flex items-center gap-1">
+              <span>🧠</span> AutoGen (Architect)
+            </span>
+          </div>
+
+          <!-- 3. BABYAGI / ROBOT CAMINANDO CON CAJAS (Transporte y Optimización) -->
+          <div id="office-robot-carrier" onclick="clickOfficeRobot('BabyAGI', 'agent-babyagi')" class="carrier-bot-entity group/cb" title="BabyAGI: Clic para interactuar con el robot cargador">
+            <div id="bubble-babyagi" class="office-speech-bubble" onclick="event.stopPropagation(); clickOfficeRobot('BabyAGI', 'agent-babyagi')">
+              🚀 BabyAGI: "Llevando paquetes de optimización..."
+            </div>
+            <!-- Cuerpo del Robot Caminante SVG con Piernas Móviles y Cajas -->
+            <div class="relative flex flex-col items-center">
+              <!-- Pila de 3 Cajas/Cubos de Datos Holográficos -->
+              <div class="flex flex-col items-center space-y-0.5 stacked-data-cube -mb-1 z-10">
+                <div class="w-6 h-3 rounded bg-amber-400/80 border border-white/60 shadow-lg shadow-amber-500/50 flex items-center justify-center text-[7px] font-mono font-bold text-slate-950">APK</div>
+                <div class="w-7 h-3 rounded bg-cyan-400/80 border border-white/60 shadow-lg shadow-cyan-500/50 flex items-center justify-center text-[7px] font-mono font-bold text-slate-950">JAR</div>
+                <div class="w-8 h-3.5 rounded bg-emerald-400/80 border border-white/60 shadow-lg shadow-emerald-500/50 flex items-center justify-center text-[7px] font-mono font-bold text-slate-950">PID 1200</div>
+              </div>
+              <!-- Avatar Robot Caminante con Piernas Móviles -->
+              <svg width="42" height="54" viewBox="0 0 42 54" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-xl">
+                <!-- Cabeza con Visor Cian -->
+                <rect x="13" y="2" width="16" height="12" rx="4" fill="#e2e8f0" stroke="#06b6d4" stroke-width="1.5" />
+                <rect x="16" y="5" width="10" height="4" rx="1.5" fill="#06b6d4" class="animate-pulse" />
+                <!-- Antena -->
+                <line x1="21" y1="2" x2="21" y2="0" stroke="#06b6d4" stroke-width="2" />
+                <circle cx="21" cy="0" r="1.5" fill="#38bdf8" />
+                <!-- Cuello -->
+                <rect x="18" y="14" width="6" height="3" fill="#64748b" />
+                <!-- Torso con Reactor Núcleo -->
+                <rect x="11" y="17" width="20" height="18" rx="4" fill="#cbd5e1" stroke="#0284c7" stroke-width="1.5" />
+                <circle cx="21" cy="25" r="4" fill="#f59e0b" class="hotspot-glow" />
+                <!-- Brazos que sostienen las cajas -->
+                <path d="M11 20L6 23L9 29" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" />
+                <path d="M31 20L36 23L33 29" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" />
+                <!-- Pierna Izquierda Caminando -->
+                <g class="leg-left">
+                  <rect x="13" y="35" width="5" height="16" rx="2.5" fill="#64748b" />
+                  <rect x="11" y="49" width="8" height="4" rx="2" fill="#334155" />
+                </g>
+                <!-- Pierna Derecha Caminando -->
+                <g class="leg-right">
+                  <rect x="24" y="35" width="5" height="16" rx="2.5" fill="#94a3b8" />
+                  <rect x="23" y="49" width="8" height="4" rx="2" fill="#475569" />
+                </g>
+              </svg>
+            </div>
+            <span class="mt-1 px-2 py-0.5 rounded-lg bg-slate-950/95 text-amber-300 font-mono text-[9px] font-bold border border-amber-500/50 backdrop-blur-md shadow-xl flex items-center gap-1 group-hover/cb:scale-110 transition">
+              <span>🚀</span> BabyAGI (Cargador)
+            </span>
+          </div>
+
+          <!-- 4. AUTOGPT / ROVER CON ORUGAS PATRULLANDO EL SUELO (Testing Agent) -->
+          <div id="office-robot-rover" onclick="clickOfficeRobot('AutoGPT', 'agent-autogpt')" class="rover-bot-entity group/rb" title="AutoGPT: Clic para interactuar con el Rover autónomo de pruebas">
+            <div id="bubble-autogpt" class="office-speech-bubble" onclick="event.stopPropagation(); clickOfficeRobot('AutoGPT', 'agent-autogpt')">
+              🧪 AutoGPT: "Rover testeando odometría y cinemática..."
+            </div>
+            <!-- Cono de Escaneo Láser hacia el Suelo -->
+            <div class="rover-scanner-beam"></div>
+            <!-- SVG del Rover con Orugas Móviles -->
+            <div class="relative flex flex-col items-center">
+              <svg width="48" height="52" viewBox="0 0 48 52" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-xl">
+                <!-- Monitor / Cabeza con Pantalla Verde -->
+                <rect x="14" y="3" width="20" height="15" rx="3" fill="#1e293b" stroke="#f97316" stroke-width="1.5" />
+                <rect x="17" y="6" width="14" height="9" rx="1.5" fill="#0f172a" />
+                <circle cx="21" cy="10" r="1.5" fill="#22c55e" class="animate-ping" />
+                <circle cx="27" cy="10" r="1.5" fill="#22c55e" />
+                <!-- Torso Robótico -->
+                <rect x="16" y="18" width="16" height="14" rx="3" fill="#f97316" stroke="#c2410c" stroke-width="1.5" />
+                <rect x="19" y="21" width="10" height="6" rx="1.5" fill="#ffffff" opacity="0.85" />
+                <!-- Tablet Holográfica que sostiene -->
+                <rect x="6" y="22" width="10" height="8" rx="1" fill="#0284c7" stroke="#38bdf8" stroke-width="1" />
+                <!-- Chasis Base y Orugas de Tanque/Rover -->
+                <rect x="8" y="32" width="32" height="12" rx="4" fill="#334155" stroke="#1e293b" stroke-width="1.5" />
+                <!-- Ruedas y Banda de Rodamiento que se mueve -->
+                <circle cx="13" cy="38" r="3.5" fill="#64748b" stroke="#0f172a" />
+                <circle cx="24" cy="38" r="3.5" fill="#64748b" stroke="#0f172a" />
+                <circle cx="35" cy="38" r="3.5" fill="#64748b" stroke="#0f172a" />
+                <rect x="8" y="32" width="32" height="12" rx="4" stroke="#f97316" stroke-width="1.5" class="tread-track" fill="none" />
+              </svg>
+            </div>
+            <span class="mt-1 px-2 py-0.5 rounded-lg bg-slate-950/95 text-orange-300 font-mono text-[9px] font-bold border border-orange-500/50 backdrop-blur-md shadow-xl flex items-center gap-1 group-hover/rb:scale-110 transition">
+              <span>🧪</span> AutoGPT (Rover Test)
+            </span>
+          </div>
+
+          <!-- 5. SUPERAGI (Especialista en Hardware y Limelight 3A) -->
+          <div id="office-robot-superagi" onclick="clickOfficeRobot('SuperAGI', 'agent-superagi')" style="top: 20%; left: 53%;" class="absolute z-20 flex flex-col items-center cursor-pointer group/rs" title="SuperAGI: Clic para calibrar hardware">
+            <div id="bubble-superagi" class="office-speech-bubble" onclick="event.stopPropagation(); clickOfficeRobot('SuperAGI', 'agent-superagi')">
+              ⚙️ SuperAGI: "Limelight 3A lista (60 FPS | 11ms)"
+            </div>
+            <div class="relative flex items-center justify-center">
+              <span class="w-5 h-5 rounded-full bg-purple-400 hotspot-glow border-2 border-white"></span>
+              <!-- Haz de calibración láser verde -->
+              <div class="absolute w-24 h-0.5 bg-gradient-to-r from-emerald-400 to-transparent top-2 left-4 rotate-45 pointer-events-none opacity-80"></div>
+            </div>
+            <span class="mt-1 px-2.5 py-1 rounded-lg bg-slate-950/90 text-purple-300 font-mono text-[10px] font-bold border border-purple-500/50 backdrop-blur-md shadow-xl hud-scanner group-hover/rs:scale-110 transition flex items-center gap-1">
+              <span>⚙️</span> SuperAGI (Hardware)
+            </span>
+          </div>
+
+          <!-- 6. LLAMAINDEX (Revisor y Auditor de Código) -->
+          <div id="office-robot-llamaindex" onclick="clickOfficeRobot('LlamaIndex', 'agent-llamaindex')" style="top: 21%; left: 87%;" class="absolute z-20 flex flex-col items-center cursor-pointer group/rl" title="LlamaIndex: Clic para auditar el código">
+            <div id="bubble-llamaindex" class="office-speech-bubble" onclick="event.stopPropagation(); clickOfficeRobot('LlamaIndex', 'agent-llamaindex')">
+              🔍 LlamaIndex: "Auditoría limpia: 0 errores detectados"
+            </div>
+            <div class="relative flex items-center justify-center">
+              <span class="w-5 h-5 rounded-full bg-indigo-400 hotspot-glow border-2 border-white"></span>
+              <div class="absolute -top-3 w-6 h-6 border-2 border-indigo-400 rounded-full animate-ping opacity-40 pointer-events-none"></div>
+            </div>
+            <span class="mt-1 px-2.5 py-1 rounded-lg bg-slate-950/90 text-indigo-300 font-mono text-[10px] font-bold border border-indigo-500/50 backdrop-blur-md shadow-xl hud-scanner group-hover/rl:scale-110 transition flex items-center gap-1">
+              <span>🔍</span> LlamaIndex (Reviewer)
+            </span>
+          </div>
+
+          <!-- 7. TÉCNICO DE MANTENIMIENTO Y SEGURIDAD ARRODILLADO -->
+          <div id="office-robot-safety" onclick="clickOfficeRobot('Safety Agent', 'agent-safety')" style="top: 66%; left: 59%;" class="absolute z-20 flex flex-col items-center cursor-pointer group/sf" title="Safety Agent: Clic para revisar límites de seguridad">
+            <div id="bubble-safety" class="office-speech-bubble" onclick="event.stopPropagation(); clickOfficeRobot('Safety Agent', 'agent-safety')">
+              🛡️ Safety Guard: "Fusible 20A y paro de emergencia verificados"
+            </div>
+            <div class="relative flex items-center justify-center">
+              <span class="w-4 h-4 rounded-full bg-rose-400 hotspot-glow border-2 border-white"></span>
+              <!-- Chispas de soldadura eléctrica -->
+              <div class="sparkle-burst" style="top: -6px; left: -10px;"></div>
+              <div class="sparkle-burst" style="top: -12px; right: -8px; animation-delay: 0.15s;"></div>
+            </div>
+            <span class="mt-1 px-2 py-0.5 rounded-lg bg-slate-950/95 text-rose-300 font-mono text-[9px] font-bold border border-rose-500/50 backdrop-blur-md shadow-xl flex items-center gap-1 group-hover/sf:scale-110 transition">
+              <span>🛡️</span> Safety (Mantenimiento)
+            </span>
+          </div>
+
+          <!-- 8. APRETÓN DE MANOS CENTRAL (SWARM WORKSPACE CORE) -->
+          <div onclick="runMultiAgentPipeline()" style="top: 53%; left: 50%;" class="hq-hotspot flex flex-col items-center group/hs cursor-pointer z-30" title="Haz clic para poner a todos los robots a colaborar juntos en el proyecto">
+            <span class="w-6 h-6 rounded-full bg-cyan-300 hotspot-glow border-2 border-white flex items-center justify-center text-xs">✨</span>
+            <span class="mt-1 px-3 py-1.5 rounded-xl bg-slate-950/95 text-cyan-300 font-mono text-[11px] font-extrabold border-2 border-cyan-400 backdrop-blur-md shadow-2xl group-hover/hs:scale-115 transition flex items-center space-x-1.5">
+              <span>🤝</span>
+              <span>¡Colaboración en Vivo!</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- PIPELINE DE TRABAJO MULTI-AGENTE (USER REQUEST ➔ FINAL CODE) -->
+        <div class="glass-panel p-4 rounded-2xl border border-white/10 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono flex items-center gap-1.5">
+              <span>🔄</span>
+              <span>Flujo de Ejecución del Enjambre (Pipeline Oficial)</span>
+            </h4>
+            <span id="pipeline-status-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/5">En espera de misión</span>
+          </div>
+
+          <!-- Pasos del Pipeline Horizontal -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 font-mono text-[11px]">
+            <!-- 1. User Request -->
+            <div id="step-user" class="pipeline-step p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <span class="text-slate-500 text-[9px] font-bold">PASO 1</span>
+              <p class="font-bold text-white text-[10px] mt-1">👤 User Request</p>
+              <span class="text-[9px] text-slate-400">Instrucción FTC</span>
+            </div>
+
+            <!-- 2. Architect Agent -->
+            <div id="step-architect" class="pipeline-step p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <span class="text-cyan-400 text-[9px] font-bold">PASO 2</span>
+              <p class="font-bold text-white text-[10px] mt-1">🧠 Architect</p>
+              <span class="text-[9px] text-slate-400">Estrategia</span>
+            </div>
+
+            <!-- 3. Coding Agent -->
+            <div id="step-coding" class="pipeline-step p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <span class="text-emerald-400 text-[9px] font-bold">PASO 3</span>
+              <p class="font-bold text-white text-[10px] mt-1">💻 Coding</p>
+              <span class="text-[9px] text-slate-400">Java FTC</span>
+            </div>
+
+            <!-- 4. Code Reviewer -->
+            <div id="step-reviewer" class="pipeline-step p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <span class="text-indigo-400 text-[9px] font-bold">PASO 4</span>
+              <p class="font-bold text-white text-[10px] mt-1">🔍 Reviewer</p>
+              <span class="text-[9px] text-slate-400">Auditoría 0 TODO</span>
+            </div>
+
+            <!-- 5. Safety Agent -->
+            <div id="step-safety" class="pipeline-step p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <span class="text-red-400 text-[9px] font-bold">PASO 5</span>
+              <p class="font-bold text-white text-[10px] mt-1">🛡️ Safety</p>
+              <span class="text-[9px] text-slate-400">Límites & 20A</span>
+            </div>
+
+            <!-- 6. Hardware Agent -->
+            <div id="step-hardware" class="pipeline-step p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <span class="text-purple-400 text-[9px] font-bold">PASO 6</span>
+              <p class="font-bold text-white text-[10px] mt-1">⚙️ Hardware</p>
+              <span class="text-[9px] text-slate-400">Puertos & Limelight</span>
+            </div>
+
+            <!-- 7. Testing Agent -->
+            <div id="step-testing" class="pipeline-step p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <span class="text-orange-400 text-[9px] font-bold">PASO 7</span>
+              <p class="font-bold text-white text-[10px] mt-1">🧪 Testing</p>
+              <span class="text-[9px] text-slate-400">Loop 50Hz</span>
+            </div>
+
+            <!-- 8. Final Code -->
+            <div id="step-final" class="pipeline-step p-2.5 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <span class="text-emerald-400 text-[9px] font-bold">PASO 8</span>
+              <p class="font-bold text-emerald-300 text-[10px] mt-1">🏆 Final Code</p>
+              <span class="text-[9px] text-emerald-400">Android Studio</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLA DE AGENTES Y RESPONSABILIDADES (Especificada por el usuario) -->
+        <div class="glass-panel p-4 rounded-2xl border border-white/10 overflow-x-auto">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider font-mono flex items-center gap-1.5">
+              <span>📋</span>
+              <span>Tabla de Agentes y Responsabilidades</span>
+            </h4>
+            <span class="text-[11px] text-slate-400 font-mono">Equipo Oficial BIOBUZZ 24096</span>
+          </div>
+
+          <table class="w-full text-left font-mono text-xs">
+            <thead>
+              <tr class="border-b border-white/10 text-slate-400 text-[11px]">
+                <th class="pb-2 font-semibold">Agente</th>
+                <th class="pb-2 font-semibold">Framework / Base</th>
+                <th class="pb-2 font-semibold">Responsabilidad</th>
+                <th class="pb-2 font-semibold text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5 text-[11px]">
+              <tr class="hover:bg-white/5 transition">
+                <td class="py-2 text-white font-bold flex items-center gap-1.5">
+                  <span>🧠</span>
+                  <span>Architect Agent</span>
+                </td>
+                <td class="py-2 text-cyan-300">Microsoft AutoGen</td>
+                <td class="py-2 text-slate-300">Diseña la estrategia del autónomo y la arquitectura modular.</td>
+                <td class="py-2 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px]">Listo</span></td>
+              </tr>
+              <tr class="hover:bg-white/5 transition">
+                <td class="py-2 text-white font-bold flex items-center gap-1.5">
+                  <span>💻</span>
+                  <span>Coding Agent</span>
+                </td>
+                <td class="py-2 text-emerald-300">LangChain Agent</td>
+                <td class="py-2 text-slate-300">Genera código Java FTC (HardwareMap, Shooter PID, Mecanum).</td>
+                <td class="py-2 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px]">Listo</span></td>
+              </tr>
+              <tr class="hover:bg-white/5 transition">
+                <td class="py-2 text-white font-bold flex items-center gap-1.5">
+                  <span>🔍</span>
+                  <span>Code Reviewer</span>
+                </td>
+                <td class="py-2 text-indigo-300">LlamaIndex RAG</td>
+                <td class="py-2 text-slate-300">Busca errores, elimina placeholders ('// TODO') y malas prácticas.</td>
+                <td class="py-2 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px]">Listo</span></td>
+              </tr>
+              <tr class="hover:bg-white/5 transition">
+                <td class="py-2 text-white font-bold flex items-center gap-1.5">
+                  <span>🛡️</span>
+                  <span>Safety Agent</span>
+                </td>
+                <td class="py-2 text-red-300">NeoIA Safety Guard</td>
+                <td class="py-2 text-slate-300">Comprueba paradas de emergencia, límites de 20A y calentamiento.</td>
+                <td class="py-2 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px]">Listo</span></td>
+              </tr>
+              <tr class="hover:bg-white/5 transition">
+                <td class="py-2 text-white font-bold flex items-center gap-1.5">
+                  <span>⚙️</span>
+                  <span>Hardware Agent</span>
+                </td>
+                <td class="py-2 text-purple-300">SuperAGI Vision</td>
+                <td class="py-2 text-slate-300">Verifica nombres, mapeo de puertos y configuración de Limelight 3A.</td>
+                <td class="py-2 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px]">Listo</span></td>
+              </tr>
+              <tr class="hover:bg-white/5 transition">
+                <td class="py-2 text-white font-bold flex items-center gap-1.5">
+                  <span>🧪</span>
+                  <span>Testing Agent</span>
+                </td>
+                <td class="py-2 text-orange-300">AutoGPT Executive</td>
+                <td class="py-2 text-slate-300">Diseña pruebas a 50Hz y analiza resultados de Driver Station.</td>
+                <td class="py-2 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px]">Listo</span></td>
+              </tr>
+              <tr class="hover:bg-white/5 transition">
+                <td class="py-2 text-white font-bold flex items-center gap-1.5">
+                  <span>🚀</span>
+                  <span>Optimization Agent</span>
+                </td>
+                <td class="py-2 text-amber-300">BabyAGI Pathing</td>
+                <td class="py-2 text-slate-300">Mejora rendimiento, precisión en cinemática y curvas Mecanum.</td>
+                <td class="py-2 text-right"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px]">Listo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Área de Trabajo Conjunto: Chat en Vivo con los Agentes y Código Final -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Chat en Vivo con la Casa de Agentes (6 columnas) -->
+        <div class="lg:col-span-6 glass-panel p-5 rounded-3xl border border-white/10 flex flex-col h-[680px] shadow-2xl relative">
+          
+          <!-- Encabezado del Chat -->
+          <div class="pb-3 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300">
+                <i data-lucide="messages-square" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                  Chat de la Casa de Agentes
+                  <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">En Línea</span>
+                </h4>
+                <p class="text-[11px] text-slate-400">Habla con todo el equipo o menciona a un robot con @Nombre</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <span id="swarm-status-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/5">En espera</span>
+              <button onclick="clearSwarmChat()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition" title="Limpiar conversación">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Barra de Menciones Rápidas (Pills de Agentes) -->
+          <div class="py-2.5 flex items-center space-x-1.5 overflow-x-auto scrollbar-none border-b border-white/5">
+            <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider mr-1">Dirigir a:</span>
+            <button onclick="tagSwarmAgent('@Todos')" class="tag-pill px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[11px] font-medium flex items-center space-x-1 shrink-0">
+              <span>👥</span>
+              <span>@Todos</span>
+            </button>
+            <button onclick="tagSwarmAgent('@AutoGen')" class="tag-pill px-2.5 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-medium flex items-center space-x-1 shrink-0">
+              <span>🧠</span>
+              <span>@Architect</span>
+            </button>
+            <button onclick="tagSwarmAgent('@LangChain')" class="tag-pill px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-medium flex items-center space-x-1 shrink-0">
+              <span>💻</span>
+              <span>@Coding</span>
+            </button>
+            <button onclick="tagSwarmAgent('@LlamaIndex')" class="tag-pill px-2.5 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-medium flex items-center space-x-1 shrink-0">
+              <span>🔍</span>
+              <span>@Reviewer</span>
+            </button>
+            <button onclick="tagSwarmAgent('@Safety')" class="tag-pill px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 text-[11px] font-medium flex items-center space-x-1 shrink-0">
+              <span>🛡️</span>
+              <span>@Safety</span>
+            </button>
+            <button onclick="tagSwarmAgent('@SuperAGI')" class="tag-pill px-2.5 py-1 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[11px] font-medium flex items-center space-x-1 shrink-0">
+              <span>⚙️</span>
+              <span>@Hardware</span>
+            </button>
+            <button onclick="tagSwarmAgent('@AutoGPT')" class="tag-pill px-2.5 py-1 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[11px] font-medium flex items-center space-x-1 shrink-0">
+              <span>🧪</span>
+              <span>@Testing</span>
+            </button>
+            <button onclick="tagSwarmAgent('@BabyAGI')" class="tag-pill px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-medium flex items-center space-x-1 shrink-0">
+              <span>🚀</span>
+              <span>@Optimization</span>
+            </button>
+          </div>
+
+          <!-- Historial de Chat (Log de Mensajes Usuario & Agentes) -->
+          <div id="swarm-chat-log" class="flex-1 overflow-y-auto p-3 my-2 space-y-3 bg-black/60 rounded-2xl border border-white/5 font-sans text-xs">
+            <div class="text-slate-400 text-center py-8 space-y-2">
+              <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto text-cyan-400">
+                <i data-lucide="bot" class="w-6 h-6"></i>
+              </div>
+              <p class="text-white font-semibold text-sm">La Casa de Agentes está conectada y escuchando.</p>
+              <p class="text-[11px] text-slate-400 max-w-sm mx-auto">
+                Escribe cualquier duda sobre tu robot, pide cambios en el código Java o dales una orden de trabajo.
+              </p>
+            </div>
+          </div>
+
+          <!-- Indicador Animado de Agente Escribiendo -->
+          <div id="swarm-typing-indicator" class="hidden px-3 py-2 mb-2 rounded-xl bg-slate-900/90 border border-cyan-500/30 text-cyan-300 text-xs flex items-center space-x-2 transition">
+            <span id="typing-agent-avatar" class="text-base">🤖</span>
+            <span id="typing-agent-name" class="font-bold text-white">AutoGen</span>
+            <span class="text-slate-400 font-mono text-[11px]">está respondiendo</span>
+            <div class="flex space-x-1 ml-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 typing-dot"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 typing-dot"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 typing-dot"></span>
+            </div>
+          </div>
+
+          <!-- Sugerencias de Consultas Rápidas -->
+          <div class="py-1.5 flex items-center space-x-1.5 overflow-x-auto scrollbar-none text-[10px] text-slate-400">
+            <span class="text-slate-500 shrink-0">Ideas:</span>
+            <button onclick="setSwarmPrompt('¿Cómo calculamos el auto-aim con Limelight 3A?')" class="px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/5 shrink-0 transition">
+              🎯 Auto-Aim Limelight 3A
+            </button>
+            <button onclick="setSwarmPrompt('@LangChain modifica el shooter a 1400 ticks/s con DcMotorEx')" class="px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/5 shrink-0 transition">
+              ⚡ @LangChain: Shooter 1400 ticks/s
+            </button>
+            <button onclick="setSwarmPrompt('@LlamaIndex cuáles son las reglas oficiales de motores para FTC?')" class="px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/5 shrink-0 transition">
+              📜 @LlamaIndex: Reglas Motores
+            </button>
+            <button onclick="setSwarmPrompt('@BabyAGI cómo funciona la cinemática Mecanum con denominador?')" class="px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/5 shrink-0 transition">
+              🔄 @BabyAGI: Cinemática Mecanum
+            </button>
+          </div>
+
+          <!-- Formulario de Entrada de Chat -->
+          <form id="swarm-chat-form" onsubmit="handleSwarmChatSubmit(event)" class="pt-2 border-t border-white/10 space-y-2">
+            <div class="relative">
+              <textarea id="swarm-chat-input" rows="2" 
+                onkeydown="handleSwarmChatKeydown(event)"
+                class="w-full glass-input text-xs text-white p-3 pr-32 rounded-xl resize-none focus:ring-1 focus:ring-cyan-400 placeholder-slate-500 font-sans" 
+                placeholder="Escribe al equipo o presiona el micrófono... (Enter para enviar)"></textarea>
+              
+              <!-- Voice Microphone Button inside Swarm Chat -->
+              <button type="button" onclick="toggleSwarmMicrophone()" id="btn-swarm-mic" class="absolute right-24 bottom-2.5 p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-300 transition border border-white/10" title="Dictar por voz al enjambre">
+                <i data-lucide="mic" class="w-3.5 h-3.5" id="swarm-mic-icon"></i>
+              </button>
+
+              <button type="submit" id="btn-swarm-send" class="absolute right-2.5 bottom-2.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs shadow-md transition flex items-center space-x-1.5">
+                <i data-lucide="send" class="w-3.5 h-3.5 fill-current"></i>
+                <span>Enviar</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Código del Proyecto Compartido (6 columnas) -->
+        <div class="lg:col-span-6 glass-panel p-5 rounded-3xl border border-white/10 flex flex-col h-[680px] shadow-2xl">
+          
+          <!-- Encabezado del Código y Pestañas de Archivos -->
+          <div class="pb-3 border-b border-white/10 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="file-code" class="w-4 h-4 text-emerald-400"></i>
+                <h4 class="text-sm font-bold text-white">Proyecto Compartido: BioBuzzFTC12</h4>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button onclick="simulateSwarmRun()" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition flex items-center space-x-1" title="Simular bucle a 50Hz">
+                  <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+                  <span>Simular</span>
+                </button>
+                <button onclick="openAndroidStudioWithCreatedCode()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 text-xs font-black shadow-lg shadow-emerald-500/20 transition flex items-center space-x-1.5 animate-pulse" title="Guardar código creado y abrir en Android Studio">
+                  <i data-lucide="play-circle" class="w-4 h-4 fill-slate-950"></i>
+                  <span>🚀 Abrir Studio con Código</span>
+                </button>
+                <button onclick="triggerOpenAppOnPC('vscode')" class="px-2.5 py-1 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 border border-blue-500/40 text-xs font-semibold shadow-sm transition flex items-center space-x-1" title="Abrir proyecto en VS Code en tu PC">
+                  <i data-lucide="code-2" class="w-3.5 h-3.5 text-blue-400"></i>
+                  <span>VS Code</span>
+                </button>
+                <button onclick="saveSwarmCodeToAndroidStudio()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-white/10 transition flex items-center space-x-1" title="Solo guardar en Android Studio sin abrir">
+                  <i data-lucide="folder-down" class="w-3.5 h-3.5"></i>
+                  <span class="hidden sm:inline">Guardar</span>
+                </button>
+                <button onclick="copySwarmCode()" class="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Copiar código">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Selector de Archivos del Proyecto -->
+            <div class="flex items-center space-x-1.5 overflow-x-auto scrollbar-none text-[11px] font-mono">
+              <button onclick="switchSwarmFile('teleop')" id="swarm-tab-teleop" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center space-x-1 shrink-0">
+                <span>📄</span>
+                <span>TeleOpBioBuzzTeam.java</span>
+              </button>
+              <button onclick="switchSwarmFile('auto')" id="swarm-tab-auto" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-white/5 flex items-center space-x-1 shrink-0">
+                <span>🤖</span>
+                <span>AutonomousBioBuzz24096.java</span>
+              </button>
+              <button onclick="switchSwarmFile('limelight')" id="swarm-tab-limelight" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-white/5 flex items-center space-x-1 shrink-0">
+                <span>👁️</span>
+                <span>LimelightVisionSubsystem.java</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenedor del Código -->
+          <div id="swarm-code-container" class="flex-1 mt-3 bg-black/80 rounded-2xl p-4 overflow-auto font-mono text-xs text-slate-200 border border-white/5 whitespace-pre-wrap leading-relaxed">
+            <span class="text-slate-500">// El código generado colaborativamente por los agentes aparecerá aquí...
+// Puedes pedirle a cualquier agente (@LangChain, @SuperAGI) que lo modifique desde el chat en vivo!</span>
+          </div>
+
+          <!-- Barra de Estado del Código -->
+          <div class="pt-2.5 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span id="swarm-code-metrics" class="text-slate-300">Sintaxis FTC 100% | 0 Placeholders | REV Control Hub Ready</span>
+            </div>
+            <span class="text-cyan-400 font-bold" id="swarm-code-lines">~180 Líneas</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <!-- Modal para Instalar Nuevo Agente -->
+    <div id="install-agent-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+      <div class="glass-panel w-full max-w-md p-6 rounded-3xl border border-white/10 shadow-2xl relative">
+        <button onclick="closeInstallAgentModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="text-center mb-6">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto mb-3">
+            <i data-lucide="user-plus" class="w-6 h-6 text-amber-400"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">Instalar Nuevo Agente en la Casa</h3>
+          <p class="text-xs text-slate-400 mt-1">Personaliza el rol y modelo del nuevo miembro del equipo</p>
+        </div>
+
+        <form id="install-agent-form" onsubmit="handleInstallAgent(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Nombre del Agente</label>
+            <input type="text" id="new-agent-name" required placeholder="Ej: Carlos" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Rol / Especialidad</label>
+            <input type="text" id="new-agent-role" required placeholder="Ej: Especialista en Brazos y Servos" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Modelo de IA que utilizará</label>
+            <select id="new-agent-model" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400">
+              <option value="turbo-biobuzz">⚡ Modo Turbo BioBuzz (< 0.1s)</option>
+              <option value="neoia-cloud">☁️ NeoIA Cloud (DeepSeek GPU)</option>
+              <option value="llama3.2:1b">🧠 llama3.2:1b (Local)</option>
+              <option value="qwen2.5-coder:1.5b">💻 qwen2.5-coder:1.5b (Local FTC)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Instrucciones / Especialidad del Agente</label>
+            <textarea id="new-agent-desc" rows="2" placeholder="Ej: Supervisa el rango de movimiento de los servomotores y asegura límites de corriente..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400 resize-none"></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-2.5 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 transition shadow-lg shadow-amber-500/20">
+            Instalar Agente en la Casa
+          </button>
+        </form>
+      </div>
+    </div>
+<div id="view-agent" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="bot" class="w-5 h-5 text-cyan-400"></i>
+            Agente Autónomo de PC & Especialista FTC
+          </h2>
+          <p class="text-sm text-slate-400">Genera código Java de robótica y guárdalo directamente en tu computadora.</p>
+        </div>
+      </div>
+
+      <!-- FTC Templates Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <button onclick="loadFTCTemplate('autonomous')" class="glass-panel p-4 rounded-xl border border-white/10 hover:border-cyan-500/40 text-left transition space-y-2 group">
+          <div class="flex items-center justify-between">
+            <span class="text-lg">🤖</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono">FTC Java</span>
+          </div>
+          <h4 class="text-sm font-bold text-white group-hover:text-cyan-300 transition">Autonomous OpMode</h4>
+          <p class="text-xs text-slate-400">Autónomo con chasis Mecanum, AprilTags y encoders.</p>
+        </button>
+
+        <button onclick="loadFTCTemplate('teleop')" class="glass-panel p-4 rounded-xl border border-white/10 hover:border-indigo-500/40 text-left transition space-y-2 group">
+          <div class="flex items-center justify-between">
+            <span class="text-lg">🎮</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono">FTC Gamepad</span>
+          </div>
+          <h4 class="text-sm font-bold text-white group-hover:text-indigo-300 transition">TeleOp Mecanum & Brazos</h4>
+          <p class="text-xs text-slate-400">Control manual con Gamepad1 (conducción) y Gamepad2 (servos / intake).</p>
+        </button>
+
+        <button onclick="loadFTCTemplate('hardware')" class="glass-panel p-4 rounded-xl border border-white/10 hover:border-purple-500/40 text-left transition space-y-2 group">
+          <div class="flex items-center justify-between">
+            <span class="text-lg">⚙️</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono">RobotMap</span>
+          </div>
+          <h4 class="text-sm font-bold text-white group-hover:text-purple-300 transition">HardwareMap & Subsystems</h4>
+          <p class="text-xs text-slate-400">Estructura limpia para definir motores, servos y sensores.</p>
+        </button>
+
+        <button onclick="loadFTCTemplate('biobuzz')" class="glass-panel p-4 rounded-xl border border-amber-500/30 hover:border-amber-400 bg-amber-500/5 text-left transition space-y-2 group shadow-lg shadow-amber-500/10">
+          <div class="flex items-center justify-between">
+            <span class="text-lg">🐝</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono font-bold">TEMPORADA BIOBUZZ</span>
+          </div>
+          <h4 class="text-sm font-bold text-white group-hover:text-amber-300 transition">Autónomo BIOBUZZ</h4>
+          <p class="text-xs text-slate-400">Rutina oficial de competición para la temporada FTC BIOBUZZ.</p>
+        </button>
+      </div>
+
+      <!-- Agent Workspace -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1 glass-panel p-5 rounded-2xl border border-white/10 space-y-4">
+          <h3 class="text-sm font-bold text-white">Instrucción al Agente</h3>
+                    <select id="agent-model-select" class="w-full glass-input text-xs text-white p-2.5 rounded-lg bg-slate-800">
+            <option value="turbo-biobuzz" selected>⚡ Modo Turbo BioBuzz (&lt; 0.1s - Idéntico a tu Android Studio)</option>
+            <option value="neoia-cloud">☁️ NeoIA Cloud (DeepSeek GPU - Como ChatGPT, 5-10s)</option>
+            <option value="llama3.2:1b">🧠 llama3.2:1b (Local en tu PC - 100% Offline)</option>
+            <option value="qwen2.5-coder:1.5b">💻 qwen2.5-coder:1.5b (Local en tu PC - FTC Especialista)</option>
+          </select>
+
+          <!-- Boton Directo Shooter + Intake -->
+          <div class="space-y-2">
+            <button type="button" onclick="loadShooterIntakeOnly()" class="w-full py-2.5 px-3 rounded-xl bg-amber-500/25 hover:bg-amber-500/35 text-amber-300 font-bold text-xs border border-amber-500/40 transition shadow-sm flex items-center justify-center space-x-2">
+              <i data-lucide="crosshair" class="w-4 h-4"></i>
+              <span>Cargar Solo Shooter + Intake (BioBuzz 24096)</span>
+            </button>
+          </div>
+
+          <textarea id="agent-task-input" rows="4" placeholder="Describe lo que debe programar tu agente..." class="w-full glass-input text-xs text-white p-3 rounded-lg resize-none"></textarea>
+          <input type="text" id="agent-filepath-input" placeholder="Nombre de archivo" value="TeleOpShooter.java" class="w-full glass-input text-xs text-white p-2.5 rounded-lg">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button onclick="runInstantAgent()" id="btn-instant-agent" class="py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold text-xs shadow-lg shadow-amber-500/25 transition flex items-center justify-center space-x-1.5" title="Genera codigo instantaneo">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>Modo Turbo (&lt; 0.1s)</span>
+            </button>
+            <button onclick="runAgentTask()" id="btn-run-agent" class="py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-semibold text-xs shadow-lg shadow-cyan-600/30 transition flex items-center justify-center space-x-1.5" title="Generar con IA">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              <span>Generar con IA</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 glass-panel p-5 rounded-2xl border border-white/10 flex flex-col min-h-[500px]">
+          <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+            <h4 class="text-sm font-semibold text-white">Código Generado por el Agente</h4>
+            <div class="flex items-center space-x-2">
+              <button onclick="saveToAndroidStudio()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md transition flex items-center space-x-1.5" title="Guardar directamente dentro de BioBuzzFTC12 en Android Studio">
+                <i data-lucide="folder-down" class="w-3.5 h-3.5"></i>
+                <span>Guardar en Android Studio</span>
+              </button>
+              <button onclick="saveCurrentCodeToDisk()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center space-x-1" title="Guardar con otro nombre">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                <span>Otro lugar</span>
+              </button>
+              <button onclick="copyAgentCode()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+          <div id="agent-status-bar" class="hidden p-2.5 mb-3 rounded-lg bg-slate-900 border border-white/5 text-xs flex items-center space-x-2 text-cyan-300">
+            <i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i>
+            <span id="agent-status-text">Procesando código FTC...</span>
+            <span id="agent-timer-badge" class="ml-auto font-mono text-cyan-400 font-bold px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/30">⏱️ 0.0s</span>
+          </div>
+          <div id="agent-code-container" class="flex-1 bg-black/60 rounded-xl p-4 overflow-auto font-mono text-xs text-slate-200 border border-white/5 whitespace-pre-wrap">
+            <span class="text-slate-500">// El código generado aparecerá aquí...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 3: CHAT CON VOZ & RAG ================= -->
+    <div id="view-chat" class="hidden flex flex-col h-[calc(100vh-12rem)] max-h-[850px] glass-panel rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-white/10 bg-slate-900/60 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <label class="text-xs text-slate-400 font-medium">Modelo Activo:</label>
+          <select id="chat-model-select" onchange="onModelChange()" class="glass-input text-xs font-medium text-white px-3 py-1.5 rounded-lg bg-slate-800">
+            <option value="llama3.2:1b">⚡ llama3.2:1b (General Rápido - 1.3 GB)</option>
+            <option value="qwen2.5-coder:1.5b">💻 qwen2.5-coder:1.5b (Programador FTC - 986 MB)</option>
+            <option value="neoia-cloud">☁️ NeoIA Cloud (DeepSeek FTC Expert)</option>
+          </select>
+          <span id="selected-service-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-white/10">Ollama</span>
+        </div>
+
+        <!-- RAG Active Badge -->
+        <div id="rag-badge" class="hidden items-center space-x-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-xs">
+          <i data-lucide="file-check" class="w-3.5 h-3.5"></i>
+          <span id="rag-filename">Manual FTC Cargado</span>
+          <button onclick="clearRAGContext()" class="hover:text-white ml-1">✕</button>
+        </div>
+
+        <button onclick="clearChatHistory()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-900/50 hover:text-rose-300 text-slate-400 transition" title="Limpiar chat">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div id="chat-messages" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+        <div class="glass-panel p-4 rounded-2xl border-white/10 text-sm leading-relaxed text-slate-200 max-w-3xl">
+          <p class="font-semibold text-white mb-1">¡Chat Multimodelo con Voz y RAG!</p>
+          <p class="text-slate-300">
+            Puedes hablarle usando el <strong>micrófono</strong>, escuchar sus respuestas con la <strong>voz</strong>, o subir un <strong>PDF/documento</strong> para que lo analice.
+          </p>
+        </div>
+      </div>
+
+      <!-- Input Bar with Mic & Document Upload -->
+      <div class="p-4 border-t border-white/10 bg-slate-900/80">
+        <form onsubmit="handleChatSubmit(event)" class="flex items-center space-x-2 sm:space-x-3">
+          <!-- Document Upload Button (RAG) -->
+          <label class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white cursor-pointer transition border border-white/10 flex items-center justify-center shrink-0" title="Subir PDF o manual FTC (RAG)">
+            <i data-lucide="paperclip" class="w-4 h-4 text-cyan-400"></i>
+            <input type="file" id="file-upload-input" accept=".txt,.pdf,.java,.py,.json,.md" onchange="handleFileUpload(event)" class="hidden">
+          </label>
+
+          <!-- Voice Mic Button (STT) -->
+          <button type="button" onclick="toggleMicrophone()" id="btn-mic" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-300 transition border border-white/10 flex items-center justify-center shrink-0" title="Hablar por micrófono">
+            <i data-lucide="mic" class="w-4 h-4" id="mic-icon"></i>
+          </button>
+
+          <!-- Textarea -->
+          <textarea id="chat-input" rows="1" onkeydown="handleInputKeydown(event)" placeholder="Escribe tu mensaje o habla por el micrófono... (Shift+Enter para salto de línea)" class="w-full glass-input rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 resize-none"></textarea>
+
+          <!-- Send Button -->
+          <button type="submit" id="btn-send-chat" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-medium text-sm shadow-md transition shrink-0 flex items-center space-x-1">
+            <span>Enviar</span>
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 4: DIAGRAMAS DE ROBÓTICA (MERMAID) ================= -->
+    <div id="view-diagrams" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="git-branch" class="w-5 h-5 text-amber-400"></i>
+            Diagramas Visuales de Estrategia FTC (Mermaid)
+          </h2>
+          <p class="text-sm text-slate-400">Genera diagramas de flujo interactivos para la trayectoria autónoma de tu robot.</p>
+        </div>
+        <button onclick="generateFTCDiagram()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-semibold shadow-md transition flex items-center space-x-1.5">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Generar Nueva Estrategia</span>
+        </button>
+      </div>
+
+      <!-- Diagram Viewer Panel -->
+      <div class="glass-panel p-6 rounded-2xl border border-white/10 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <h3 class="text-sm font-bold text-white" id="diagram-title">Estrategia Autónoma: Mecanum + AprilTag Detection</h3>
+          <span class="text-xs text-amber-400 font-mono">Mermaid.js Engine</span>
+        </div>
+
+        <div id="mermaid-render-container" class="bg-black/60 rounded-xl p-6 min-h-[350px] flex items-center justify-center overflow-auto border border-white/5">
+          <!-- Rendered diagram -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 5: CATALOG ================= -->
+    <div id="view-catalog" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="box" class="w-5 h-5 text-purple-400"></i>
+            Catálogo Curado de 20 Modelos Locales
+          </h2>
+          <p class="text-sm text-slate-400">Protegido por el Guardián de 5 GB para nunca saturar tu disco.</p>
+        </div>
+        <span class="text-xs bg-slate-800/80 px-3.5 py-1.5 rounded-full border border-white/10 font-mono" id="catalog-disk-free">
+          2.85 GB disponibles del cupo de 5 GB
+        </span>
+      </div>
+      <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+    </div>
+
+    <!-- ================= VIEW 6: RADAR ================= -->
+    <div id="view-radar" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-white">Radar de Puertos y Servicios</h2>
+        <button onclick="scanAllServices()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs">Reescanear</button>
+      </div>
+      <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+  </main>
+
+  <!-- ================= MODAL: CÓDIGO QR PARA CELULAR ================= -->
+  <div id="modal-qr" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-sm w-full p-6 rounded-2xl border border-white/15 space-y-4 text-center">
+      <div class="flex items-center justify-between pb-2 border-b border-white/10">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i data-lucide="smartphone" class="w-4 h-4 text-purple-400"></i>
+          <span>Control desde tu Celular</span>
+        </h3>
+        <button onclick="closeQRModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-300">
+        Conecta tu teléfono al <strong>mismo Wi-Fi</strong> de tu casa y escanea este código para abrir tu ecosistema:
+      </p>
+
+      <!-- QR Container -->
+      <div class="flex justify-center p-4 bg-white rounded-2xl shadow-xl w-fit mx-auto" id="qrcode-box"></div>
+
+      <div class="bg-black/50 p-2.5 rounded-xl border border-white/5 text-[11px] font-mono text-cyan-300 break-all" id="mobile-url-text">
+        Cargando dirección de red...
+      </div>
+
+      <button onclick="closeQRModal()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CONECTOR Y REPRODUCTOR YOUTUBE ================= -->
+  <div id="modal-youtube" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-2xl w-full p-6 rounded-2xl border border-red-500/30 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white shadow-lg shadow-red-600/30">
+            <i data-lucide="youtube" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>Mi Canal & Videos de YouTube</span>
+              <span class="text-[9px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 font-mono border border-red-500/30">Conectado</span>
+            </h3>
+            <p class="text-[11px] text-slate-400">Vincula tu canal o pega cualquier video de YouTube para verlo o analizarlo con los agentes</p>
+          </div>
+        </div>
+        <button onclick="closeYouTubeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">✕</button>
+      </div>
+
+      <!-- Input de Configuración de Canal / Video -->
+      <div class="space-y-2">
+        <label class="text-xs font-mono text-slate-300 flex items-center justify-between">
+          <span>Enlace de tu Canal o Video de YouTube:</span>
+          <span class="text-[10px] text-red-400 font-mono">Ej: https://youtube.com/@tu_canal o URL de video</span>
+        </label>
+        <div class="flex gap-2">
+          <input type="text" id="youtube-url-input" placeholder="https://www.youtube.com/@cicada_3301 o URL de video" class="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono" />
+          <button onclick="saveAndApplyYouTubeUrl()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-red-600/30 transition">
+            <i data-lucide="save" class="w-3.5 h-3.5"></i>
+            <span>Guardar & Cargar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Reproductor Integrado / Vista Previa -->
+      <div class="rounded-xl overflow-hidden border border-white/10 bg-black aspect-video relative flex items-center justify-center shadow-inner">
+        <iframe id="youtube-embed-frame" class="w-full h-full" src="https://www.youtube.com/embed?listType=search&list=FTC%20Robotics%20BioBuzz" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <!-- Acciones de los Agentes con YouTube -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
+        <a id="btn-open-youtube-external" href="https://www.youtube.com/" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition">
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-red-400"></i>
+          <span>Abrir en YouTube.com</span>
+        </a>
+        <button onclick="askAgentsToAnalyzeVideo()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-red-600 to-indigo-600 hover:from-red-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition">
+          <span>🧠</span>
+          <span>Pedir a Agentes Analizar este Video</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: MODO PC APAGADA (24/7 CLOUD WORKER) ================= -->
+  <div id="modal-cloud-247" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-xl w-full p-6 rounded-2xl border border-emerald-500/40 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-cyan-500 flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-emerald-500/30">
+            <i data-lucide="cloud" class="w-5 h-5 text-slate-950"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>Trabajar con la PC Apagada (Servidor 24/7)</span>
+              <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/40">Activo 24/7</span>
+            </h3>
+            <p class="text-[11px] text-slate-400">Tus agentes continúan programando y ejecutando tareas en la nube sin necesidad de tener tu PC encendida</p>
+          </div>
+        </div>
+        <button onclick="closeCloud247Modal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">✕</button>
+      </div>
+
+      <!-- Métodos para Trabajar con la PC Apagada -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+        <!-- Opción 1: Nube Render 24/7 -->
+        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 space-y-2">
+          <div class="flex items-center space-x-2 text-cyan-300 font-bold">
+            <i data-lucide="server" class="w-4 h-4 text-cyan-400"></i>
+            <span>1. Servidor Cloud en Render</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Tu servidor en la nube de <strong>NeoIA Cloud</strong> está activo permanentemente en centros de datos. No consume luz ni batería de tu PC.
+          </p>
+          <a href="https://neoia-351a.onrender.com/" target="_blank" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-mono text-[10px] border border-cyan-500/40 w-full justify-center transition">
+            <span>Abrir en la Nube 24/7</span>
+            <i data-lucide="external-link" class="w-3 h-3"></i>
+          </a>
+        </div>
+
+        <!-- Opción 2: Control Móvil desde el Celular -->
+        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 space-y-2">
+          <div class="flex items-center space-x-2 text-purple-300 font-bold">
+            <i data-lucide="smartphone" class="w-4 h-4 text-purple-400"></i>
+            <span>2. Control desde tu Teléfono</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Abre tu enlace en el navegador de tu móvil. Puedes acostarte a dormir con la PC apagada y ver cómo los agentes terminan el código de BioBuzz.
+          </p>
+          <button onclick="closeCloud247Modal(); openQRModal();" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 font-mono text-[10px] border border-purple-500/40 w-full justify-center transition">
+            <span>Ver Código QR para Móvil</span>
+            <i data-lucide="qr-code" class="w-3 h-3"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tareas Autónomas en Progreso -->
+      <div class="p-3.5 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-2">
+        <h4 class="text-xs font-bold text-emerald-300 flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Tareas en Segundo Plano Continuo
+          </span>
+          <span class="text-[10px] font-mono text-slate-400">Independiente de la PC</span>
+        </h4>
+        <ul class="text-[11px] text-slate-300 space-y-1 font-mono">
+          <li class="flex items-center gap-1.5">✓ <strong>LangChain:</strong> Bucle de compilación continua de OpModes FTC.</li>
+          <li class="flex items-center gap-1.5">✓ <strong>AutoGPT:</strong> Simulación de 1,000 partidas autónomas sin supervisión.</li>
+          <li class="flex items-center gap-1.5">✓ <strong>LlamaIndex:</strong> Auditoría de dependencias y actualización de reglas FIRST 2026.</li>
+        </ul>
+      </div>
+
+      <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/10">
+        <button onclick="closeCloud247Modal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+          Entendido, cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+  <script src="app.js?v=living_office_v9"></script>
+</body>
+</html>
