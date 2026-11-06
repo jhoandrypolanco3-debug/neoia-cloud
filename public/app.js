@@ -143,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDefaultDiagram();
   if (typeof switchSwarmFile === 'function') switchSwarmFile('teleop');
   initOfficeLivingSimulation();
+  initOfficeCamera();
   initYouTubeIntegration();
   lucide.createIcons();
 });
@@ -1747,6 +1748,7 @@ function clickOfficeRobot(name, id) {
       el.classList.add('robot-waving', 'robot-jump-happy');
       setTimeout(() => el.classList.remove('robot-waving', 'robot-jump-happy'), 1600);
       triggerConfettiBurst(el);
+      showRobotHoloCard(name);
     }
   }
 
@@ -3321,5 +3323,218 @@ async function triggerPwaNativeInstall() {
     closePwaModal();
   } else {
     showToast('💡 Si no aparece el aviso automático, usa el menú del navegador: "Instalar aplicación" o "Añadir a pantalla de inicio"', 'info');
+  }
+}
+
+// ============================================================
+// CÁMARA INTERACTIVA DE LA OFICINA (ZOOM & PAN & TOUCH)
+// ============================================================
+let officeCamera = {
+  zoom: 1.0,
+  panX: 0,
+  panY: 0,
+  isDragging: false,
+  startX: 0,
+  startY: 0
+};
+
+function initOfficeCamera() {
+  const stage = document.getElementById('office-stage');
+  const world = document.getElementById('office-world');
+  if (!stage || !world) return;
+
+  // Zoom con rueda del ratón
+  stage.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.15 : -0.15;
+    changeOfficeZoom(delta);
+  }, { passive: false });
+
+  // Arrastre con ratón (Pan)
+  stage.addEventListener('mousedown', (e) => {
+    if (e.target.closest('button, .office-speech-bubble, .hq-hotspot')) return;
+    officeCamera.isDragging = true;
+    officeCamera.startX = e.clientX - officeCamera.panX;
+    officeCamera.startY = e.clientY - officeCamera.panY;
+    stage.classList.add('cursor-grabbing');
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!officeCamera.isDragging) return;
+    officeCamera.panX = e.clientX - officeCamera.startX;
+    officeCamera.panY = e.clientY - officeCamera.startY;
+    applyOfficeCameraTransform();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (officeCamera.isDragging) {
+      officeCamera.isDragging = false;
+      const stageEl = document.getElementById('office-stage');
+      if (stageEl) stageEl.classList.remove('cursor-grabbing');
+    }
+  });
+
+  // Soporte táctil móvil (Touch Drag)
+  stage.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1 && !e.target.closest('button, .office-speech-bubble, .hq-hotspot')) {
+      officeCamera.isDragging = true;
+      officeCamera.startX = e.touches[0].clientX - officeCamera.panX;
+      officeCamera.startY = e.touches[0].clientY - officeCamera.panY;
+    }
+  }, { passive: true });
+
+  stage.addEventListener('touchmove', (e) => {
+    if (officeCamera.isDragging && e.touches.length === 1) {
+      officeCamera.panX = e.touches[0].clientX - officeCamera.startX;
+      officeCamera.panY = e.touches[0].clientY - officeCamera.startY;
+      applyOfficeCameraTransform();
+    }
+  }, { passive: true });
+
+  stage.addEventListener('touchend', () => {
+    officeCamera.isDragging = false;
+  });
+}
+
+function applyOfficeCameraTransform() {
+  const world = document.getElementById('office-world');
+  const label = document.getElementById('office-zoom-label');
+  if (!world) return;
+  world.style.transform = `translate(${officeCamera.panX}px, ${officeCamera.panY}px) scale(${officeCamera.zoom})`;
+  if (label) label.innerText = `${Math.round(officeCamera.zoom * 100)}%`;
+}
+
+function changeOfficeZoom(delta) {
+  playSciFiBeep('click');
+  officeCamera.zoom = Math.min(2.5, Math.max(0.65, officeCamera.zoom + delta));
+  applyOfficeCameraTransform();
+}
+
+function resetOfficeCamera() {
+  playSciFiBeep('click');
+  officeCamera.zoom = 1.0;
+  officeCamera.panX = 0;
+  officeCamera.panY = 0;
+  applyOfficeCameraTransform();
+}
+
+// ============================================================
+// TARJETAS HOLOGRÁFICAS DE PERFIL DE ROBOT
+// ============================================================
+const ROBOT_HOLO_DATABASE = {
+  'langchain': {
+    name: 'LangChain (Coding Agent)',
+    role: 'Desarrollador de Firmware FTC • Mecanum & PID',
+    avatar: '💻',
+    model: 'Qwen 2.5 Coder 1.5B (Local)',
+    status: 'En Línea • 99.4% Eficiencia',
+    task: 'Escribiendo TeleOpBioBuzzTeam.java con cinemática Mecanum y PID de shooter a 1200 ticks/s.'
+  },
+  'autogen': {
+    name: 'AutoGen (Architect Agent)',
+    role: 'Arquitecto de Estrategia Autónoma & Bezier',
+    avatar: '🧠',
+    model: 'DeepSeek R1 1.5B (Lógica)',
+    status: 'En Línea • 98.7% Eficiencia',
+    task: 'Diseñando la rutina autónoma de 50 puntos con evasión de obstáculos y orientación IMU.'
+  },
+  'babyagi': {
+    name: 'BabyAGI (Cargador / Optimizer)',
+    role: 'Optimizador de Tareas & Manejo de Paquetes',
+    avatar: '🚀',
+    model: 'SmolLM2 1.7B (Compacto)',
+    status: 'Activo • 100% Batería',
+    task: 'Transportando 3 módulos compilados de visión Limelight 3A hacia el repositorio de Gradle.'
+  },
+  'autogpt': {
+    name: 'AutoGPT (Testing Rover)',
+    role: 'Simulador de Chasis & Pruebas en Pista',
+    avatar: '🧪',
+    model: 'Meta Llama 3.2 1B (Ultra Rápido)',
+    status: 'Simulando • 50 Hz Loop',
+    task: 'Simulando 1,000 partidas consecutivas para verificar que no haya sobrecalentamiento de motores.'
+  },
+  'superagi': {
+    name: 'SuperAGI (Hardware / Visión)',
+    role: 'Ingeniero de Sensores Limelight 3A & I2C',
+    avatar: '⚙️',
+    model: 'StarCoder2 3B',
+    status: 'En Mira • Tracking AprilTag #11',
+    task: 'Calculando auto-apuntado proporcional con constante KP = 0.035 para tiro perfecto.'
+  },
+  'llamaindex': {
+    name: 'LlamaIndex (Reviewer / RAG)',
+    role: 'Auditor de Calidad & Manual FIRST 2026',
+    avatar: '🔍',
+    model: 'Microsoft Phi-3 Mini 3.8B',
+    status: 'Certificado • 0 Errores',
+    task: 'Indexando en tiempo real las reglas de penalización de FIRST Tech Challenge y voltajes.'
+  },
+  'safety agent': {
+    name: 'Safety Guard (Mantenimiento)',
+    role: 'Oficial de Seguridad Eléctrica y Térmica',
+    avatar: '🛡️',
+    model: 'IBM Granite Code 3B',
+    status: 'Protegido • Rango Verde',
+    task: 'Comprobando límites térmicos de bobinas de tracción y fusible de 20A en la caja de control.'
+  },
+  'core assembler': {
+    name: 'Core Assembler (Robot de Espalda)',
+    role: 'Ensamblador del Núcleo & Data Cubes',
+    avatar: '🤖',
+    model: 'Qwen 2.5 3B',
+    status: 'Interactivo • Matriz Activa',
+    task: 'Manipulando la torre de cubos holográficos de telemetría y sincronizando el bus CAN.'
+  }
+};
+
+let currentSelectedRobotKey = 'langchain';
+
+function showRobotHoloCard(name) {
+  playSciFiBeep('send');
+  const key = (name || 'langchain').toLowerCase();
+  currentSelectedRobotKey = key;
+  const data = ROBOT_HOLO_DATABASE[key] || ROBOT_HOLO_DATABASE['langchain'];
+
+  const nameEl = document.getElementById('robot-card-name');
+  const roleEl = document.getElementById('robot-card-role');
+  const avatarEl = document.getElementById('robot-card-avatar');
+  const modelEl = document.getElementById('robot-card-model');
+  const statusEl = document.getElementById('robot-card-status');
+  const taskEl = document.getElementById('robot-card-task');
+
+  if (nameEl) nameEl.innerText = data.name;
+  if (roleEl) roleEl.innerText = data.role;
+  if (avatarEl) avatarEl.innerText = data.avatar;
+  if (modelEl) modelEl.innerText = data.model;
+  if (statusEl) statusEl.innerText = data.status;
+  if (taskEl) taskEl.innerText = data.task;
+
+  const modal = document.getElementById('modal-robot-card');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeRobotHoloCard() {
+  const modal = document.getElementById('modal-robot-card');
+  if (modal) modal.classList.add('hidden');
+}
+
+function assignTaskToSelectedRobot() {
+  closeRobotHoloCard();
+  const data = ROBOT_HOLO_DATABASE[currentSelectedRobotKey] || ROBOT_HOLO_DATABASE['langchain'];
+  const input = document.getElementById('swarm-user-input');
+  if (input) {
+    input.value = `@${data.name.split(' ')[0]} `;
+    input.focus();
+  }
+  showToast(`Mención activada para ${data.name}. Escribe tu orden.`, 'info');
+}
+
+function celebrateSelectedRobot() {
+  closeRobotHoloCard();
+  const data = ROBOT_HOLO_DATABASE[currentSelectedRobotKey];
+  if (data) {
+    clickOfficeRobot(data.name.split(' ')[0], 'agent-langchain');
+    showToast(`🎉 ¡${data.name} está celebrando en la oficina!`, 'success');
   }
 }

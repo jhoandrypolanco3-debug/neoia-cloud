@@ -411,7 +411,9 @@
         </div>
 
         <!-- ESCENARIO DE LA OFICINA EN MOVIMIENTO (LIVING ROBOT OFFICE SIMULATOR) -->
-        <div id="office-stage" class="office-stage-container border border-cyan-500/30 shadow-2xl select-none relative group">
+        <div id="office-stage" class="office-stage-container border border-cyan-500/30 shadow-2xl select-none relative group cursor-grab active:cursor-grabbing">
+          <!-- Contenedor Mundial Zoomable & Arrastrable (Camera Pan & Zoom) -->
+          <div id="office-world" class="w-full h-full relative origin-center transition-transform duration-75">
           <!-- Fondo Real de la Foto del Cuartel General -->
           <img src="/agent-house-hq.jpg" alt="Cuartel Central de Agentes 2026" class="w-full h-[440px] sm:h-[500px] md:h-[560px] object-cover object-center filter brightness-95 group-hover:brightness-100 transition duration-500">
           
@@ -810,6 +812,16 @@
               <span>🤝</span>
               <span>¡Colaboración en Vivo!</span>
             </span>
+          </div>
+          </div> <!-- Fin #office-world -->
+
+          <!-- Floating Camera Control HUD (Zoom & Reset) -->
+          <div class="absolute bottom-3 left-3 z-30 flex items-center space-x-1.5 p-1 rounded-xl bg-slate-950/90 backdrop-blur-md border border-cyan-500/40 shadow-xl text-xs font-mono select-none">
+            <button onclick="changeOfficeZoom(0.2)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-cyan-500/20 text-cyan-300 flex items-center justify-center transition font-bold" title="Acercar Cámara (Zoom In)">＋</button>
+            <span id="office-zoom-label" class="px-1.5 text-cyan-400 font-bold text-[11px]">100%</span>
+            <button onclick="changeOfficeZoom(-0.2)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-cyan-500/20 text-cyan-300 flex items-center justify-center transition font-bold" title="Alejar Cámara (Zoom Out)">－</button>
+            <button onclick="resetOfficeCamera()" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] transition" title="Restablecer Posición y Zoom">Reset</button>
+            <span class="text-[10px] text-slate-500 hidden sm:inline pl-1">🖱️ Arrastrar / Rueda</span>
           </div>
         </div>
 
@@ -1650,6 +1662,59 @@
         <span>✓ Soporte Offline y Caché Instantánea</span>
         <button onclick="closePwaModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold transition">
           Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Tarjeta Holográfica de Perfil de Robot -->
+  <div id="modal-robot-card" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-panel w-full max-w-md p-6 rounded-3xl border border-cyan-500/40 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center space-x-3">
+          <div id="robot-card-avatar" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center text-2xl shadow-lg shadow-cyan-500/30">
+            🤖
+          </div>
+          <div>
+            <h3 id="robot-card-name" class="text-base font-bold text-white">LangChain (Coding Agent)</h3>
+            <span id="robot-card-role" class="text-xs text-cyan-400 font-mono">Desarrollador de Firmware FTC</span>
+          </div>
+        </div>
+        <button onclick="closeRobotHoloCard()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">✕</button>
+      </div>
+
+      <!-- Estado & Modelo de IA -->
+      <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+        <div class="p-2.5 rounded-xl bg-slate-900 border border-white/10">
+          <span class="text-[10px] text-slate-400 block">MODELO ASIGNADO</span>
+          <span id="robot-card-model" class="text-emerald-400 font-bold">Qwen 2.5 Coder 1.5B</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900 border border-white/10">
+          <span class="text-[10px] text-slate-400 block">ESTADO / EFICIENCIA</span>
+          <span id="robot-card-status" class="text-cyan-300 font-bold">En Línea • 99.4%</span>
+        </div>
+      </div>
+
+      <!-- Tarea Actual -->
+      <div class="p-3 rounded-xl bg-slate-950 border border-cyan-500/30 space-y-1">
+        <div class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+          <span>Misión Actual del Agente</span>
+        </div>
+        <p id="robot-card-task" class="text-xs text-slate-200 leading-relaxed font-mono">
+          Escribiendo `TeleOpBioBuzzTeam.java` con cinemática Mecanum y PID de shooter a 1200 ticks/s.
+        </p>
+      </div>
+
+      <!-- Acciones Rápidas con este Robot -->
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="assignTaskToSelectedRobot()" class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs shadow-md transition flex items-center justify-center space-x-1.5 cursor-pointer">
+          <span>💬</span>
+          <span>Hablar en Chat</span>
+        </button>
+        <button onclick="celebrateSelectedRobot()" class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-1.5 cursor-pointer">
+          <span>🎉</span>
+          <span>Hacerlo Festejar</span>
         </button>
       </div>
     </div>
