@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { exec, spawn } = require('child_process');
 
 const PORT = 3333;
@@ -105,6 +106,29 @@ const server = http.createServer(async (req, res) => {
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(results));
+    return;
+  }
+
+  // 1b. Live System & PC Performance Metrics
+  if (pathname === '/api/system/metrics') {
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    const memUsagePct = Math.round((usedMem / totalMem) * 100);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      ram: {
+        totalGB: (totalMem / (1024 ** 3)).toFixed(1),
+        usedGB: (usedMem / (1024 ** 3)).toFixed(1),
+        freeGB: (freeMem / (1024 ** 3)).toFixed(1),
+        percentage: memUsagePct
+      },
+      cpus: os.cpus().length,
+      platform: os.platform(),
+      uptimeHours: (os.uptime() / 3600).toFixed(1),
+      timestamp: Date.now()
+    }));
     return;
   }
 

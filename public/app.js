@@ -139,6 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
   scanAllServices();
   loadCatalogGrid();
   updateStorageMeter();
+  updateLivePcMetrics();
+  setInterval(updateLivePcMetrics, 4000);
   initSpeechRecognition();
   renderDefaultDiagram();
   if (typeof switchSwarmFile === 'function') switchSwarmFile('teleop');
@@ -173,6 +175,30 @@ async function updateStorageMeter() {
     }
     if (diskFreeEl) {
       diskFreeEl.innerText = `${data.remainingGB} GB restantes del límite de 5 GB`;
+    }
+  } catch (e) {}
+}
+
+// Monitor de Rendimiento de la PC en Tiempo Real (RAM, Cores)
+async function updateLivePcMetrics() {
+  try {
+    const res = await fetch('/api/system/metrics');
+    if (!res.ok) return;
+    const data = await res.json();
+    const ramText = document.getElementById('pc-ram-used-text');
+    const bar = document.getElementById('pc-ram-bar');
+    if (ramText && data.ram) {
+      ramText.innerText = `${data.ram.usedGB} GB (${data.ram.percentage}%)`;
+      if (bar) {
+        bar.style.width = `${data.ram.percentage}%`;
+        if (data.ram.percentage > 85) {
+          bar.className = 'h-full bg-rose-500 rounded-full transition-all duration-500';
+        } else if (data.ram.percentage > 70) {
+          bar.className = 'h-full bg-amber-400 rounded-full transition-all duration-500';
+        } else {
+          bar.className = 'h-full bg-cyan-400 rounded-full transition-all duration-500';
+        }
+      }
     }
   } catch (e) {}
 }

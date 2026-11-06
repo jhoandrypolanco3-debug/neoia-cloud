@@ -110,6 +110,15 @@
           </div>
         </div>
 
+        <!-- Live PC RAM HUD Widget -->
+        <div id="pc-ram-hud-widget" class="hidden lg:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 text-xs shadow-inner font-mono" title="Uso de memoria RAM de tu PC en tiempo real">
+          <i data-lucide="cpu" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span>RAM PC: <strong id="pc-ram-used-text" class="text-cyan-300">--</strong></span>
+          <div class="w-14 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div id="pc-ram-bar" class="h-full bg-cyan-400 rounded-full transition-all duration-500" style="width: 50%;"></div>
+          </div>
+        </div>
+
         <!-- TTS Voice Toggle -->
         <button onclick="toggleVoiceAudio()" id="btn-toggle-tts" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-xs flex items-center space-x-1.5 border border-white/10" title="Activar/Desactivar lectura por voz">
           <i data-lucide="volume-2" class="w-4 h-4 text-cyan-400" id="tts-icon"></i>
