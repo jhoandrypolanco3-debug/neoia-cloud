@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Portfolio | MIT Admissions & Research</title>
+  <meta name="description" content="Robotics & AI Systems Engineering Portfolio for MIT (Massachusetts Institute of Technology). FIRST Tech Challenge (BIOBUZZ 24096), Multi-Agent AI Architecture, and Control Systems.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --mit-crimson: #A31F34;
+      --mit-dark-red: #7A1425;
+      --mit-grey: #8A8B8C;
+    }
+    body {
+      background-color: #060913;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    .glass-card {
+      background: rgba(13, 20, 36, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+    }
+    .glass-card:hover {
+      border-color: rgba(163, 31, 52, 0.5);
+      box-shadow: 0 10px 30px -10px rgba(163, 31, 52, 0.25);
+    }
+    .mit-badge {
+      background: linear-gradient(135deg, rgba(163, 31, 52, 0.2) 0%, rgba(163, 31, 52, 0.05) 100%);
+      border: 1px solid rgba(163, 31, 52, 0.4);
+      color: #ff6b81;
+    }
+    .code-block {
+      background: #040711;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+  </style>
+</head>
+<body class="selection:bg-red-700 selection:text-white">
+
+  <!-- Header / Navigation -->
+  <header class="border-b border-white/10 glass-card sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-700 via-rose-600 to-amber-500 p-0.5 flex items-center justify-center shadow-lg shadow-red-700/30">
+          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center font-black text-sm text-red-400">
+            MIT
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">
+              Jhoandry Polanco
+            </h1>
+            <span class="mit-badge text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">
+              MAKER PORTFOLIO
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-mono">Robotics Software Engineer • FIRST Tech Challenge • AI Architect</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3 text-xs">
+        <a href="#projects" class="hidden sm:inline-block text-slate-300 hover:text-white transition">Projects</a>
+        <a href="#control-systems" class="hidden sm:inline-block text-slate-300 hover:text-white transition">Control Systems</a>
+        <a href="#ai-architecture" class="hidden sm:inline-block text-slate-300 hover:text-white transition">AI Systems</a>
+        <a href="https://neoia-351a.onrender.com/" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-red-700/30 hover:bg-red-700/50 text-red-200 border border-red-600/40 font-semibold transition flex items-center space-x-1.5">
+          <span>Live Ecosystem</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section: Mens et Manus -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-12">
+    <div class="space-y-6">
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-950/60 border border-red-700/40 text-red-300 text-xs font-mono">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+        <span>MIT MOTTO: "MENS ET MANUS" (MIND AND HAND)</span>
+      </div>
+
+      <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight max-w-4xl">
+        Bridging <span class="bg-gradient-to-r from-red-500 via-rose-400 to-amber-400 bg-clip-text text-transparent">Competitive Robotics</span> with Autonomous Multi-Agent AI.
+      </h2>
+
+      <p class="text-slate-300 text-base sm:text-lg max-w-3xl leading-relaxed">
+        I design and build physical and algorithmic robotic systems: from sub-second closed-loop PID control and Mecanum kinematics on <strong>FIRST Tech Challenge Team BIOBUZZ 24096</strong>, to a distributed <strong>Multi-Agent AI Engine</strong> that writes, audits, and deploys Java robot firmware autonomously.
+      </p>
+
+      <!-- Key Metrics Strip -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4">
+        <div class="p-4 rounded-2xl glass-card border border-white/5">
+          <div class="text-2xl font-black text-red-400 font-mono">50 Pts</div>
+          <div class="text-xs text-slate-400 mt-0.5">Autonomous Routine (AprilTag Vision)</div>
+        </div>
+        <div class="p-4 rounded-2xl glass-card border border-white/5">
+          <div class="text-2xl font-black text-amber-400 font-mono">1200 ticks/s</div>
+          <div class="text-xs text-slate-400 mt-0.5">Closed-Loop PID Shooter Velocity</div>
+        </div>
+        <div class="p-4 rounded-2xl glass-card border border-white/5">
+          <div class="text-2xl font-black text-cyan-400 font-mono">0.035 Kp</div>
+          <div class="text-xs text-slate-400 mt-0.5">Limelight 3A Auto-Aim Proportional Gain</div>
+        </div>
+        <div class="p-4 rounded-2xl glass-card border border-white/5">
+          <div class="text-2xl font-black text-emerald-400 font-mono">7 Agents</div>
+          <div class="text-xs text-slate-400 mt-0.5">Collaborative Swarm for Robot Firmware</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Project 1: FTC Robot BIOBUZZ 24096 -->
+  <section id="projects" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 border-t border-white/10">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-wider text-red-400 font-bold">PROJECT 01 • COMPETITION ROBOTICS</span>
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">BIOBUZZ 24096: Competition Chassis & Subsystems</h3>
+      </div>
+      <span class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-900 border border-white/10 text-slate-300">FIRST Tech Challenge</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Description & Engineering Decisions -->
+      <div class="space-y-4">
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Lead programmer and systems designer for FTC Team <strong>BIOBUZZ 24096</strong>. Built a comprehensive competition-ready software stack focusing on driver precision, deterministic autonomous scoring, and rapid sensor feedback.
+        </p>
+
+        <div class="space-y-3">
+          <div class="p-4 rounded-xl glass-card space-y-1">
+            <h4 class="text-sm font-bold text-white flex items-center space-x-2">
+              <i data-lucide="compass" class="w-4 h-4 text-amber-400"></i>
+              <span>Mecanum Holonomic Kinematics with Dynamic Normalization</span>
+            </h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Implemented 4-wheel omnidirectional drive kinematics with instantaneous denominator scaling:
+              <code class="text-amber-300 font-mono">max(1.0, |y| + |x| + |rx|)</code>. This eliminates motor saturation during diagonal translation combined with angular velocity, preventing trajectory drift.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl glass-card space-y-1">
+            <h4 class="text-sm font-bold text-white flex items-center space-x-2">
+              <i data-lucide="target" class="w-4 h-4 text-red-400"></i>
+              <span>Computer Vision Auto-Aim with Limelight 3A</span>
+            </h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Integrated 100 Hz AprilTag detection pipeline. Proportional steering feedback loop (<code class="text-red-300 font-mono">turn = tx * 0.035</code>) allows the robot to lock onto targets automatically when the driver pulls the left trigger.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl glass-card space-y-1">
+            <h4 class="text-sm font-bold text-white flex items-center space-x-2">
+              <i data-lucide="zap" class="w-4 h-4 text-emerald-400"></i>
+              <span>High-Frequency Velocity PID Launch System</span>
+            </h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Controlled via <code class="text-emerald-300 font-mono">DcMotorEx.setVelocity(1200)</code> with closed-loop encoder feedback. Maintains launch velocity within ±2% variance even as the 12V competition battery drops under load.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code Snippet Card -->
+      <div class="rounded-2xl code-block p-5 flex flex-col justify-between shadow-2xl">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
+            <span class="text-xs text-slate-400 font-mono ml-2">TeleOpBioBuzzTeam.java</span>
+          </div>
+          <span class="text-[10px] font-mono text-cyan-400">Java • FTC SDK</span>
+        </div>
+
+        <pre class="text-[11px] leading-relaxed text-slate-300 overflow-x-auto scrollbar-none font-mono"><code><span class="text-purple-400">@TeleOp</span>(name = <span class="text-green-300">"BIOBUZZ 24096: TeleOp Principal"</span>)
+<span class="text-blue-400">public class</span> <span class="text-yellow-300">TeleOpBioBuzzTeam</span> <span class="text-blue-400">extends</span> LinearOpMode {
+  <span class="text-slate-500">// Limelight 3A Vision Assisted Aiming</span>
+  <span class="text-blue-400">if</span> (gamepad1.left_trigger &gt; <span class="text-amber-400">0.3</span> &amp;&amp; limelight.isTargetVisible()) {
+    rx = limelight.getAutoAimTurnPower(); <span class="text-slate-500">// Kp = 0.035</span>
+  }
+
+  <span class="text-slate-500">// Mecanum Kinematics with Denominator Normalization</span>
+  <span class="text-blue-400">double</span> denom = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), <span class="text-amber-400">1.0</span>);
+  frontLeft.setPower((y + x + rx) / denom);
+  backLeft.setPower((y - x + rx) / denom);
+  frontRight.setPower((y - x - rx) / denom);
+  backRight.setPower((y + x - rx) / denom);
+
+  <span class="text-slate-500">// Closed-Loop Encoder Shooter Velocity (PID)</span>
+  <span class="text-blue-400">if</span> (shooterActive) {
+    shooterMotor.setVelocity(<span class="text-amber-400">1200.0</span>); <span class="text-slate-500">// ticks/s</span>
+  }
+}</code></pre>
+
+        <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+          <span class="text-slate-400">Production Tested: Regional Qualifiers</span>
+          <span class="text-emerald-400 flex items-center gap-1">✓ 100% Zero-Latency Loop</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Project 2: Multi-Agent AI Engine (NeoIA Nexus) -->
+  <section id="ai-architecture" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 border-t border-white/10">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">PROJECT 02 • DISTRIBUTED SYSTEMS & AI</span>
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">NeoIA Nexus: Multi-Agent Robotic Code Synthesis</h3>
+      </div>
+      <span class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-900 border border-white/10 text-slate-300">Autonomous LLM Swarm</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="p-5 rounded-2xl glass-card space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-mono font-bold">
+          01
+        </div>
+        <h4 class="text-base font-bold text-white">Agent Consensus Loop</h4>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Seven specialized AI agents (Architect, Coder, Reviewer, Hardware, Safety, Optimizer, Tester) engage in structured critique to generate certified, compilation-ready robot OpModes.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-2xl glass-card space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-mono font-bold">
+          02
+        </div>
+        <h4 class="text-base font-bold text-white">Dual Local-Cloud Bridge</h4>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Hybrid inference architecture: 20 quantized local models (Qwen 2.5, DeepSeek R1, Llama 3.2) orchestrated on-device under a strict 5GB quota, paired with cloud GPUs for 24/7 background compilation.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-2xl glass-card space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono font-bold">
+          03
+        </div>
+        <h4 class="text-base font-bold text-white">Direct IDE & OS Automation</h4>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Custom Node.js process bridge writing Java code directly into the target Android Studio repository, bypassing sandbox constraints and launching IDE instances with a single voice or chat command.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Competencies Matrix -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12 border-t border-white/10">
+    <h3 class="text-xl font-bold text-white mb-6">Technical Competencies Matrix</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
+      <div class="p-4 rounded-xl glass-card space-y-2">
+        <div class="text-red-400 font-bold uppercase">Robotics & Control</div>
+        <ul class="text-slate-300 space-y-1">
+          <li>• Mecanum Kinematics</li>
+          <li>• Closed-Loop PID / Feedforward</li>
+          <li>• Limelight 3A Vision Pipelines</li>
+          <li>• Encoder Odometry & Dead Reckoning</li>
+          <li>• I2C / CAN Bus Sensor Integration</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-xl glass-card space-y-2">
+        <div class="text-cyan-400 font-bold uppercase">Software Development</div>
+        <ul class="text-slate-300 space-y-1">
+          <li>• Java (FTC SDK, Android Studio)</li>
+          <li>• Node.js & Asynchronous Systems</li>
+          <li>• Python (Computer Vision, RAG)</li>
+          <li>• Progressive Web Apps (PWA)</li>
+          <li>• Git / CI / Deployment Pipelines</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-xl glass-card space-y-2">
+        <div class="text-purple-400 font-bold uppercase">Artificial Intelligence</div>
+        <ul class="text-slate-300 space-y-1">
+          <li>• Multi-Agent Systems (LangChain, AutoGen)</li>
+          <li>• Local LLM Orchestration (Ollama)</li>
+          <li>• Retrieval-Augmented Generation (RAG)</li>
+          <li>• Model Quantization & Memory Budgets</li>
+          <li>• Web Audio API & Sci-Fi Synthesis</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-xl glass-card space-y-2">
+        <div class="text-emerald-400 font-bold uppercase">Maker & Prototyping</div>
+        <ul class="text-slate-300 space-y-1">
+          <li>• CAD Design & 3D Prototyping</li>
+          <li>• Electrical Wiring & 20A Fusing</li>
+          <li>• Motor Gearing (GoBILDA 312 RPM)</li>
+          <li>• Technical Notebook Documentation</li>
+          <li>• Rapid Iteration & Field Diagnostics</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/10 py-10 text-center text-xs text-slate-500 font-mono">
+    <p>Prepared for MIT Admissions & Undergraduate Maker Portfolio Evaluation • 2026</p>
+    <p class="mt-1">Candidate: Jhoandry Polanco • Team BIOBUZZ 24096 • NeoIA Robotics Technologies</p>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

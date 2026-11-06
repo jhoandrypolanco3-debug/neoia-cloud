@@ -4,8 +4,8 @@ const path = require('path');
 const os = require('os');
 const { exec, spawn } = require('child_process');
 
-const PORT = 3333;
-const PUBLIC_DIR = __dirname;
+const PORT = process.env.PORT || 3333;
+const PUBLIC_DIR = fs.existsSync(path.join(__dirname, 'public')) ? path.join(__dirname, 'public') : __dirname;
 
 const TARGET_SERVICES = {
   ollama: 'http://localhost:11434',
@@ -492,11 +492,14 @@ const server = http.createServer(async (req, res) => {
   }
 
   // 7. Static file serving
-  let filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'index.html' : pathname);
-  if (!filePath.startsWith(PUBLIC_DIR)) {
-    res.writeHead(403);
-    res.end('Acceso denegado');
-    return;
+  let relPath = pathname === '/' ? 'index.html' : pathname.replace(/^\//, '');
+  let filePath = path.join(PUBLIC_DIR, relPath);
+  if (!fs.existsSync(filePath)) {
+    if (fs.existsSync(path.join(__dirname, relPath))) {
+      filePath = path.join(__dirname, relPath);
+    } else if (fs.existsSync(path.join(__dirname, 'public', relPath))) {
+      filePath = path.join(__dirname, 'public', relPath);
+    }
   }
 
   fs.stat(filePath, (err, stats) => {
