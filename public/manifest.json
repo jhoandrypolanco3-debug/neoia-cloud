@@ -1,0 +1,55 @@
+{
+  "name": "NeoIA Nexus • Cuartel de Agentes IA",
+  "short_name": "NeoIA Nexus",
+  "description": "Ecosistema de Inteligencia Artificial Multi-Agente, Automatización de PC y Robótica.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#06b6d4",
+  "orientation": "any",
+  "categories": ["productivity", "developer tools", "utilities"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Oficina de Agentes",
+      "short_name": "Oficina",
+      "description": "Ver a los robots trabajando en vivo",
+      "url": "/",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Música MS painr",
+      "short_name": "Música",
+      "description": "Poner música para los trabajadores",
+      "url": "/#music",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Abrir Android Studio",
+      "short_name": "Studio",
+      "description": "Abrir proyecto de Android Studio en tu PC",
+      "url": "/#studio",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

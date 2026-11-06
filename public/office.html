@@ -2,8 +2,19 @@
 <html lang="es" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Local AI Nexus - Ecosistema de IA de 5 Capas & Agente FTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>NeoIA Nexus • Cuartel de Agentes IA & Ecosistema Local</title>
+  
+  <!-- Progressive Web App (PWA) Meta & Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#06b6d4">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NeoIA Nexus">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Marked.js para Markdown -->
@@ -68,6 +79,12 @@
 
       <!-- Quick Action Controls in Header -->
       <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Botón Instalar App PWA -->
+        <button onclick="promptPWAInstallation()" id="btn-header-pwa-install" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500/20 via-teal-500/20 to-emerald-500/20 hover:from-cyan-500/30 hover:to-emerald-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-bold flex items-center space-x-1.5 transition shadow-sm" title="Instalar NeoIA Nexus en tu PC de escritorio o celular">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span>Instalar App</span>
+        </button>
+
         <!-- Enlace a la Web Corporativa -->
         <a href="https://neoia-351a.onrender.com/" target="_blank" class="hidden sm:flex px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-semibold items-center space-x-1.5 transition shadow-sm" title="Visitar la web corporativa de NeoIA Robotics Technologies">
           <i data-lucide="globe" class="w-3.5 h-3.5"></i>
@@ -381,6 +398,10 @@
             <button onclick="openCloud247Modal()" class="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900/90 text-emerald-300 border border-emerald-500/40 text-[11px] font-mono flex items-center space-x-1.5 transition shadow-sm" title="Trabajar con la PC apagada (Servidor en la Nube 24/7)">
               <span>☁️</span>
               <span>Modo PC Apagada (24/7)</span>
+            </button>
+            <button onclick="promptPWAInstallation()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-500/25 to-indigo-500/25 hover:from-blue-500/35 hover:to-indigo-500/35 text-blue-300 border border-blue-500/40 text-[11px] font-mono flex items-center space-x-1.5 transition shadow-sm font-bold" title="Instalar NeoIA Nexus en tu PC de escritorio o móvil">
+              <span>📲</span>
+              <span>Instalar App PWA</span>
             </button>
             <button onclick="runMultiAgentPipeline()" id="btn-run-pipeline" class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-amber-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/25 transition flex items-center space-x-1.5">
               <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
@@ -1579,8 +1600,63 @@
     </div>
   </div>
 
+  <!-- Modal: Instalar Aplicación PWA (Móvil y Escritorio) -->
+  <div id="modal-pwa-install" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-panel w-full max-w-md p-6 rounded-3xl border border-cyan-500/40 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+            <i data-lucide="download-cloud" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Instalar NeoIA Nexus</h3>
+            <p class="text-xs text-slate-400">App nativa para Windows, Mac, Android e iOS</p>
+          </div>
+        </div>
+        <button onclick="closePwaModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">✕</button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 flex items-center space-x-3">
+        <img src="/icon-192.png" alt="NeoIA App Icon" class="w-14 h-14 rounded-2xl border border-cyan-400/40 shadow-md">
+        <div>
+          <div class="text-sm font-bold text-white">NeoIA Nexus & Cuartel de Agentes</div>
+          <div class="text-[11px] text-cyan-300 font-mono">PWA 2026 • Modo Standalone</div>
+          <div class="text-[10px] text-slate-400">Sin barras de navegador, acceso directo desde tu escritorio o pantalla de inicio</div>
+        </div>
+      </div>
+
+      <!-- Sección Android / Windows / Chrome -->
+      <div id="pwa-native-prompt-section" class="space-y-2">
+        <button onclick="triggerPwaNativeInstall()" id="btn-pwa-native-install" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-bold text-sm shadow-xl shadow-cyan-500/25 transition flex items-center justify-center space-x-2 cursor-pointer">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Instalar Ahora en este Dispositivo</span>
+        </button>
+      </div>
+
+      <!-- Sección Guía iOS (iPhone / Safari) -->
+      <div class="p-3.5 rounded-xl bg-slate-900 border border-white/10 space-y-2 text-xs">
+        <div class="font-bold text-amber-300 flex items-center space-x-1.5">
+          <span>🍎</span>
+          <span>¿Usas iPhone / iPad (Safari)?</span>
+        </div>
+        <ol class="text-[11px] text-slate-300 list-decimal list-inside space-y-1 font-mono">
+          <li>Toca el botón <strong>Compartir</strong> (icono <span class="text-cyan-400">⬆️</span> en Safari).</li>
+          <li>Desplázate y selecciona <strong>"Añadir a pantalla de inicio"</strong> (<span class="text-emerald-400">➕</span>).</li>
+          <li>Pulsa <strong>Añadir</strong> arriba a la derecha.</li>
+        </ol>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-white/10 text-[11px] text-slate-400 font-mono">
+        <span>✓ Soporte Offline y Caché Instantánea</span>
+        <button onclick="closePwaModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold transition">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
-  <script src="app.js?v=living_office_v9"></script>
+  <script src="app.js?v=pwa_living_v10"></script>
 </body>
 </html>

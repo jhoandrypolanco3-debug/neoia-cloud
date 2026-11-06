@@ -3263,3 +3263,63 @@ function setHappyWorkerThoughts() {
     }
   });
 }
+
+// ============================================================
+// PWA (PROGRESSIVE WEB APP) - INSTALACIÓN & SERVICE WORKER
+// ============================================================
+let deferredPwaPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then((reg) => {
+      console.log('⚡ PWA Service Worker activo:', reg.scope);
+    }).catch((err) => {
+      console.warn('PWA Service Worker aviso:', err);
+    });
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+  console.log('📲 PWA: Evento de instalación capturado');
+  const btnHeader = document.getElementById('btn-header-pwa-install');
+  if (btnHeader) {
+    btnHeader.classList.remove('hidden');
+    btnHeader.classList.add('flex');
+  }
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPwaPrompt = null;
+  showToast('🎉 ¡NeoIA Nexus se instaló con éxito en tu dispositivo!', 'success');
+  closePwaModal();
+});
+
+function promptPWAInstallation() {
+  playSciFiBeep('click');
+  const modal = document.getElementById('modal-pwa-install');
+  if (modal) modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+}
+
+function closePwaModal() {
+  const modal = document.getElementById('modal-pwa-install');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function triggerPwaNativeInstall() {
+  playSciFiBeep('send');
+  if (deferredPwaPrompt) {
+    deferredPwaPrompt.prompt();
+    const { outcome } = await deferredPwaPrompt.userChoice;
+    console.log(`PWA install outcome: ${outcome}`);
+    if (outcome === 'accepted') {
+      showToast('🚀 Instalando NeoIA Nexus en tu sistema...', 'info');
+    }
+    deferredPwaPrompt = null;
+    closePwaModal();
+  } else {
+    showToast('💡 Si no aparece el aviso automático, usa el menú del navegador: "Instalar aplicación" o "Añadir a pantalla de inicio"', 'info');
+  }
+}

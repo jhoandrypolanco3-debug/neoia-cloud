@@ -6,7 +6,14 @@
   <title>NeoIA Robotics Technologies | Inteligencia Artificial para Robótica Competitiva</title>
   <meta name="description" content="NeoIA Robotics Technologies es la plataforma empresarial de IA para equipos de FIRST Tech Challenge (FTC) y FRC. Ecosistema híbrido: motor local para Android Studio y GPU DeepSeek en la nube.">
   <meta name="keywords" content="NeoIA, NeoIA Technologies, Robótica FTC, FIRST Tech Challenge, BIOBUZZ 24096, IA Robótica, DeepSeek Robótica, Android Studio FTC">
-  <meta name="theme-color" content="#030712">
+    <meta name="theme-color" content="#06b6d4">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NeoIA Nexus">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
   <!-- Tailwind CSS (servido localmente: la pagina no depende de ningun CDN) -->
@@ -684,6 +691,14 @@ public class AutoDisparar extends LinearOpMode {
 
     // Inicializar con demo de Shooter
     demoSelect('shooter');
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      });
+    }
   </script>
 </body>
 </html>
