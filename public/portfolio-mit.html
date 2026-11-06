@@ -1,42 +1,43 @@
 <!DOCTYPE html>
-<html lang="es" class="dark scroll-smooth">
+<html lang="en" class="dark scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jhoandry Polanco | MIT Admissions Maker Portfolio</title>
-  <meta name="description" content="Official MIT Maker Portfolio of Jhoandry Polanco: FIRST Tech Challenge (BIOBUZZ 24096), Multi-Agent AI Swarms, Kinematics, CAD Engineering, and Full-Stack Systems.">
+  <meta name="description" content="Official MIT Maker Portfolio of Jhoandry Polanco: FIRST Tech Challenge (BIOBUZZ #24096), Multi-Agent AI Swarms, Holonomic Kinematics, CAD Engineering, and Full-Stack Systems.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23A31F34'/><text x='50' y='65' font-size='48' font-weight='900' fill='white' text-anchor='middle'>MIT</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
       --mit-crimson: #A31F34;
-      --mit-dark: #07090e;
-      --mit-card: rgba(15, 23, 42, 0.72);
+      --mit-crimson-glow: rgba(163, 31, 52, 0.4);
+      --mit-dark: #05070f;
+      --mit-card: rgba(13, 20, 36, 0.78);
       --mit-border: rgba(255, 255, 255, 0.08);
       --mit-accent: #ff4757;
     }
     body {
-      background-color: #05070f;
+      background-color: #04060d;
       color: #e2e8f0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background-image: 
-        radial-gradient(circle at 15% 20%, rgba(163, 31, 52, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 85% 80%, rgba(37, 99, 235, 0.12) 0%, transparent 45%),
-        linear-gradient(to bottom, #05070f 0%, #030408 100%);
+        radial-gradient(circle at 10% 15%, rgba(163, 31, 52, 0.22) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(37, 99, 235, 0.16) 0%, transparent 45%),
+        linear-gradient(to bottom, #04060d 0%, #020306 100%);
       background-attachment: fixed;
     }
     .glass-card {
       background: var(--mit-card);
       border: 1px solid var(--mit-border);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .glass-card:hover {
-      border-color: rgba(163, 31, 52, 0.45);
-      transform: translateY(-3px);
-      box-shadow: 0 16px 36px -12px rgba(163, 31, 52, 0.3);
+      border-color: rgba(163, 31, 52, 0.55);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -15px var(--mit-crimson-glow);
     }
     .mit-badge {
       background: linear-gradient(135deg, rgba(163, 31, 52, 0.35) 0%, rgba(163, 31, 52, 0.1) 100%);
@@ -44,7 +45,7 @@
       color: #ffa4b2;
     }
     .code-block {
-      background: #02040a;
+      background: #020409;
       border: 1px solid rgba(255, 255, 255, 0.08);
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
@@ -52,7 +53,13 @@
       background: #A31F34;
       color: #ffffff;
       border-color: #ff6b81;
-      box-shadow: 0 4px 14px rgba(163, 31, 52, 0.4);
+      box-shadow: 0 4px 14px rgba(163, 31, 52, 0.45);
+    }
+    .grid-bg {
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     }
   </style>
 </head>
@@ -73,92 +80,161 @@
               Jhoandry Polanco
             </h1>
             <span class="mit-badge text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">
-              MAKER PORTFOLIO 2026
+              MIT MAKER PORTFOLIO
             </span>
           </div>
-          <p class="text-xs text-slate-400 font-mono">Robotics Systems Engineer • FIRST Tech Challenge • AI Architecture</p>
+          <p class="text-xs text-slate-400 font-mono">Robotics Systems Engineer • FIRST Tech Challenge • AI Swarm Architect</p>
         </div>
       </div>
 
       <div class="flex items-center space-x-3 text-xs">
-        <a href="#projects" class="hidden md:inline-block text-slate-300 hover:text-white font-medium transition">Proyectos</a>
-        <a href="#competencies" class="hidden md:inline-block text-slate-300 hover:text-white font-medium transition">Competencias</a>
-        <a href="#philosophy" class="hidden md:inline-block text-slate-300 hover:text-white font-medium transition">Mente y Mano</a>
+        <!-- Interactive Sound FX Toggle -->
+        <button onclick="toggleAudioFx()" id="audio-toggle-btn" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 font-mono flex items-center space-x-1.5 transition">
+          <i data-lucide="volume-2" id="audio-icon" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span id="audio-label">Audio FX: ON</span>
+        </button>
+
+        <a href="#simulator" class="hidden lg:inline-block text-slate-300 hover:text-white font-medium transition">Simulator</a>
+        <a href="#projects" class="hidden md:inline-block text-slate-300 hover:text-white font-medium transition">Projects (14)</a>
+        <a href="#philosophy" class="hidden md:inline-block text-slate-300 hover:text-white font-medium transition">Mens et Manus</a>
         <a href="http://localhost:3333/" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 font-semibold transition flex items-center space-x-1.5">
           <i data-lucide="monitor" class="w-3.5 h-3.5 text-cyan-400"></i>
-          <span>App Local :3333</span>
+          <span>Local :3333</span>
         </a>
         <a href="https://neoia-351a.onrender.com/" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-red-700/40 hover:bg-red-700/60 text-red-100 border border-red-500/50 font-semibold transition flex items-center space-x-1.5 shadow-md shadow-red-700/20">
           <i data-lucide="cloud" class="w-3.5 h-3.5 text-amber-300"></i>
-          <span>Ecosistema en la Nube</span>
+          <span>Cloud Ecosystem</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section: MIT "Mens et Manus" -->
+  <!-- Hero Section: "Mens et Manus" -->
   <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-12">
     <div class="space-y-6">
       <div class="inline-flex items-center space-x-2.5 px-3.5 py-1.5 rounded-full bg-red-950/60 border border-red-700/50 text-red-300 text-xs font-mono">
         <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-        <span class="font-bold">MIT ADMISSIONS CANDIDATE • EECS (COURSE 6) & MECH-E (COURSE 2)</span>
+        <span class="font-bold">MIT UNDERGRADUATE ADMISSIONS CANDIDATE • EECS (COURSE 6) & MECH-E (COURSE 2)</span>
       </div>
 
       <h2 class="text-3xl sm:text-6xl font-black text-white tracking-tight leading-tight max-w-5xl">
-        Ingeniería Robótica, <span class="bg-gradient-to-r from-red-500 via-rose-400 to-amber-400 bg-clip-text text-transparent">Sistemas de Control Cerrado</span> y Enjambres de IA Autónoma.
+        Autonomous Robotics, <span class="bg-gradient-to-r from-red-500 via-rose-400 to-amber-400 bg-clip-text text-transparent">Closed-Loop Control</span> & Multi-Agent Intelligence.
       </h2>
 
       <p class="text-slate-300 text-base sm:text-xl max-w-4xl leading-relaxed">
-        Mi trabajo materializa la filosofía de MIT <strong>"Mens et Manus" (Mente y Mano)</strong>: diseñar modelos matemáticos rigurosos y construirlos físicamente en chasis de competencia, desde algoritmos de odometría y visión por computador a 100 FPS para <strong>FTC Team BIOBUZZ 24096</strong>, hasta arquitecturas multi-agente distribuidas y simuladores físicos interactivos.
+        My engineering methodology embodies MIT’s motto <strong>"Mens et Manus" (Mind and Hand)</strong>: combining rigorous applied mathematics with hands-on mechanical fabrication. From sub-millisecond Mecanum kinematics and 100 FPS AprilTag tracking on <strong>FTC Team BIOBUZZ #24096</strong>, to a distributed 7-agent LLM swarm synthesizing verified Java firmware.
       </p>
 
-      <!-- Key Engineering Metrics Strip -->
+      <!-- Elite Metrics Strip -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
         <div class="p-5 rounded-2xl glass-card border border-white/5">
-          <div class="text-3xl font-black text-red-400 font-mono">14+</div>
-          <div class="text-xs text-slate-300 font-semibold mt-1">Proyectos de Vida Desarrollados</div>
-          <div class="text-[11px] text-slate-500">Robótica FTC, IA, CAD, Simuladores</div>
+          <div class="text-3xl font-black text-red-400 font-mono">14 Projects</div>
+          <div class="text-xs text-slate-300 font-semibold mt-1">Full Portfolio Catalog</div>
+          <div class="text-[11px] text-slate-500">FTC Robotics, CAD, AI, Physics</div>
         </div>
         <div class="p-5 rounded-2xl glass-card border border-white/5">
-          <div class="text-3xl font-black text-amber-400 font-mono">1200 t/s</div>
-          <div class="text-xs text-slate-300 font-semibold mt-1">Control PID en Lanzador</div>
-          <div class="text-[11px] text-slate-500">Estabilidad ±2% ante caídas de voltaje</div>
+          <div class="text-3xl font-black text-amber-400 font-mono">1200 ticks/s</div>
+          <div class="text-xs text-slate-300 font-semibold mt-1">Shooter Velocity PID</div>
+          <div class="text-[11px] text-slate-500">±1.8% variance under battery sag</div>
         </div>
         <div class="p-5 rounded-2xl glass-card border border-white/5">
-          <div class="text-3xl font-black text-cyan-400 font-mono">100 Hz</div>
-          <div class="text-xs text-slate-300 font-semibold mt-1">Visión Limelight 3A</div>
-          <div class="text-[11px] text-slate-500">Tracking y corrección angular automática</div>
+          <div class="text-3xl font-black text-cyan-400 font-mono">100 FPS</div>
+          <div class="text-xs text-slate-300 font-semibold mt-1">Limelight 3A Vision Loop</div>
+          <div class="text-[11px] text-slate-500">Auto-Aim with Kp = 0.035</div>
         </div>
         <div class="p-5 rounded-2xl glass-card border border-white/5">
-          <div class="text-3xl font-black text-emerald-400 font-mono">7 Agentes</div>
-          <div class="text-xs text-slate-300 font-semibold mt-1">Enjambre NeoIA Nexus</div>
-          <div class="text-[11px] text-slate-500">Generación y auditoría autónoma de código</div>
+          <div class="text-3xl font-black text-emerald-400 font-mono">7 AI Agents</div>
+          <div class="text-xs text-slate-300 font-semibold mt-1">NeoIA Nexus Swarm</div>
+          <div class="text-[11px] text-slate-500">Autonomous multi-agent consensus</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Interactive Project Filter Controls -->
-  <section id="projects" class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-4">
+  <!-- Interactive Real-Time Kinematics Simulator -->
+  <section id="simulator" class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/10 relative overflow-hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/10 gap-4">
+        <div>
+          <div class="inline-flex items-center space-x-2 text-xs font-mono text-cyan-400 font-bold uppercase">
+            <i data-lucide="activity" class="w-4 h-4"></i>
+            <span>Interactive Engineering Canvas</span>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-black text-white mt-1">Real-Time Mecanum Kinematics & Auto-Aim Simulator</h3>
+          <p class="text-xs text-slate-400 mt-1">Click anywhere on the field to command target waypoint vector. Notice denominator normalization preventing motor saturation.</p>
+        </div>
+        <div class="flex items-center space-x-3 text-xs font-mono">
+          <div class="px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-cyan-300" id="sim-telemetry">
+            Target: (X: 0, Y: 0) • Heading: 0°
+          </div>
+          <button onclick="resetSimRobot()" class="px-3 py-1.5 rounded-lg bg-red-700/30 hover:bg-red-700/50 text-red-300 border border-red-600/40 font-semibold transition">
+            Reset Pose
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Canvas Field -->
+        <div class="lg:col-span-2 relative rounded-2xl overflow-hidden border border-white/10 bg-slate-950/90 grid-bg aspect-[16/9] flex items-center justify-center">
+          <canvas id="mecanum-canvas" class="w-full h-full cursor-crosshair"></canvas>
+          <div class="absolute bottom-3 left-3 px-3 py-1 rounded-md bg-black/60 backdrop-blur-md text-[10px] font-mono text-slate-400 border border-white/5">
+            12ft x 12ft FTC Competition Perimeter • Dynamic Holonomic Vectors
+          </div>
+        </div>
+
+        <!-- Telemetry & Math Model -->
+        <div class="space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <h4 class="text-sm font-bold text-white font-mono flex items-center gap-2">
+              <i data-lucide="cpu" class="w-4 h-4 text-amber-400"></i>
+              Kinematic Equations
+            </h4>
+            <div class="p-3.5 rounded-xl bg-black/60 border border-white/10 font-mono text-[11px] text-slate-300 space-y-2">
+              <div class="text-amber-400 font-bold">// Mecanum Wheel Distribution</div>
+              <div>FL = (vy + vx + vθ) / denom</div>
+              <div>BL = (vy - vx + vθ) / denom</div>
+              <div>FR = (vy - vx - vθ) / denom</div>
+              <div>BR = (vy + vx - vθ) / denom</div>
+              <div class="pt-1 text-slate-400 text-[10px]">denom = max(1.0, |vy| + |vx| + |vθ|)</div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-black/60 border border-white/10 font-mono text-[11px] text-slate-300 space-y-1.5">
+              <div class="text-cyan-400 font-bold">// Limelight 3A Auto-Aim</div>
+              <div>Kp = 0.035 • Latency: 9.8 ms</div>
+              <div>Target Lock: <span id="sim-target-status" class="text-emerald-400 font-bold">LOCKED (AprilTag #3)</span></div>
+            </div>
+          </div>
+
+          <button onclick="triggerSimAutoAim()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-mono text-xs font-bold transition shadow-lg shadow-red-700/30 flex items-center justify-center space-x-2">
+            <i data-lucide="target" class="w-4 h-4"></i>
+            <span>Execute 100 FPS Auto-Aim Pulse</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Project Catalog -->
+  <section id="projects" class="max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-4">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
       <div>
-        <span class="text-xs font-mono uppercase tracking-wider text-red-400 font-bold">CATÁLOGO EXHAUSTIVO DE INGENIERÍA</span>
-        <h3 class="text-2xl sm:text-3xl font-black text-white mt-0.5">Todos Mis Proyectos de Vida</h3>
+        <span class="text-xs font-mono uppercase tracking-wider text-red-400 font-bold">EXHAUSTIVE ENGINEERING CATALOG</span>
+        <h3 class="text-2xl sm:text-3xl font-black text-white mt-0.5">All 14 Projects of My Engineering Life</h3>
       </div>
       
       <!-- Filter Tabs -->
       <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
         <button onclick="filterCategory('all')" id="filter-all" class="filter-btn active px-3.5 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition">
-          Todos (14)
+          All (14)
         </button>
         <button onclick="filterCategory('ftc')" id="filter-ftc" class="filter-btn px-3.5 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition">
-          Robótica FTC & Hardware (5)
+          FTC Robotics & Hardware (5)
         </button>
         <button onclick="filterCategory('ai')" id="filter-ai" class="filter-btn px-3.5 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition">
-          IA & Software Swarm (4)
+          AI & Multi-Agent Swarm (4)
         </button>
         <button onclick="filterCategory('sim')" id="filter-sim" class="filter-btn px-3.5 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition">
-          Física & CAD 3D (3)
+          Physics & 3D CAD (3)
         </button>
         <button onclick="filterCategory('apps')" id="filter-apps" class="filter-btn px-3.5 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition">
           Apps & Cloud (2)
@@ -180,13 +256,13 @@
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="bot" class="w-5 h-5 text-red-400"></i>
-            BIOBUZZ 24096: Chasis de Competencia
+            BIOBUZZ 24096: Competition Chassis
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Arquitectura de hardware y software para el robot de competencia oficial. Integra 4 motores GoBILDA 312 RPM en configuración Mecanum, REV Expansion Hub con bus I2C redundante, protección térmica de drivers y distribución eléctrica de 20A.
+            Lead software and systems architecture for official FTC competition chassis. Features 4 GoBILDA 312 RPM motors, REV Expansion Hub with redundant I2C bus, thermal protection, and 20A main fusing.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Archivos Clave:</div>
+            <div class="text-slate-200 font-semibold">Core Files:</div>
             <div>• HardwareBioBuzz.java (24.4 KB)</div>
             <div>• BioBuzzTeleOpCompetition.java (27.8 KB)</div>
           </div>
@@ -194,9 +270,9 @@
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
           <button onclick="openCodeModal('teleop')" class="text-xs font-mono text-red-400 hover:text-red-300 flex items-center gap-1 font-semibold">
             <i data-lucide="code" class="w-3.5 h-3.5"></i>
-            <span>Inspeccionar Código</span>
+            <span>Inspect Java Code</span>
           </button>
-          <span class="text-[10px] font-mono text-emerald-400">En Producción</span>
+          <span class="text-[10px] font-mono text-emerald-400">Production Tested</span>
         </div>
       </div>
 
@@ -204,18 +280,18 @@
       <div class="project-card glass-card rounded-2xl p-6 flex flex-col justify-between" data-category="ftc">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-amber-950/70 text-amber-300 border border-amber-700/40 font-bold">ALGORITMO PROPIO</span>
-            <span class="text-xs text-slate-400 font-mono">Cinemática & Odometría</span>
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-amber-950/70 text-amber-300 border border-amber-700/40 font-bold">ORIGINAL ALGORITHM</span>
+            <span class="text-xs text-slate-400 font-mono">Kinematics & Odometry</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="git-commit" class="w-5 h-5 text-amber-400"></i>
             Jhoandri Pathing Calibration
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Algoritmo propio diseñado para calibrar el factor de derrape transversal de ruedas Mecanum y escalamiento dinámico por denominador. Elimina la saturación de potencia vectorial cuando el piloto traslada y rota simultáneamente.
+            Custom-engineered calibration algorithm designed to mitigate lateral slip of Mecanum rollers. Uses dynamic denominator scaling to prevent motor torque clipping during compound strafe and rotation maneuvers.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Innovación Matemática:</div>
+            <div class="text-slate-200 font-semibold">Mathematical Innovation:</div>
             <div>• <code class="text-amber-300 font-mono">denom = max(1.0, |y| + |x| + |rx|)</code></div>
             <div>• JhoandriPathingCalibration.java</div>
           </div>
@@ -223,9 +299,9 @@
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
           <button onclick="openCodeModal('pathing')" class="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold">
             <i data-lucide="code" class="w-3.5 h-3.5"></i>
-            <span>Ver Deducción & Código</span>
+            <span>View Proof & Code</span>
           </button>
-          <span class="text-[10px] font-mono text-emerald-400">Calibración Activa</span>
+          <span class="text-[10px] font-mono text-emerald-400">Active Calibration</span>
         </div>
       </div>
 
@@ -238,23 +314,23 @@
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="crosshair" class="w-5 h-5 text-cyan-400"></i>
-            Subensamble de Visión Limelight 3A
+            Limelight 3A Vision Subsystem
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Pipeline de visión artificial para tracking de AprilTags 36h11 y detección de elementos de juego. Bucle proporcional de auto-apuntado (<code class="text-cyan-300">Kp = 0.035</code>) que alinea el robot con la canasta de lanzamiento en menos de 300 ms.
+            High-speed optical pipeline for AprilTag 36h11 tracking. Proportional steering closed-loop (<code class="text-cyan-300">Kp = 0.035</code>) allows the robot to lock onto the high-basket target in under 300 milliseconds.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Métricas de Detección:</div>
-            <div>• Latencia de inferencia: 9.8 ms</div>
+            <div class="text-slate-200 font-semibold">Detection Metrics:</div>
+            <div>• Inference Latency: 9.8 ms</div>
             <div>• LimelightVisionSubsystem.java</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
           <button onclick="openCodeModal('vision')" class="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold">
             <i data-lucide="code" class="w-3.5 h-3.5"></i>
-            <span>Código de Visión</span>
+            <span>Inspect Vision Code</span>
           </button>
-          <span class="text-[10px] font-mono text-emerald-400">Bucle Cerrado</span>
+          <span class="text-[10px] font-mono text-emerald-400">Closed-Loop</span>
         </div>
       </div>
 
@@ -262,7 +338,7 @@
       <div class="project-card glass-card rounded-2xl p-6 flex flex-col justify-between" data-category="ftc">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-purple-950/70 text-purple-300 border border-purple-700/40 font-bold">ESTADO FINITO</span>
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-purple-950/70 text-purple-300 border border-purple-700/40 font-bold">FINITE STATE MACHINE</span>
             <span class="text-xs text-slate-400 font-mono">Autonomous 30s Period</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
@@ -270,17 +346,17 @@
             BioBuzz Autonomous Decision Brain
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Máquina de estados determinista para el periodo autónomo de 30 segundos. Ejecuta toma de decisiones en tiempo real ante obstrucciones de la alianza contraria, parking scoring garantizado y secuencias de pre-carga.
+            Deterministic state machine for the 30-second autonomous round. Delivers real-time replanning when alliance paths are blocked, securing high basket preload drops and guaranteed parking.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Lógica Autónoma:</div>
+            <div class="text-slate-200 font-semibold">Autonomous Logic:</div>
             <div>• BioBuzzBrain.java & AutonomousBioBuzz24096.java</div>
-            <div>• 50 puntos acumulados en rutina autónoma</div>
+            <div>• 50 Autonomous points routine</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
           <span class="text-xs font-mono text-purple-400 font-semibold">BioBuzzBrain.java</span>
-          <span class="text-[10px] font-mono text-emerald-400">50 Puntos</span>
+          <span class="text-[10px] font-mono text-emerald-400">50 Points Routine</span>
         </div>
       </div>
 
@@ -288,25 +364,25 @@
       <div class="project-card glass-card rounded-2xl p-6 flex flex-col justify-between" data-category="ftc">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-emerald-950/70 text-emerald-300 border border-emerald-700/40 font-bold">CONTROL PID</span>
-            <span class="text-xs text-slate-400 font-mono">Flywheel Balística</span>
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-emerald-950/70 text-emerald-300 border border-emerald-700/40 font-bold">PID CONTROL</span>
+            <span class="text-xs text-slate-400 font-mono">Flywheel Ballistics</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="zap" class="w-5 h-5 text-emerald-400"></i>
-            Lanzador de Alta Frecuencia PID
+            High-Frequency Velocity PID Shooter
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Sistema de rueda de inercia dual controlado mediante <code class="text-emerald-300 font-mono">DcMotorEx.setVelocity(1200)</code> con cálculo integral de recuperación de par tras cada disparo consecutivo.
+            Dual flywheel launch system driven by <code class="text-emerald-300 font-mono">DcMotorEx.setVelocity(1200)</code> with integral torque recovery, maintaining launch velocity within ±1.8% variance during battery voltage fluctuations.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Especificaciones:</div>
-            <div>• Recuperación de velocidad: &lt; 180 ms</div>
+            <div class="text-slate-200 font-semibold">Key Parameters:</div>
+            <div>• Velocity recovery: &lt; 180 ms</div>
             <div>• TeleOpShooterIntake.java</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
           <span class="text-xs font-mono text-emerald-400 font-semibold">1200 ticks/sec</span>
-          <span class="text-[10px] font-mono text-emerald-400">PID Activo</span>
+          <span class="text-[10px] font-mono text-emerald-400">PID Active</span>
         </div>
       </div>
 
@@ -319,23 +395,23 @@
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="network" class="w-5 h-5 text-blue-400"></i>
-            NeoIA Nexus: Enjambre de 7 Agentes
+            NeoIA Nexus: 7-Agent Swarm
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Sistema distribuido de agentes especializados (Arquitecto, Programador Java, Revisor de Seguridad, Optimizador de Hardware, Auditor de Compilación) que debaten y sintetizan firmware de robots en tiempo real.
+            Distributed multi-agent collective (Architect, Java Coder, Safety Verifier, Hardware Optimizer, Compilation Auditor) debating and synthesizing verified robot OpModes in real time.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Orquestación:</div>
-            <div>• 20 Modelos locales cuantizados bajo límite de 5GB</div>
-            <div>• Consenso probabilístico de 3 rondas</div>
+            <div class="text-slate-200 font-semibold">Orchestration:</div>
+            <div>• 20 Local quantized models under 5GB RAM budget</div>
+            <div>• 3-Round probabilistic consensus verification</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
           <a href="http://localhost:3333/" class="text-xs font-mono text-blue-400 hover:text-blue-300 flex items-center gap-1 font-semibold">
             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            <span>Ver Swarm en Vivo</span>
+            <span>Live Swarm UI</span>
           </a>
-          <span class="text-[10px] font-mono text-blue-400">Localhost :3333</span>
+          <span class="text-[10px] font-mono text-blue-400">Port :3333</span>
         </div>
       </div>
 
@@ -343,25 +419,25 @@
       <div class="project-card glass-card rounded-2xl p-6 flex flex-col justify-between" data-category="ai">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-indigo-950/70 text-indigo-300 border border-indigo-700/40 font-bold">SISTEMAS OPERATIVOS</span>
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-indigo-950/70 text-indigo-300 border border-indigo-700/40 font-bold">OPERATING SYSTEMS</span>
             <span class="text-xs text-slate-400 font-mono">Node.js Process Bridge</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="terminal" class="w-5 h-5 text-indigo-400"></i>
-            Puente de Automatización OS & IDE
+            Desktop OS & IDE Automation Bridge
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Motor de ejecución de bajo nivel que traduce comandos de voz o chat web en escrituras directas dentro del árbol de código fuente de Android Studio y lanza procesos nativos de Windows evadiendo bloqueos de archivos .lock.
+            Low-level execution engine translating web chat and voice intents directly into write operations inside the Android Studio repository, bypassing sandbox constraints and launching IDE instances.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Capacidades:</div>
-            <div>• Escritura directa a gradle/TeamCode</div>
-            <div>• Disparo de compilación con 1 comando</div>
+            <div class="text-slate-200 font-semibold">Capabilities:</div>
+            <div>• Direct write to TeamCode Gradle tree</div>
+            <div>• Single-click process launch</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
           <span class="text-xs font-mono text-indigo-400 font-semibold">child_process.spawn</span>
-          <span class="text-[10px] font-mono text-emerald-400">Integrado</span>
+          <span class="text-[10px] font-mono text-emerald-400">Integrated</span>
         </div>
       </div>
 
@@ -369,24 +445,24 @@
       <div class="project-card glass-card rounded-2xl p-6 flex flex-col justify-between" data-category="sim">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-teal-950/70 text-teal-300 border border-teal-700/40 font-bold">SIMULACIÓN FÍSICA</span>
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-teal-950/70 text-teal-300 border border-teal-700/40 font-bold">PHYSICS SIMULATION</span>
             <span class="text-xs text-slate-400 font-mono">HTML5 Canvas • Vector Engine</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="activity" class="w-5 h-5 text-teal-400"></i>
-            Simulador de Física & Odometría FTC
+            FTC Odometry & Physics Simulator
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Entorno virtual interactivo del campo oficial de FTC con modelado de fricción de pista de espuma, masa de robot de 14.5 kg e inercia rotacional para probar rutinas autónomas sin desgastar componentes mecánicos reales.
+            Interactive virtual field modeling foam-tile friction, 14.5 kg chassis mass, and rotational moment of inertia. Allows driver training and autonomous trajectory validation with zero mechanical wear.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Ubicación:</div>
+            <div class="text-slate-200 font-semibold">Repository:</div>
             <div>• ftc-biobuzz-simulator</div>
-            <div>• Renderizado a 60 FPS con WebGL/Canvas</div>
+            <div>• 60 FPS Canvas rendering</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
-          <span class="text-xs font-mono text-teal-400 font-semibold">Modelo 14.5 kg</span>
+          <span class="text-xs font-mono text-teal-400 font-semibold">14.5 kg Model</span>
           <span class="text-[10px] font-mono text-emerald-400">60 FPS</span>
         </div>
       </div>
@@ -395,7 +471,7 @@
       <div class="project-card glass-card rounded-2xl p-6 flex flex-col justify-between" data-category="apps">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-sky-950/70 text-sky-300 border border-sky-700/40 font-bold">EDUCACIÓN STEM</span>
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-sky-950/70 text-sky-300 border border-sky-700/40 font-bold">STEM OUTREACH</span>
             <span class="text-xs text-slate-400 font-mono">Mentoring & Academy</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
@@ -403,17 +479,17 @@
             FIRST Robotics Academy
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Plataforma educativa interactiva construida para enseñar programación Java en FTC, diseño de mecanismos con GoBILDA y REV a estudiantes novatos y equipos emergentes en la comunidad hispana.
+            Educational platform developed to teach Java robotics programming, GoBILDA structural mechanics, and REV electronics to novice students and rookie teams in the Hispanic STEM community.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Impacto Social:</div>
+            <div class="text-slate-200 font-semibold">Community Impact:</div>
             <div>• first-robotics-academy</div>
-            <div>• Módulos de Hardware, PID, Visión y Cableado</div>
+            <div>• Hardware, PID, Vision & Wiring curricula</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
           <span class="text-xs font-mono text-sky-400 font-semibold">first-robotics-academy</span>
-          <span class="text-[10px] font-mono text-emerald-400">Comunidad STEM</span>
+          <span class="text-[10px] font-mono text-emerald-400">Community STEM</span>
         </div>
       </div>
 
@@ -421,24 +497,24 @@
       <div class="project-card glass-card rounded-2xl p-6 flex flex-col justify-between" data-category="sim">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-rose-950/70 text-rose-300 border border-rose-700/40 font-bold">CAD & AERODINÁMICA</span>
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-rose-950/70 text-rose-300 border border-rose-700/40 font-bold">CAD & AERODYNAMICS</span>
             <span class="text-xs text-slate-400 font-mono">Autodesk Fusion 360</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="wind" class="w-5 h-5 text-rose-400"></i>
-            Ingeniería Formula 1 & Fusion 360
+            Formula 1 Aerodynamics & Fusion 360
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Modelado paramétrico de perfiles aerodinámicos, alerones con efecto suelo y difusores. Estudio de túnel de viento virtual CFD para optimizar el coeficiente de sustentación negativa (downforce) minimizando el arrastre (drag).
+            Parametric CAD models of ground-effect wings, vortex generators, and diffusers. Computational Fluid Dynamics (CFD) virtual wind tunnel studies to maximize negative lift coefficient (downforce) while reducing drag.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Herramientas:</div>
+            <div class="text-slate-200 font-semibold">Engineering Tools:</div>
             <div>• Autodesk Fusion 360 Parametric CAD</div>
             <div>• formula1-fusion360</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
-          <span class="text-xs font-mono text-rose-400 font-semibold">Análisis CFD</span>
+          <span class="text-xs font-mono text-rose-400 font-semibold">CFD Analysis</span>
           <span class="text-[10px] font-mono text-rose-400">Downforce Calc</span>
         </div>
       </div>
@@ -447,25 +523,25 @@
       <div class="project-card glass-card rounded-2xl p-6 flex flex-col justify-between" data-category="sim">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-amber-950/70 text-amber-300 border border-amber-700/40 font-bold">FÍSICA TEÓRICA</span>
-            <span class="text-xs text-slate-400 font-mono">Mecánica Relativista</span>
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-amber-950/70 text-amber-300 border border-amber-700/40 font-bold">THEORETICAL PHYSICS</span>
+            <span class="text-xs text-slate-400 font-mono">Relativistic Mechanics</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="atom" class="w-5 h-5 text-amber-400"></i>
-            Einstein Lab: Simulador de Relatividad
+            Einstein Lab: Relativity Simulator
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Laboratorio interactivo de física computacional que simula dilatación temporal relativista (<code class="text-amber-300">γ = 1/√(1-v²/c²)</code>), contracción de Lorentz y curvatura del espacio-tiempo cerca de horizontes de sucesos.
+            Computational physics simulator visualizing relativistic time dilation (<code class="text-amber-300">γ = 1/√(1-v²/c²)</code>), Lorentz contraction, and spacetime geodesics near gravitational event horizons.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Ubicación:</div>
+            <div class="text-slate-200 font-semibold">Repository:</div>
             <div>• einstein-lab</div>
-            <div>• Visualizador dinámico de vectores Lorentz</div>
+            <div>• Real-time Lorentz vector transforms</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
-          <span class="text-xs font-mono text-amber-400 font-semibold">γ Factor de Lorentz</span>
-          <span class="text-[10px] font-mono text-emerald-400">Simulación Viva</span>
+          <span class="text-xs font-mono text-amber-400 font-semibold">γ Lorentz Factor</span>
+          <span class="text-[10px] font-mono text-emerald-400">Live Simulation</span>
         </div>
       </div>
 
@@ -474,24 +550,24 @@
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-violet-950/70 text-violet-300 border border-violet-700/40 font-bold">NLP & AUDIO</span>
-            <span class="text-xs text-slate-400 font-mono">WebRTC • Speech Engine</span>
+            <span class="text-xs text-slate-400 font-mono">Web Audio API • Real-Time NLP</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="mic" class="w-5 h-5 text-violet-400"></i>
-            Asistente Virtual & Zoom AI
+            Voice Assistant & Zoom AI Copilot
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Sistema de procesamiento de audio en tiempo real y asistencia visual interactiva. Reconocimiento de comandos de voz con síntesis adaptativa y orquestación contextual de tareas durante videoconferencias.
+            Real-time audio processing system and contextual visual assistant. Features multi-lingual speech recognition with adaptive audio synthesis and hands-free task execution during video conferences.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Módulos:</div>
+            <div class="text-slate-200 font-semibold">Modules:</div>
             <div>• asistente-virtual & zoom-ai-assistant</div>
-            <div>• Integración Web Audio API con osciladores de feedback</div>
+            <div>• Web Audio API acoustic feedback oscillators</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
-          <span class="text-xs font-mono text-violet-400 font-semibold">Procesamiento de Voz</span>
-          <span class="text-[10px] font-mono text-emerald-400">Tiempo Real</span>
+          <span class="text-xs font-mono text-violet-400 font-semibold">Voice Processing</span>
+          <span class="text-[10px] font-mono text-emerald-400">Real-Time</span>
         </div>
       </div>
 
@@ -504,23 +580,23 @@
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="cloud-lightning" class="w-5 h-5 text-emerald-400"></i>
-            NeoIA Cloud & PWA Multiplataforma
+            NeoIA Cloud & Cross-Platform PWA
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Plataforma Progressive Web App instalable nativamente en teléfonos y computadoras con Service Worker para funcionamiento offline, enlace a endpoints de telemetría y despliegue continuo en la nube de Render.
+            Progressive Web App installable across mobile devices and desktop computers. Features offline Service Worker caching, telemetry endpoint synchronization, and CI/CD deployment on Render.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Producción en la Nube:</div>
+            <div class="text-slate-200 font-semibold">Cloud Production:</div>
             <div>• neoia-351a.onrender.com</div>
-            <div>• Iconos adaptativos PWA 192x192 & 512x512</div>
+            <div>• Adaptive PWA icons 192x192 & 512x512</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
           <a href="https://neoia-351a.onrender.com/" target="_blank" class="text-xs font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold">
             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            <span>Ver URL de Render</span>
+            <span>View Render Production</span>
           </a>
-          <span class="text-[10px] font-mono text-emerald-400">PWA Activa</span>
+          <span class="text-[10px] font-mono text-emerald-400">PWA Active</span>
         </div>
       </div>
 
@@ -528,20 +604,20 @@
       <div class="project-card glass-card rounded-2xl p-6 flex flex-col justify-between" data-category="apps">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-orange-950/70 text-orange-300 border border-orange-700/40 font-bold">DEV TOOLS</span>
-            <span class="text-xs text-slate-400 font-mono">Git Engine • Tree Hashes</span>
+            <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-orange-950/70 text-orange-300 border border-orange-700/40 font-bold">DEVELOPER TOOLS</span>
+            <span class="text-xs text-slate-400 font-mono">Git Engine • DAG Hashes</span>
           </div>
           <h4 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="git-pull-request" class="w-5 h-5 text-orange-400"></i>
-            GitHub Clone & Motor de Control de Versiones
+            GitHub Clone & Version Control Engine
           </h4>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Implementación de un visualizador y motor de objetos Git compatible con blobs, trees y commits en grafos acíclicos dirigidos (DAG). Diseñado para auditar el historial de revisiones del código de robots sin conexión externa.
+            Custom implementation of a Git-compatible object store managing blobs, trees, and commits in Directed Acyclic Graphs (DAG). Engineered to audit robot firmware revisions offline during tournaments.
           </p>
           <div class="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] font-mono text-slate-400 space-y-1">
-            <div class="text-slate-200 font-semibold">Ubicación:</div>
+            <div class="text-slate-200 font-semibold">Repository:</div>
             <div>• github-clone</div>
-            <div>• Algoritmos de diffing y cálculo SHA-1</div>
+            <div>• SHA-1 hashing & file diffing engine</div>
           </div>
         </div>
         <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
@@ -555,78 +631,31 @@
 
   <!-- MIT "Mens et Manus" Philosophy Alignment -->
   <section id="philosophy" class="max-w-7xl mx-auto px-4 sm:px-6 py-14 border-t border-white/10">
-    <div class="p-8 sm:p-10 rounded-3xl glass-card border border-red-500/30 relative overflow-hidden">
-      <div class="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-red-600/10 blur-3xl pointer-events-none"></div>
+    <div class="p-8 sm:p-12 rounded-3xl glass-card border border-red-500/30 relative overflow-hidden">
+      <div class="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-red-600/15 blur-3xl pointer-events-none"></div>
 
-      <div class="max-w-3xl space-y-4">
+      <div class="max-w-3xl space-y-5">
         <div class="inline-flex items-center space-x-2 text-xs font-mono text-red-400 font-bold uppercase tracking-widest">
           <i data-lucide="award" class="w-4 h-4"></i>
-          <span>MIT Core Value Alignment</span>
+          <span>MIT Admissions & Research Philosophy</span>
         </div>
         <h3 class="text-2xl sm:text-4xl font-black text-white tracking-tight">
-          ¿Por qué MIT? La Unión Inseparable de la Teoría y el Taller
+          Why MIT? The Inseparable Bond of Mind and Hand
         </h3>
         <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-          En FIRST Tech Challenge no basta con tener una fórmula elegante: si el robot vibra en el campo, si la batería cae a 11.2V o si los engranajes GoBILDA sufren holgura, el software debe compensarlo en milisegundos. Esta convicción de construir con las manos lo que se concibe con la mente es exactamente el espíritu de <strong>EECS Course 6-2</strong> y <strong>Mechanical Engineering Course 2</strong> de MIT.
+          In FIRST Tech Challenge, a mathematical equation on paper means nothing if the robot shakes on the foam tiles, if the 12V battery drops under load, or if gear backlash causes odometric drift. The software must adapt instantly to physical reality.
         </p>
-        <div class="pt-4 flex flex-wrap gap-4 text-xs font-mono">
+        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+          This conviction—to build with your hands what you envision with your mind—is the very definition of <strong>MIT EECS (Course 6-2)</strong> and <strong>Mechanical Engineering (Course 2)</strong>. My goal at MIT is to advance the frontiers of autonomous field robotics and embedded machine intelligence at <strong>MIT CSAIL</strong> and the <strong>MIT Media Lab</strong>.
+        </p>
+        <div class="pt-2 flex flex-wrap gap-3 text-xs font-mono">
           <div class="px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-slate-200">
-            • Enfoque de Investigación: Robótica Autónoma y Sistemas de Visión Embebidos
+            • Research Focus: Autonomous Kinematics & Embedded Computer Vision
           </div>
           <div class="px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-slate-200">
-            • Laboratorios Meta: MIT CSAIL & MIT Media Lab
+            • Target Labs: MIT CSAIL & MIT Media Lab
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Technical Competencies Matrix -->
-  <section id="competencies" class="max-w-7xl mx-auto px-4 sm:px-6 py-12 border-t border-white/10">
-    <h3 class="text-2xl font-black text-white mb-6">Matriz de Competencias de Ingeniería</h3>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
-      <div class="p-5 rounded-2xl glass-card space-y-2.5">
-        <div class="text-red-400 font-bold uppercase text-sm">Robótica & Control</div>
-        <ul class="text-slate-300 space-y-1.5 leading-relaxed">
-          <li>• Cinemática Mecanum Holonómica</li>
-          <li>• Bucles Cerrados PID / Feedforward</li>
-          <li>• Visión Limelight 3A (AprilTag 36h11)</li>
-          <li>• Odometría & Sensores Dead-Reckoning</li>
-          <li>• REV Control Hub & Bus I2C/CAN</li>
-        </ul>
-      </div>
-
-      <div class="p-5 rounded-2xl glass-card space-y-2.5">
-        <div class="text-cyan-400 font-bold uppercase text-sm">Desarrollo & Sistemas</div>
-        <ul class="text-slate-300 space-y-1.5 leading-relaxed">
-          <li>• Java para Robótica (FTC SDK)</li>
-          <li>• Node.js Asíncrono & Servidores REST</li>
-          <li>• Progressive Web Apps (PWA & Manifest)</li>
-          <li>• Python (Visión Artificial, RAG)</li>
-          <li>• Automatización Nativa de OS (Process Spawn)</li>
-        </ul>
-      </div>
-
-      <div class="p-5 rounded-2xl glass-card space-y-2.5">
-        <div class="text-purple-400 font-bold uppercase text-sm">Inteligencia Artificial</div>
-        <ul class="text-slate-300 space-y-1.5 leading-relaxed">
-          <li>• Sistemas Multi-Agente & Consenso</li>
-          <li>• Orquestación Local de LLMs (Ollama)</li>
-          <li>• Cuantización y Límite de Memoria (5GB)</li>
-          <li>• RAG (Retrieval-Augmented Generation)</li>
-          <li>• Síntesis Web Audio API en Tiempo Real</li>
-        </ul>
-      </div>
-
-      <div class="p-5 rounded-2xl glass-card space-y-2.5">
-        <div class="text-emerald-400 font-bold uppercase text-sm">Maker & Fabricación</div>
-        <ul class="text-slate-300 space-y-1.5 leading-relaxed">
-          <li>• Modelado CAD Paramétrico (Fusion 360)</li>
-          <li>• Cableado Eléctrico Robótico & Fusibles 20A</li>
-          <li>• Reductores Planetarios (GoBILDA 312 RPM)</li>
-          <li>• Cuaderno de Ingeniería & Especificaciones</li>
-          <li>• Diagnósticos Rápidos en Pista de Torneo</li>
-        </ul>
       </div>
     </div>
   </section>
@@ -656,9 +685,9 @@
 
       <!-- Modal Footer -->
       <div class="p-4 border-t border-white/10 bg-slate-950/80 flex items-center justify-between text-xs font-mono text-slate-400">
-        <span id="modal-code-badge" class="text-emerald-400 font-semibold">FTC SDK Oficial • Java 17</span>
+        <span id="modal-code-badge" class="text-emerald-400 font-semibold">Official FTC SDK • Java 17</span>
         <button onclick="closeCodeModal()" class="px-4 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold transition">
-          Cerrar
+          Close Inspector
         </button>
       </div>
     </div>
@@ -667,22 +696,243 @@
   <!-- Footer -->
   <footer class="border-t border-white/10 py-12 text-center text-xs text-slate-500 font-mono">
     <div class="max-w-7xl mx-auto px-4 space-y-2">
-      <p class="text-slate-400 font-semibold">Preparado para el Comité de Admisiones de Pregrado & Maker Portfolio • MIT 2026</p>
-      <p>Candidato: <strong class="text-slate-300">Jhoandry Polanco</strong> • Equipo FIRST Tech Challenge BIOBUZZ #24096 • NeoIA Robotics Technologies</p>
+      <p class="text-slate-400 font-semibold">Prepared for the Undergraduate Admissions Committee & Maker Portfolio • MIT 2026</p>
+      <p>Candidate: <strong class="text-slate-300">Jhoandry Polanco</strong> • FIRST Tech Challenge Team BIOBUZZ #24096 • NeoIA Robotics Technologies</p>
       <div class="pt-4 flex items-center justify-center space-x-4 text-[11px] text-slate-400">
-        <a href="http://localhost:3333/portfolio-mit.html" class="hover:text-red-400 transition underline underline-offset-4">Servidor Local (:3333)</a>
+        <a href="http://localhost:3333/portfolio-mit.html" class="hover:text-red-400 transition underline underline-offset-4">Localhost :3333</a>
         <span>•</span>
-        <a href="https://neoia-351a.onrender.com/portfolio-mit.html" target="_blank" class="hover:text-red-400 transition underline underline-offset-4">Enlace Nube (Render)</a>
+        <a href="https://neoia-351a.onrender.com/portfolio-mit.html" target="_blank" class="hover:text-red-400 transition underline underline-offset-4">Cloud Deployment (Render)</a>
       </div>
     </div>
   </footer>
 
   <script>
-    // Initialize Lucide Icons
     lucide.createIcons();
 
-    // Project Category Filtering
+    // -------------------------------------------------------------
+    // Audio FX Synthesizer using Web Audio API
+    // -------------------------------------------------------------
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.05) {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function toggleAudioFx() {
+      audioEnabled = !audioEnabled;
+      const label = document.getElementById('audio-label');
+      const icon = document.getElementById('audio-icon');
+      if (audioEnabled) {
+        label.textContent = 'Audio FX: ON';
+        icon.classList.remove('text-slate-500');
+        icon.classList.add('text-amber-400');
+        playTone(880, 'sine', 0.12, 0.08);
+      } else {
+        label.textContent = 'Audio FX: OFF';
+        icon.classList.remove('text-amber-400');
+        icon.classList.add('text-slate-500');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Interactive 2D Mecanum Physics & Kinematics Canvas
+    // -------------------------------------------------------------
+    const canvas = document.getElementById('mecanum-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const robot = {
+      x: canvas.width * 0.25,
+      y: canvas.height * 0.5,
+      targetX: canvas.width * 0.25,
+      targetY: canvas.height * 0.5,
+      angle: 0,
+      targetAngle: 0,
+      width: 44,
+      height: 44,
+      trail: []
+    };
+
+    const aprilTagTarget = {
+      x: canvas.width * 0.85,
+      y: canvas.height * 0.25,
+      radius: 12
+    };
+
+    function resetSimRobot() {
+      robot.x = canvas.width * 0.2;
+      robot.y = canvas.height * 0.5;
+      robot.targetX = robot.x;
+      robot.targetY = robot.y;
+      robot.angle = 0;
+      robot.targetAngle = 0;
+      robot.trail = [];
+      playTone(440, 'triangle', 0.2, 0.06);
+    }
+
+    function triggerSimAutoAim() {
+      playTone(1320, 'sine', 0.2, 0.09);
+      setTimeout(() => playTone(1760, 'sine', 0.25, 0.08), 100);
+      const dx = aprilTagTarget.x - robot.x;
+      const dy = aprilTagTarget.y - robot.y;
+      robot.targetAngle = Math.atan2(dy, dx);
+      document.getElementById('sim-target-status').textContent = 'LOCKED (AprilTag #3) • 0.035 Kp Pulse';
+    }
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      robot.targetX = e.clientX - rect.left;
+      robot.targetY = e.clientY - rect.top;
+      playTone(660, 'sine', 0.1, 0.06);
+    });
+
+    function updateSimulation() {
+      // Proportional vector translation
+      const dx = robot.targetX - robot.x;
+      const dy = robot.targetY - robot.y;
+      robot.x += dx * 0.08;
+      robot.y += dy * 0.08;
+
+      // Angular tracking
+      const dAngle = robot.targetAngle - robot.angle;
+      robot.angle += dAngle * 0.12;
+
+      // Record trail
+      if (Math.hypot(dx, dy) > 1) {
+        robot.trail.push({ x: robot.x, y: robot.y });
+        if (robot.trail.length > 35) robot.trail.shift();
+      }
+
+      // Telemetry update
+      const telem = document.getElementById('sim-telemetry');
+      if (telem) {
+        telem.textContent = `Pose: (X: ${Math.round(robot.x)}, Y: ${Math.round(robot.y)}) • Heading: ${(robot.angle * (180 / Math.PI)).toFixed(1)}°`;
+      }
+    }
+
+    function renderSimulation() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Field Center Crosshair
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, 0);
+      ctx.lineTo(canvas.width / 2, canvas.height);
+      ctx.moveTo(0, canvas.height / 2);
+      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.stroke();
+
+      // Draw AprilTag Target
+      ctx.fillStyle = '#06b6d4';
+      ctx.beginPath();
+      ctx.arc(aprilTagTarget.x, aprilTagTarget.y, aprilTagTarget.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(aprilTagTarget.x, aprilTagTarget.y, aprilTagTarget.radius + 6, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px monospace';
+      ctx.fillText('AprilTag #3 (High Basket)', aprilTagTarget.x - 55, aprilTagTarget.y - 18);
+
+      // Vision Aim Ray
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.35)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(robot.x, robot.y);
+      ctx.lineTo(aprilTagTarget.x, aprilTagTarget.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Robot Path Trail
+      if (robot.trail.length > 1) {
+        ctx.strokeStyle = 'rgba(163, 31, 52, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(robot.trail[0].x, robot.trail[0].y);
+        for (let i = 1; i < robot.trail.length; i++) {
+          ctx.lineTo(robot.trail[i].x, robot.trail[i].y);
+        }
+        ctx.stroke();
+      }
+
+      // Robot Chassis
+      ctx.save();
+      ctx.translate(robot.x, robot.y);
+      ctx.rotate(robot.angle);
+
+      // Chassis body
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(-robot.width / 2, -robot.height / 2, robot.width, robot.height, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // 4 Mecanum Wheels
+      ctx.fillStyle = '#f59e0b';
+      const wWidth = 8, wHeight = 14;
+      ctx.fillRect(-robot.width / 2 - 3, -robot.height / 2 + 2, wWidth, wHeight); // FL
+      ctx.fillRect(robot.width / 2 - 5, -robot.height / 2 + 2, wWidth, wHeight);  // FR
+      ctx.fillRect(-robot.width / 2 - 3, robot.height / 2 - 16, wWidth, wHeight); // BL
+      ctx.fillRect(robot.width / 2 - 5, robot.height / 2 - 16, wWidth, wHeight);  // BR
+
+      // Heading indicator arrow
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.moveTo(0, -robot.height / 2 + 4);
+      ctx.lineTo(-6, robot.height / 2 - 6);
+      ctx.lineTo(6, robot.height / 2 - 6);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function simLoop() {
+      updateSimulation();
+      renderSimulation();
+      requestAnimationFrame(simLoop);
+    }
+    requestAnimationFrame(simLoop);
+
+    // -------------------------------------------------------------
+    // Category Filtering
+    // -------------------------------------------------------------
     function filterCategory(cat) {
+      playTone(520, 'sine', 0.08, 0.04);
       const cards = document.querySelectorAll('.project-card');
       const buttons = document.querySelectorAll('.filter-btn');
 
@@ -699,10 +949,12 @@
       });
     }
 
+    // -------------------------------------------------------------
     // Code Snippets Database
+    // -------------------------------------------------------------
     const CODE_SNIPPETS = {
       teleop: {
-        title: "TeleOpBioBuzzTeam.java — Cinemática Holonómica & Auto-Aim",
+        title: "TeleOpBioBuzzTeam.java — Holonomic Kinematics & Auto-Aim",
         badge: "FIRST Tech Challenge • TeleOp Principal BIOBUZZ 24096",
         code: `@TeleOp(name = "BIOBUZZ 24096: TeleOp Principal", group = "BIOBUZZ")
 public class TeleOpBioBuzzTeam extends LinearOpMode {
@@ -712,35 +964,35 @@ public class TeleOpBioBuzzTeam extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        frontLeft   = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight  = hardwareMap.get(DcMotor.class, "frontRight");
-        backLeft    = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight   = hardwareMap.get(DcMotor.class, "backRight");
+        frontLeft    = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRight   = hardwareMap.get(DcMotor.class, "frontRight");
+        backLeft     = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight    = hardwareMap.get(DcMotor.class, "backRight");
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooterMotor");
-        limelight   = new LimelightVisionSubsystem(hardwareMap);
+        limelight    = new LimelightVisionSubsystem(hardwareMap);
 
         waitForStart();
 
         while (opModeIsActive()) {
-            double y  = -gamepad1.left_stick_y;  // Avance
-            double x  =  gamepad1.left_stick_x;  // Traslación lateral (strafe)
-            double rx =  gamepad1.right_stick_x; // Rotación angular
+            double y  = -gamepad1.left_stick_y;  // Forward
+            double x  =  gamepad1.left_stick_x;  // Lateral Strafe
+            double rx =  gamepad1.right_stick_x; // Angular Rotation
 
-            // Corrección de apuntado automático con Limelight 3A
+            // Limelight 3A Vision Assisted Aiming
             if (gamepad1.left_trigger > 0.3 && limelight.isTargetVisible()) {
-                rx = limelight.getAutoAimTurnPower(); // Ganancia Proporcional Kp = 0.035
+                rx = limelight.getAutoAimTurnPower(); // Proportional Gain Kp = 0.035
             }
 
-            // Normalización por denominador para evitar saturación de potencia
+            // Denominator normalization eliminates power clipping
             double denom = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1.0);
             frontLeft.setPower((y + x + rx) / denom);
             backLeft.setPower((y - x + rx) / denom);
             frontRight.setPower((y - x - rx) / denom);
             backRight.setPower((y + x - rx) / denom);
 
-            // Control de velocidad en bucle cerrado (PID Flywheel)
+            // Closed-loop PID shooter flywheel
             if (gamepad1.right_bumper) {
-                shooterMotor.setVelocity(1200.0); // 1200 ticks/s constante
+                shooterMotor.setVelocity(1200.0); // ticks/s
             } else {
                 shooterMotor.setVelocity(0.0);
             }
@@ -749,20 +1001,20 @@ public class TeleOpBioBuzzTeam extends LinearOpMode {
 }`
       },
       pathing: {
-        title: "JhoandriPathingCalibration.java — Calibración de Trayectoria Holonómica",
-        badge: "Algoritmo Desarrollado por Jhoandry Polanco",
+        title: "JhoandriPathingCalibration.java — Holonomic Trajectory Calibration",
+        badge: "Original Algorithm by Jhoandry Polanco",
         code: `package org.firstinspires.ftc.teamcode.calibration;
 
 /**
  * JhoandriPathingCalibration
- * Calibrador cinemático para chasis Mecanum GoBILDA 312 RPM.
- * Corrige el deslizamiento transversal (lateral slip factor) y
- * asegura una relación 1:1 entre desplazamientos odómetricos y telemetría de campo.
+ * Kinematic calibrator for GoBILDA 312 RPM Mecanum chassis.
+ * Mitigates lateral roller slip factor and ensures a 1:1 ratio
+ * between odometry encoder telemetry and physical displacement.
  */
 public class JhoandriPathingCalibration {
-    public static final double LATERAL_STRAFE_FACTOR = 1.1428; // Compensación por derrape de rodillos
-    public static final double TICKS_PER_REV = 537.7;           // Encoder GoBILDA Yellowjacket
-    public static final double WHEEL_DIAMETER_INCHES = 3.7795;  // Rueda Mecanum 96mm
+    public static final double LATERAL_STRAFE_FACTOR = 1.1428; // Slip compensation
+    public static final double TICKS_PER_REV = 537.7;           // GoBILDA Yellowjacket encoder
+    public static final double WHEEL_DIAMETER_INCHES = 3.7795;  // 96mm Mecanum Wheel
     public static final double GEAR_RATIO = 1.0;
 
     public static double inchesToTicks(double inches) {
@@ -775,8 +1027,8 @@ public class JhoandriPathingCalibration {
 }`
       },
       vision: {
-        title: "LimelightVisionSubsystem.java — Auto-Aim Proporcional AprilTag 36h11",
-        badge: "Detección a 100 FPS con Limelight 3A",
+        title: "LimelightVisionSubsystem.java — 100 FPS AprilTag Auto-Aim Subsystem",
+        badge: "Limelight 3A • Proportional Feedback Control",
         code: `package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -790,7 +1042,7 @@ public class LimelightVisionSubsystem {
 
     public LimelightVisionSubsystem(HardwareMap hardwareMap) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(0); // Pipeline 0: AprilTags de Competencia
+        limelight.pipelineSwitch(0); // Pipeline 0: Competition AprilTags
         limelight.start();
     }
 
@@ -803,10 +1055,10 @@ public class LimelightVisionSubsystem {
         LLResult result = limelight.getLatestResult();
         if (result == null || !result.isValid()) return 0.0;
         
-        double tx = result.getTx(); // Error angular horizontal en grados
+        double tx = result.getTx(); // Horizontal angular offset in degrees
         double turn = tx * KP_AIM;
 
-        // Banda muerta y potencia mínima para vencer la inercia estática
+        // Overcome static chassis friction
         if (Math.abs(turn) < MIN_TURN_POWER && Math.abs(tx) > 0.5) {
             turn = Math.signum(turn) * MIN_TURN_POWER;
         }
@@ -817,6 +1069,7 @@ public class LimelightVisionSubsystem {
     };
 
     function openCodeModal(key) {
+      playTone(720, 'sine', 0.1, 0.05);
       const data = CODE_SNIPPETS[key];
       if (!data) return;
       document.getElementById('modal-code-title').textContent = data.title;
@@ -833,7 +1086,6 @@ public class LimelightVisionSubsystem {
       modal.classList.remove('flex');
     }
 
-    // Close on Escape or click outside
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeCodeModal();
     });
