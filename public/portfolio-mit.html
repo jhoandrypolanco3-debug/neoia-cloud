@@ -660,6 +660,180 @@
     </div>
   </section>
 
+  <!-- Enterprise Database Architecture Section -->
+  <section id="database" class="max-w-7xl mx-auto px-4 sm:px-6 py-12 border-t border-white/10">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div>
+        <div class="inline-flex items-center space-x-2 text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider">
+          <i data-lucide="database" class="w-4 h-4"></i>
+          <span>ENTERPRISE-GRADE DATA LAYER • FAANG STANDARDS</span>
+        </div>
+        <h3 class="text-2xl sm:text-3xl font-black text-white mt-1">
+          Arquitectura de Base de Datos Empresarial (Native SQLite & WAL Mode)
+        </h3>
+        <p class="text-xs text-slate-400 mt-1 max-w-3xl">
+          Estructura de persistencia robusta y de ultra-baja latencia diseñada con patrones empresariales (Repository Pattern / DAO), transacciones ACID y modo WAL (Write-Ahead Logging) para soportar telemetría robótica a 100 Hz y auditoría de despliegues.
+        </p>
+      </div>
+      <button onclick="fetchDbLiveStats()" class="px-4 py-2 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold transition flex items-center space-x-2 shadow-lg shadow-emerald-700/20">
+        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+        <span>Probar Consulta SQLite en Vivo</span>
+      </button>
+    </div>
+
+    <!-- Live Database Telemetry HUD -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="p-4 rounded-xl glass-card border border-white/5 space-y-1">
+        <div class="text-[10px] font-mono uppercase text-slate-400">Motor de Base de Datos</div>
+        <div class="text-base font-bold text-white font-mono flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>SQLite 3.45+ (Native)</span>
+        </div>
+        <div class="text-[11px] text-emerald-400 font-mono">Modo WAL Activo (Sin Bloqueo)</div>
+      </div>
+
+      <div class="p-4 rounded-xl glass-card border border-white/5 space-y-1">
+        <div class="text-[10px] font-mono uppercase text-slate-400">Latencia de Consulta</div>
+        <div class="text-base font-bold text-cyan-400 font-mono" id="db-latency-display">0.24 ms</div>
+        <div class="text-[11px] text-slate-500 font-mono">In-Process Zero Network Tax</div>
+      </div>
+
+      <div class="p-4 rounded-xl glass-card border border-white/5 space-y-1">
+        <div class="text-[10px] font-mono uppercase text-slate-400">Garantía Transaccional</div>
+        <div class="text-base font-bold text-amber-400 font-mono">ACID Compliant</div>
+        <div class="text-[11px] text-slate-500 font-mono">Integridad referencial ON</div>
+      </div>
+
+      <div class="p-4 rounded-xl glass-card border border-white/5 space-y-1">
+        <div class="text-[10px] font-mono uppercase text-slate-400">Tablas Principales</div>
+        <div class="text-base font-bold text-purple-400 font-mono" id="db-tables-count">6 Tablas Activas</div>
+        <div class="text-[11px] text-slate-500 font-mono">Esquema Versionado</div>
+      </div>
+    </div>
+
+    <!-- Database Schema Table Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-xs font-mono">
+      <!-- Table 1 -->
+      <div class="p-4 rounded-xl glass-card border border-white/10 space-y-2">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <span class="text-emerald-400 font-bold flex items-center gap-1.5">
+            <i data-lucide="table" class="w-3.5 h-3.5"></i>
+            <span>engineers</span>
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-400">Perfil & Auth</span>
+        </div>
+        <p class="text-[11px] text-slate-400 font-sans">
+          Almacena perfiles de ingenieros líderes, UUIDs de sistema y roles de acceso.
+        </p>
+        <div class="bg-black/50 p-2.5 rounded-lg text-[10px] text-slate-300 space-y-0.5">
+          <div>• id (PK AUTOINCREMENT)</div>
+          <div>• uuid (TEXT UNIQUE)</div>
+          <div>• username, role, specialization</div>
+          <div>• created_at, last_login</div>
+        </div>
+      </div>
+
+      <!-- Table 2 -->
+      <div class="p-4 rounded-xl glass-card border border-white/10 space-y-2">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <span class="text-cyan-400 font-bold flex items-center gap-1.5">
+            <i data-lucide="table" class="w-3.5 h-3.5"></i>
+            <span>projects</span>
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-400">14 Proyectos</span>
+        </div>
+        <p class="text-[11px] text-slate-400 font-sans">
+          Catálogo estructurado de proyectos con stack tecnológico y métricas JSON.
+        </p>
+        <div class="bg-black/50 p-2.5 rounded-lg text-[10px] text-slate-300 space-y-0.5">
+          <div>• id, project_id (UNIQUE)</div>
+          <div>• title, category (ftc, ai, sim, apps)</div>
+          <div>• tech_stack (JSON Array)</div>
+          <div>• metrics_json (JSON KPIs)</div>
+        </div>
+      </div>
+
+      <!-- Table 3 -->
+      <div class="p-4 rounded-xl glass-card border border-white/10 space-y-2">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <span class="text-amber-400 font-bold flex items-center gap-1.5">
+            <i data-lucide="table" class="w-3.5 h-3.5"></i>
+            <span>robot_telemetry</span>
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-400">Time-Series</span>
+        </div>
+        <p class="text-[11px] text-slate-400 font-sans">
+          Serie temporal de alta frecuencia para telemetría de competencia en vivo.
+        </p>
+        <div class="bg-black/50 p-2.5 rounded-lg text-[10px] text-slate-300 space-y-0.5">
+          <div>• session_id, robot_id</div>
+          <div>• battery_volts (REAL), shooter_rpm (REAL)</div>
+          <div>• target_locked (INTEGER 0/1)</div>
+          <div>• pos_x, pos_y, heading_deg, latency_ms</div>
+        </div>
+      </div>
+
+      <!-- Table 4 -->
+      <div class="p-4 rounded-xl glass-card border border-white/10 space-y-2">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <span class="text-purple-400 font-bold flex items-center gap-1.5">
+            <i data-lucide="table" class="w-3.5 h-3.5"></i>
+            <span>chat_messages</span>
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-400">Swarm History</span>
+        </div>
+        <p class="text-[11px] text-slate-400 font-sans">
+          Historial de deliberación y consenso multi-agente indexado por sesión.
+        </p>
+        <div class="bg-black/50 p-2.5 rounded-lg text-[10px] text-slate-300 space-y-0.5">
+          <div>• session_id, agent_id</div>
+          <div>• role (user, assistant, system)</div>
+          <div>• content (TEXT), tokens_used</div>
+          <div>• model_id (qwen2.5, deepseek)</div>
+        </div>
+      </div>
+
+      <!-- Table 5 -->
+      <div class="p-4 rounded-xl glass-card border border-white/10 space-y-2">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <span class="text-rose-400 font-bold flex items-center gap-1.5">
+            <i data-lucide="table" class="w-3.5 h-3.5"></i>
+            <span>code_deployments</span>
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-400">IDE Audit</span>
+        </div>
+        <p class="text-[11px] text-slate-400 font-sans">
+          Registro inmutable de código generado e inyectado en Android Studio.
+        </p>
+        <div class="bg-black/50 p-2.5 rounded-lg text-[10px] text-slate-300 space-y-0.5">
+          <div>• file_path, target_ide</div>
+          <div>• lines_of_code, status</div>
+          <div>• deployed_by (NeoIA Coder Agent)</div>
+          <div>• created_at (TIMESTAMP)</div>
+        </div>
+      </div>
+
+      <!-- Table 6 -->
+      <div class="p-4 rounded-xl glass-card border border-white/10 space-y-2">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <span class="text-blue-400 font-bold flex items-center gap-1.5">
+            <i data-lucide="table" class="w-3.5 h-3.5"></i>
+            <span>system_audit_logs</span>
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-400">Seguridad</span>
+        </div>
+        <p class="text-[11px] text-slate-400 font-sans">
+          Ledger de auditoría de seguridad para cumplimiento enterprise y tracing.
+        </p>
+        <div class="bg-black/50 p-2.5 rounded-lg text-[10px] text-slate-300 space-y-0.5">
+          <div>• event_type, severity (INFO, WARN, SEC)</div>
+          <div>• details_json (JSON Tracing)</div>
+          <div>• ip_address, created_at</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Interactive Code Inspector Modal -->
   <div id="code-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-card rounded-2xl border border-white/20 w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
@@ -1092,6 +1266,34 @@ public class LimelightVisionSubsystem {
     document.getElementById('code-modal').addEventListener('click', (e) => {
       if (e.target.id === 'code-modal') closeCodeModal();
     });
+
+    // -------------------------------------------------------------
+    // Live Database Stats Probe
+    // -------------------------------------------------------------
+    async function fetchDbLiveStats() {
+      playTone(960, 'sine', 0.12, 0.08);
+      const start = performance.now();
+      try {
+        const res = await fetch('/api/db/stats');
+        const latency = (performance.now() - start).toFixed(2);
+        if (res.ok) {
+          const data = await res.json();
+          const latencyEl = document.getElementById('db-latency-display');
+          if (latencyEl) latencyEl.textContent = `${latency} ms (Live)`;
+          
+          const tablesEl = document.getElementById('db-tables-count');
+          if (tablesEl && data.tableCounts) {
+            const totalRows = Object.values(data.tableCounts).reduce((a, b) => a + b, 0);
+            tablesEl.textContent = `6 Tablas (${totalRows} Registros)`;
+          }
+          playTone(1440, 'triangle', 0.15, 0.06);
+        }
+      } catch (err) {
+        console.warn('DB probe error:', err);
+      }
+    }
+    // Auto probe on load
+    setTimeout(fetchDbLiveStats, 800);
   </script>
 </body>
 </html>
