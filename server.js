@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { exec, spawn } = require('child_process');
+const db = require('./database');
 
 const PORT = process.env.PORT || 3333;
 const PUBLIC_DIR = fs.existsSync(path.join(__dirname, 'public')) ? path.join(__dirname, 'public') : __dirname;
@@ -130,6 +131,44 @@ const server = http.createServer(async (req, res) => {
       timestamp: Date.now()
     }));
     return;
+  }
+
+  // Enterprise Database Endpoints
+  if (pathname === '/api/db/stats') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(db.getStats()));
+    return;
+  }
+
+  if (pathname === '/api/db/projects') {
+    const category = parsedUrl.searchParams.get('category');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(db.getProjects(category)));
+    return;
+  }
+
+  if (pathname === '/api/db/telemetry') {
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const telemetryData = JSON.parse(body);
+          db.logTelemetry(telemetryData);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, logged: true }));
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: e.message }));
+        }
+      });
+      return;
+    } else {
+      const limit = parseInt(parsedUrl.searchParams.get('limit')) || 30;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(db.getTelemetry(limit)));
+      return;
+    }
   }
 
   // 1.0. Hybrid Cloud Bridge: Proxy to NeoIA Cloud on Render
