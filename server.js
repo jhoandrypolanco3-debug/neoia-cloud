@@ -25,7 +25,8 @@ const MIME_TYPES = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon'
+  '.ico': 'image/x-icon',
+  '.apk': 'application/vnd.android.package-archive'
 };
 
 // 20 Curated Local Models
@@ -530,6 +531,22 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // 6.5. Direct APK Download Route
+  if (pathname === '/download-apk' || pathname === '/apk' || pathname === '/biobuzz.apk') {
+    let apkFile = path.join(PUBLIC_DIR, 'FTC-8404-Odometry-Workshop.apk');
+    if (!fs.existsSync(apkFile)) apkFile = path.join(__dirname, 'FTC-8404-Odometry-Workshop.apk');
+    if (fs.existsSync(apkFile)) {
+      const stat = fs.statSync(apkFile);
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.android.package-archive',
+        'Content-Disposition': 'attachment; filename="FTC-8404-Odometry-Workshop.apk"',
+        'Content-Length': stat.size
+      });
+      fs.createReadStream(apkFile).pipe(res);
+      return;
+    }
+  }
+
   // 7. Static file serving
   let relPath = pathname === '/' ? 'index.html' : pathname.replace(/^\//, '');
   let filePath = path.join(PUBLIC_DIR, relPath);
@@ -550,11 +567,17 @@ const server = http.createServer(async (req, res) => {
 
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-
-    res.writeHead(200, { 
+    const headers = {
       'Content-Type': contentType,
       'Cache-Control': 'no-store, no-cache, must-revalidate'
-    });
+    };
+
+    if (ext === '.apk') {
+      headers['Content-Disposition'] = `attachment; filename="${path.basename(filePath)}"`;
+      headers['Content-Length'] = stats.size;
+    }
+
+    res.writeHead(200, headers);
     fs.createReadStream(filePath).pipe(res);
   });
 });

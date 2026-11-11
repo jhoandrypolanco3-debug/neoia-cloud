@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FTC 26-27 BioBuzz Arena | Intake & Shooter</title>
+<style>
+  :root {
+    --ftc-orange: #f57e25;
+    --first-blue: #0066b2;
+    --first-blue-glow: #0088eb;
+    --red-alliance: #ef4444;
+    --blue-alliance: #3b82f6;
+    --bg-dark: #0a0e17;
+    --panel-bg: #141b26;
+    --border-color: #263345;
+    --text-white: #f8fafc;
+    --text-muted: #94a3b8;
+    --good: #00d26a;
+    --pollen: #facc15;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
+  body { background: var(--bg-dark); color: var(--text-white); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+  header.topbar {
+    height: 44px; background: var(--ftc-orange); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px; color: #fff; z-index: 1000; flex-shrink: 0;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 1rem; }
+  .brand span.sub { font-size: 0.65rem; background: #fff; color: var(--ftc-orange); padding: 1px 5px; border-radius: 4px; font-weight: bold; }
+  .top-btn {
+    background: rgba(0,0,0,0.25); border: none; color: #fff; padding: 5px 12px; border-radius: 6px;
+    font-size: 0.78rem; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .top-btn.apk { background: #00d26a; color: #000; font-weight: 900; }
+
+  #appContainer { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+  @media(min-width: 850px) { #appContainer { flex-direction: row; } }
+
+  .arena-viewport {
+    flex: 1; position: relative; background: #070a10; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  }
+  #biobuzzCanvas { width: 100%; height: 100%; display: block; touch-action: none; }
+
+  .arena-hud {
+    position: absolute; top: 8px; left: 8px; right: 8px; display: flex; justify-content: space-between; pointer-events: none;
+  }
+  .hud-pill {
+    background: rgba(15, 22, 34, 0.88); backdrop-filter: blur(8px); border: 1px solid var(--border-color);
+    padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-family: monospace;
+  }
+  .hud-pill b { color: var(--ftc-orange); }
+
+  .cam-pip {
+    position: absolute; top: 40px; right: 8px; width: 125px; height: 75px;
+    background: #000; border: 1.5px solid var(--first-blue-glow); border-radius: 6px; overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.6); pointer-events: none;
+  }
+  .cam-pip-title {
+    position: absolute; top: 2px; left: 3px; font-size: 0.55rem; background: rgba(0,0,0,0.7);
+    padding: 1px 4px; border-radius: 2px; color: var(--good); font-weight: bold;
+  }
+  #camCanvas { width: 100%; height: 100%; display: block; }
+
+  /* PANEL DE CONTROL MÓVIL INFERIOR */
+  .mobile-tray {
+    height: 145px; background: var(--panel-bg); border-top: 2px solid var(--border-color);
+    display: flex; padding: 10px 12px; gap: 14px; flex-shrink: 0; z-index: 10; align-items: center; justify-content: space-between;
+  }
+  @media(min-width: 850px) {
+    .mobile-tray { width: 380px; height: auto; border-top: none; border-left: 2px solid var(--border-color); flex-direction: column; }
+  }
+
+  /* DPAD MÓVIL PROPORCIONADO (CUADRADO / TIPO GAMEPAD) */
+  .dpad-container {
+    display: grid; grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(2, 44px); gap: 6px;
+    width: auto; height: auto; flex-shrink: 0;
+  }
+  .dbtn {
+    width: 44px; height: 44px;
+    background: #1e293b; border: 1.5px solid var(--first-blue); color: #fff; border-radius: 10px;
+    font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; justify-content: center;
+    touch-action: manipulation; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+  }
+  .dbtn:active, .dbtn.active { background: var(--ftc-orange); color: #000; transform: scale(0.92); border-color: var(--ftc-orange); }
+
+  .control-actions { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 8px; overflow: hidden; }
+  .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .btn-act {
+    background: var(--first-blue); color: #fff; border: none; padding: 10px 4px; border-radius: 8px;
+    font-size: 0.78rem; font-weight: bold; cursor: pointer; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+  }
+  .btn-act.intake { background: #16a34a; color: #fff; }
+  .btn-act.shoot { background: #ef4444; color: #fff; }
+  .btn-act.orange { background: var(--ftc-orange); color: #000; }
+  .btn-act.sec { background: #1e293b; border: 1px solid var(--border-color); }
+  .btn-act:active { filter: brightness(1.25); transform: scale(0.96); }
+
+  .mobile-telemetry {
+    background: #0b111a; border: 1px solid var(--border-color); border-radius: 6px;
+    padding: 4px 8px; font-family: monospace; font-size: 0.68rem; color: var(--text-muted);
+  }
+  .mobile-telemetry div { margin-bottom: 2px; }
+  .mobile-telemetry b { color: var(--text-white); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="/portfolio-mit.html" style="color:#fff; text-decoration:none; display:flex; align-items:center; gap:6px;">
+      <span>☰ FTCSIM</span>
+      <span class="sub">BIOBUZZ 26-27 OFICIAL</span>
+    </a>
+  </div>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <a href="/FTC-8404-Odometry-Workshop.apk" class="top-btn apk" download="FTC-8404-Odometry-Workshop.apk">⬇ APK MÓVIL</a>
+    <button class="top-btn" id="btnResetAll">↺ Reset</button>
+    <a href="/portfolio-mit.html" class="top-btn" style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.2)">🏛️ Portafolio MIT</a>
+  </div>
+</header>
+
+<div id="appContainer">
+
+  <div class="arena-viewport">
+    <div class="arena-hud">
+      <div class="hud-pill">ODOMETRÍA: <b id="hudPose" style="color:var(--ftc-orange)">X: 30.0" Y: 25.0" θ: 90°</b></div>
+      <div class="hud-pill">INVENTARIO: <b id="hudLoaded" style="color:var(--pollen)">POLEN: 0/3</b></div>
+      <div class="hud-pill">PUNTOS: <b id="hudScore" style="color:var(--good)">0 PTS</b></div>
+    </div>
+
+    <div class="cam-pip">
+      <div class="cam-pip-title">CAM · INTAKE TARGET</div>
+      <canvas id="camCanvas" width="125" height="75"></canvas>
+    </div>
+
+    <canvas id="biobuzzCanvas" width="800" height="600"></canvas>
+  </div>
+
+  <div class="mobile-tray">
+    
+    <!-- DPAD VIRTUAL -->
+    <div class="dpad-container">
+      <button class="dbtn" data-k="q">⟲</button>
+      <button class="dbtn" data-k="w">▲</button>
+      <button class="dbtn" data-k="e">⟳</button>
+      <button class="dbtn" data-k="a">◀</button>
+      <button class="dbtn" data-k="s">▼</button>
+      <button class="dbtn" data-k="d">▶</button>
+    </div>
+
+    <!-- ACCIONES DE RECOGER Y TIRAR -->
+    <div class="control-actions">
+      <div class="action-buttons">
+        <button class="btn-act intake" id="btnIntake">📥 RECOGER (Intake)</button>
+        <button class="btn-act shoot" id="btnShoot">🚀 TIRAR (Shooter)</button>
+        <button class="btn-act orange" id="btnAutoCell">▶ Auto: Tirar a Celda</button>
+        <button class="btn-act sec" id="btnSpawnPollen">➕ Spawn Polen</button>
+      </div>
+
+      <div class="mobile-telemetry">
+        <div>Mecanismo: <b id="tMech" style="color:var(--good)">INTAKE READY</b></div>
+        <div>DeadWheels: <b id="tTicks">L: 0 | R: 0 | Perp: 0</b></div>
+        <div>Pose: <b id="tPose">X: 30.0" Y: 30.0" θ: 90°</b></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ================= MOTOR ISOMÉTRICO 3D - BIOBUZZ CON INTAKE & SHOOTER =================
+const canvas = document.getElementById('biobuzzCanvas'), ctx = canvas.getContext('2d');
+const camCanvas = document.getElementById('camCanvas'), camCtx = camCanvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+let robot = { x: 30, y: 30, h: Math.PI / 2, inventory: 0, intakeSpin: 0, isIntaking: false };
+let deadWheels = { l: 0, r: 0, p: 0 };
+let score = 0;
+const keys = new Set();
+
+// Elementos de juego: Bolas de Polen en el suelo y Proyectiles en el aire
+let groundPollen = [
+  { x: 35, y: 50, z: 0 },
+  { x: 50, y: 35, z: 0 },
+  { x: 25, y: 70, z: 0 },
+  { x: 85, y: 40, z: 0 },
+  { x: 45, y: 95, z: 0 },
+  { x: 100, y: 85, z: 0 },
+  { x: 72, y: 110, z: 0 }
+];
+
+let flyingBalls = []; // Proyectiles lanzados por el shooter
+
+function toIso(x, y, z = 0) {
+  const originX = canvas.width / 2;
+  const originY = canvas.height * 0.72;
+  const scale = Math.min(canvas.width, canvas.height) / 195;
+  const isoX = originX + (x - y) * Math.cos(0.50) * scale;
+  const isoY = originY - (x + y) * Math.sin(0.50) * scale - z * scale;
+  return { x: isoX, y: isoY };
+}
+
+// Renderizado de Cancha BioBuzz 26-27
+function renderBioBuzzField() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#090d14";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Áreas Alianza exteriores
+  const redOut0 = toIso(-24, 40, 0), redOut1 = toIso(0, 40, 0), redOut2 = toIso(0, 104, 0), redOut3 = toIso(-24, 104, 0);
+  ctx.fillStyle = "rgba(239, 68, 68, 0.25)";
+  ctx.beginPath(); ctx.moveTo(redOut0.x, redOut0.y); ctx.lineTo(redOut1.x, redOut1.y); ctx.lineTo(redOut2.x, redOut2.y); ctx.lineTo(redOut3.x, redOut3.y); ctx.closePath();
+  ctx.fill(); ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 2; ctx.stroke();
+
+  const blueOut0 = toIso(144, 40, 0), blueOut1 = toIso(168, 40, 0), blueOut2 = toIso(168, 104, 0), blueOut3 = toIso(144, 104, 0);
+  ctx.fillStyle = "rgba(59, 130, 246, 0.25)";
+  ctx.beginPath(); ctx.moveTo(blueOut0.x, blueOut0.y); ctx.lineTo(blueOut1.x, blueOut1.y); ctx.lineTo(blueOut2.x, blueOut2.y); ctx.lineTo(blueOut3.x, blueOut3.y); ctx.closePath();
+  ctx.fill(); ctx.strokeStyle = "#3b82f6"; ctx.lineWidth = 2; ctx.stroke();
+
+  // Piso 6x6 SoftTiles
+  for (let i = 0; i < 6; i++) {
+    for (let j = 0; j < 6; j++) {
+      const p0 = toIso(i * 24, j * 24, 0);
+      const p1 = toIso((i + 1) * 24, j * 24, 0);
+      const p2 = toIso((i + 1) * 24, (j + 1) * 24, 0);
+      const p3 = toIso(i * 24, (j + 1) * 24, 0);
+
+      ctx.fillStyle = (i + j) % 2 === 0 ? "#525a66" : "#5d6673";
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y); ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "#3f4752"; ctx.lineWidth = 1; ctx.stroke();
+    }
+  }
+
+  // Paredes perimetrales de vidrio posteriores
+  const h3 = toIso(0, 144, 13), h2 = toIso(144, 144, 13), h1 = toIso(144, 0, 13);
+  ctx.strokeStyle = "rgba(148, 163, 184, 0.85)"; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(h3.x, h3.y); ctx.lineTo(h2.x, h2.y); ctx.lineTo(h1.x, h1.y); ctx.stroke();
+
+  // 4 Flower Dispensers
+  const flowerSpots = [{x: 48, y: 140}, {x: 140, y: 96}, {x: 96, y: 4}, {x: 4, y: 48}];
+  flowerSpots.forEach(fl => {
+    const fb = toIso(fl.x, fl.y, 0), ft = toIso(fl.x, fl.y, 22);
+    ctx.strokeStyle = "#16a34a"; ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.moveTo(fb.x, fb.y); ctx.lineTo(ft.x, ft.y); ctx.stroke();
+    for(let k = 3; k <= 18; k += 5) {
+      const pBall = toIso(fl.x, fl.y, k);
+      ctx.fillStyle = "#facc15"; ctx.beginPath(); ctx.arc(pBall.x, pBall.y, 3, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.strokeStyle = "#eab308"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(ft.x, ft.y, 5, 0, Math.PI*2); ctx.stroke();
+  });
+
+  // Estructura Central: Celdas Inclinadas (CELL RED / BLUE)
+  const p1B = toIso(54, 54, 0), p1T = toIso(64, 64, 46);
+  const p2B = toIso(90, 54, 0), p2T = toIso(80, 64, 46);
+  const p3B = toIso(90, 90, 0), p3T = toIso(80, 80, 46);
+  const p4B = toIso(54, 90, 0), p4T = toIso(64, 80, 46);
+
+  ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.moveTo(p1B.x, p1B.y); ctx.lineTo(p1T.x, p1T.y);
+  ctx.moveTo(p2B.x, p2B.y); ctx.lineTo(p2T.x, p2T.y);
+  ctx.moveTo(p3B.x, p3B.y); ctx.lineTo(p3T.x, p3T.y);
+  ctx.moveTo(p4B.x, p4B.y); ctx.lineTo(p4T.x, p4T.y);
+  ctx.stroke();
+
+  function renderTiltedCell(cx, cy, cz, colorHex, isRed) {
+    const b0 = toIso(cx - 7, cy - 7, cz), b1 = toIso(cx + 7, cy - 7, cz), b2 = toIso(cx + 7, cy + 7, cz), b3 = toIso(cx - 7, cy + 7, cz);
+    const t0 = toIso(cx - 9, cy - 9, cz + 12), t1 = toIso(cx + 9, cy - 9, cz + 12), t2 = toIso(cx + 9, cy + 9, cz + 12), t3 = toIso(cx - 9, cy + 9, cz + 12);
+
+    ctx.fillStyle = isRed ? "rgba(239, 68, 68, 0.35)" : "rgba(59, 130, 246, 0.35)";
+    ctx.strokeStyle = colorHex; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(b0.x, b0.y); ctx.lineTo(b1.x, b1.y); ctx.lineTo(b2.x, b2.y); ctx.lineTo(b3.x, b3.y); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(t0.x, t0.y); ctx.lineTo(t1.x, t1.y); ctx.lineTo(t2.x, t2.y); ctx.lineTo(t3.x, t3.y); ctx.closePath(); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(b0.x, b0.y); ctx.lineTo(t0.x, t0.y); ctx.moveTo(b1.x, b1.y); ctx.lineTo(t1.x, t1.y);
+    ctx.moveTo(b2.x, b2.y); ctx.lineTo(t2.x, t2.y); ctx.moveTo(b3.x, b3.y); ctx.lineTo(t3.x, t3.y);
+    ctx.stroke();
+  }
+  renderTiltedCell(62, 64, 48, "#ef4444", true);
+  renderTiltedCell(62, 80, 48, "#ef4444", true);
+  renderTiltedCell(82, 64, 48, "#3b82f6", false);
+  renderTiltedCell(82, 80, 48, "#3b82f6", false);
+
+  // DIBUJAR POLEN EN EL SUELO
+  groundPollen.forEach(p => {
+    const pt = toIso(p.x, p.y, p.z);
+    ctx.fillStyle = "#facc15";
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#ca8a04"; ctx.lineWidth = 1; ctx.stroke();
+  });
+
+  // DIBUJAR PROYECTILES EN EL AIRE (TIRADOS POR EL ROBOT)
+  flyingBalls.forEach(b => {
+    const pt = toIso(b.x, b.y, b.z);
+    const shadow = toIso(b.x, b.y, 0);
+    // Sombra del tiro
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.beginPath(); ctx.arc(shadow.x, shadow.y, 3, 0, Math.PI*2); ctx.fill();
+    // Bola disparada
+    ctx.fillStyle = "#facc15";
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; ctx.stroke();
+  });
+
+  // DIBUJAR ROBOT
+  drawRobot();
+
+  // Paredes frontales de vidrio
+  const h0 = toIso(0, 0, 13);
+  ctx.strokeStyle = "rgba(148, 163, 184, 0.75)"; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(h0.x, h0.y); ctx.lineTo(h1.x, h1.y); ctx.moveTo(h0.x, h0.y); ctx.lineTo(h3.x, h3.y); ctx.stroke();
+}
+
+function drawRobot() {
+  const rPos = toIso(robot.x, robot.y, 0);
+
+  ctx.fillStyle = "rgba(0,0,0,0.55)";
+  ctx.beginPath(); ctx.ellipse(rPos.x, rPos.y + 4, 22, 12, 0, 0, Math.PI * 2); ctx.fill();
+
+  ctx.save();
+  ctx.translate(rPos.x, rPos.y);
+
+  // Ruedas Mecanum traseras
+  ctx.fillStyle = "#334155"; ctx.strokeStyle = "#0f172a"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.ellipse(-18, -4, 5, 10, -0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(16, 10, 5, 10, -0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Chasis
+  ctx.fillStyle = "#1e2430"; ctx.strokeStyle = "#384761"; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-14, -8); ctx.lineTo(12, 4); ctx.lineTo(6, 16); ctx.lineTo(-20, 4); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  // Torres del elevador
+  ctx.fillStyle = "#475569";
+  ctx.fillRect(-8, -26, 4, 22);
+  ctx.fillRect(4, -20, 4, 22);
+
+  // Cañón / Shooter superior (inclinado a 45 grados hacia adelante)
+  ctx.fillStyle = "#ef4444"; ctx.strokeStyle = "#991b1b"; ctx.lineWidth = 1.5;
+  ctx.fillRect(-3, -22, 6, 14);
+
+  // Si tiene polen cargado en el robot
+  if (robot.inventory > 0) {
+    ctx.fillStyle = "#facc15";
+    ctx.beginPath(); ctx.arc(0, -22, 4, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Ruedas de Intake verdes (giran con animación cuando está recogiendo)
+  robot.intakeSpin += robot.isIntaking ? 0.35 : 0;
+  ctx.fillStyle = "#22c55e"; ctx.strokeStyle = "#15803d"; ctx.lineWidth = 1.5;
+  ctx.save();
+  ctx.translate(-4, 14);
+  ctx.rotate(robot.intakeSpin);
+  ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-6, 0); ctx.lineTo(6, 0); ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(12, 22);
+  ctx.rotate(-robot.intakeSpin);
+  ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-6, 0); ctx.lineTo(6, 0); ctx.stroke();
+  ctx.restore();
+
+  // Placa frontal protectora amarilla
+  ctx.fillStyle = "#facc15"; ctx.strokeStyle = "#ca8a04"; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(-1, -4); ctx.lineTo(7, 0); ctx.lineTo(5, 12); ctx.lineTo(-3, 8); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  ctx.restore();
+}
+
+// Visor de Cámara
+function renderCameraPiP() {
+  camCtx.fillStyle = "#0a0f18";
+  camCtx.fillRect(0, 0, camCanvas.width, camCanvas.height);
+  camCtx.strokeStyle = "rgba(0, 210, 106, 0.4)";
+  camCtx.strokeRect(camCanvas.width/2 - 12, camCanvas.height/2 - 12, 24, 24);
+
+  // Busca el polen más cercano al frente
+  let nearest = null, minD = 999;
+  groundPollen.forEach(p => {
+    const d = Math.hypot(p.x - robot.x, p.y - robot.y);
+    if (d < minD) { minD = d; nearest = p; }
+  });
+
+  if (nearest && minD < 45) {
+    camCtx.strokeStyle = "#facc15"; camCtx.lineWidth = 1.5;
+    camCtx.fillStyle = "rgba(250, 204, 21, 0.3)";
+    camCtx.fillRect(camCanvas.width/2 - 12, camCanvas.height/2 - 8, 24, 16);
+    camCtx.strokeRect(camCanvas.width/2 - 12, camCanvas.height/2 - 8, 24, 16);
+    camCtx.fillStyle = "#facc15"; camCtx.font = "bold 8px monospace";
+    camCtx.fillText(`POLEN ${minD.toFixed(0)}"`, camCanvas.width/2 - 14, camCanvas.height/2 - 10);
+  }
+}
+
+// Controles táctiles
+document.querySelectorAll('.dbtn').forEach(btn => {
+  const k = btn.dataset.k;
+  btn.addEventListener('pointerdown', e => { keys.add(k); btn.classList.add('active'); btn.setPointerCapture(e.pointerId); });
+  ['pointerup','pointercancel','pointerleave'].forEach(t => btn.addEventListener(t, () => { keys.delete(k); btn.classList.remove('active'); }));
+});
+
+// ACCIÓN: RECOGER (INTAKE)
+function triggerIntake() {
+  robot.isIntaking = true;
+  document.getElementById('tMech').textContent = "INTAKING...";
+  document.getElementById('tMech').style.color = "var(--yellow)";
+
+  setTimeout(() => { robot.isIntaking = false; document.getElementById('tMech').textContent = "INTAKE READY"; document.getElementById('tMech').style.color = "var(--good)"; }, 1200);
+
+  // Si hay polen a menos de 14 pulgadas del frente del robot, lo absorbe
+  groundPollen = groundPollen.filter(p => {
+    const dist = Math.hypot(p.x - robot.x, p.y - robot.y);
+    if (dist < 16 && robot.inventory < 3) {
+      robot.inventory++;
+      return false; // Se elimina del suelo porque entró al robot
+    }
+    return true;
+  });
+  updateHud();
+}
+document.getElementById('btnIntake').onclick = triggerIntake;
+
+// ACCIÓN: TIRAR (SHOOTER)
+function triggerShoot() {
+  if (robot.inventory <= 0) {
+    alert("¡Sin polen! Acércate a una bola amarilla en el suelo y pulsa 'RECOGER'.");
+    return;
+  }
+  robot.inventory--;
+  updateHud();
+
+  document.getElementById('tMech').textContent = "FIRE SHOOTER!";
+  document.getElementById('tMech').style.color = "var(--bad)";
+  setTimeout(() => { document.getElementById('tMech').textContent = "INTAKE READY"; document.getElementById('tMech').style.color = "var(--good)"; }, 600);
+
+  // Dispara el proyectil hacia la orientación actual del robot
+  const speed = 2.4;
+  flyingBalls.push({
+    x: robot.x,
+    y: robot.y,
+    z: 10,
+    vx: Math.cos(robot.h) * speed,
+    vy: Math.sin(robot.h) * speed,
+    vz: 1.8,
+    gravity: 0.08
+  });
+}
+document.getElementById('btnShoot').onclick = triggerShoot;
+
+// Spawn más polen
+document.getElementById('btnSpawnPollen').onclick = () => {
+  for (let i = 0; i < 4; i++) {
+    groundPollen.push({
+      x: 20 + Math.random() * 100,
+      y: 20 + Math.random() * 100,
+      z: 0
+    });
+  }
+};
+
+// Auto: Alinearse y tirar a la Celda central
+document.getElementById('btnAutoCell').onclick = () => {
+  // Apunta hacia el centro de las celdas (72, 72)
+  const targetAngle = Math.atan2(72 - robot.y, 72 - robot.x);
+  robot.h = targetAngle;
+  setTimeout(triggerShoot, 300);
+};
+
+function updateHud() {
+  document.getElementById('hudLoaded').textContent = `POLEN: ${robot.inventory}/3`;
+  document.getElementById('hudScore').textContent = `${score} PTS`;
+  const deg = Math.round(((robot.h * 180 / Math.PI) % 360 + 360) % 360);
+  const poseEl = document.getElementById('hudPose');
+  if (poseEl) poseEl.textContent = `X: ${robot.x.toFixed(1)}" Y: ${robot.y.toFixed(1)}" θ: ${deg}°`;
+}
+
+// Bucle de física
+function updateLoop(dt) {
+  let f = 0, s = 0, w = 0;
+  if (keys.has('w')) f += 1;
+  if (keys.has('s')) f -= 1;
+  if (keys.has('d')) s += 1;
+  if (keys.has('a')) s -= 1;
+  if (keys.has('q')) w += 1;
+  if (keys.has('e')) w -= 1;
+
+  const V = 50, W = 2.8;
+  robot.h += w * W * dt;
+  robot.x += (f * Math.cos(robot.h) + s * Math.sin(robot.h)) * V * dt;
+  robot.y += (f * Math.sin(robot.h) - s * Math.cos(robot.h)) * V * dt;
+
+  robot.x = Math.max(12, Math.min(132, robot.x));
+  robot.y = Math.max(12, Math.min(132, robot.y));
+
+  deadWheels.l += Math.round((f * V * dt) * 45);
+  deadWheels.r += Math.round((f * V * dt) * 45);
+  deadWheels.p += Math.round((s * V * dt) * 45);
+
+  // Física de bolas disparadas
+  flyingBalls.forEach(b => {
+    b.x += b.vx;
+    b.y += b.vy;
+    b.z += b.vz;
+    b.vz -= b.gravity;
+
+    // Si encesta en las celdas centrales (área entre x: 55 a 90, y: 55 a 90 a altura z > 35)
+    if (b.x > 55 && b.x < 90 && b.y > 55 && b.y < 90 && b.z > 35 && b.z < 60) {
+      score += 50; // ¡Anotó en la Cell!
+      b.z = -1; // Cae dentro de la canasta
+      updateHud();
+    }
+  });
+
+  // Elimina las bolas que caen al piso
+  flyingBalls = flyingBalls.filter(b => b.z > 0);
+
+  const deg = Math.round((robot.h * 180 / Math.PI) % 360);
+  const headStr = (deg < 0 ? deg + 360 : deg) + '°';
+  document.getElementById('tPose').textContent = `X: ${robot.x.toFixed(1)}" Y: ${robot.y.toFixed(1)}" θ: ${headStr}`;
+  document.getElementById('tTicks').textContent = `L: ${deadWheels.l} | R: ${deadWheels.r} | Perp: ${deadWheels.p}`;
+}
+
+document.getElementById('btnResetAll').onclick = () => {
+  robot = { x: 30, y: 30, h: Math.PI / 2, inventory: 0, intakeSpin: 0, isIntaking: false };
+  deadWheels = { l: 0, r: 0, p: 0 };
+  score = 0;
+  flyingBalls = [];
+  updateHud();
+};
+
+let lastTime = performance.now();
+function gameLoop(now) {
+  const dt = Math.min(0.05, (now - lastTime) / 1000);
+  lastTime = now;
+  updateLoop(dt);
+  renderBioBuzzField();
+  renderCameraPiP();
+  requestAnimationFrame(gameLoop);
+}
+requestAnimationFrame(gameLoop);
+</script>
+
+</body>
+</html>
