@@ -1205,9 +1205,12 @@ async function scanAllServices() {
 
   if (availableModels.length === 0) {
     availableModels = [
-      { id: 'llama3.2:1b', name: '⚡ llama3.2:1b (General Rápido)', serviceId: 'ollama', useProxy: true },
-      { id: 'qwen2.5-coder:1.5b', name: '💻 qwen2.5-coder:1.5b (Programador FTC)', serviceId: 'ollama', useProxy: true }
+      { id: 'neoia-cloud', name: '☁️ NeoIA Cloud (DeepSeek FTC - 100% En Línea)', serviceId: 'neoia-cloud', useProxy: false }
     ];
+  } else {
+    availableModels.unshift(
+      { id: 'neoia-cloud', name: '☁️ NeoIA Cloud (DeepSeek FTC - 100% En Línea)', serviceId: 'neoia-cloud', useProxy: false }
+    );
   }
 
   populateChatModelsDropdown();
@@ -1323,7 +1326,7 @@ function onModelChange() {
       }
       return;
     }
-    const serviceId = opt.getAttribute('data-service') || 'ollama';
+    const serviceId = opt.value === 'neoia-cloud' ? 'RENDER CLOUD (IA EN VIVO)' : (opt.getAttribute('data-service') || 'ollama');
     badge.innerText = `Servicio: ${serviceId.toUpperCase()}`;
   }
 }
