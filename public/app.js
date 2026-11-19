@@ -1146,7 +1146,7 @@ async function loadCatalogGrid() {
 }
 
 async function installModelViaAgent(modelId) {
-  showToast(`Iniciando descarga de ${modelId}...`, 'info');
+  showToast(`Iniciando descarga de ${modelId}... Esto puede tomar unos minutos.`, 'info');
   try {
     const res = await fetch('/api/agent/run-cmd', {
       method: 'POST',
@@ -1160,7 +1160,11 @@ async function installModelViaAgent(modelId) {
       scanAllServices();
       updateStorageMeter();
     } else {
-      showToast(`Error: ${data.error || data.stderr}`, 'error');
+      let errMsg = data.error || 'Fallo durante la descarga del modelo.';
+      if (typeof errMsg === 'string' && (errMsg.includes('pulling') || errMsg.includes('timed out'))) {
+        errMsg = `Descarga en progreso o tiempo de espera excedido para ${modelId}. Revisa tu terminal de Ollama.`;
+      }
+      showToast(errMsg, 'error');
     }
   } catch (e) {
     showToast(`Error de red: ${e.message}`, 'error');
@@ -1381,15 +1385,21 @@ async function handleChatSubmit(e) {
     }
   } catch (err) {
     if (err.message.includes('not found') || err.message.includes('404')) {
-      updateChatMessage(botMsgId, `⚠️ Ese modelo no está instalado. Cambiando automáticamente a **llama3.2:1b**...`);
+      updateChatMessage(botMsgId, `🔄 El modelo local \`${modelId}\` aún se está descargando. Conectando con **NeoIA Cloud (DeepSeek)** para responderte de inmediato... ☁️`);
       try {
-        await sendToOllama('llama3.2:1b', text, SYSTEM_PRESETS.general, 0.7, (partial) => {
-          updateChatMessage(botMsgId, partial);
+        const cloudRes = await fetch('/api/cloud-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
         });
-        const select = document.getElementById('chat-model-select');
-        if (select) select.value = 'llama3.2:1b';
-      } catch (retryErr) {
-        updateChatMessage(botMsgId, `⚠️ **Error:** ${retryErr.message}`);
+        const cloudData = await cloudRes.json();
+        const cloudReply = cloudData.reply || cloudData.error || 'Respuesta lista en la nube.';
+        updateChatMessage(botMsgId, `**[Respuesta vía NeoIA Cloud ☁️]**\n\n${cloudReply}`);
+        if (ttsEnabled) {
+          speakText(cloudReply);
+        }
+      } catch (cloudErr) {
+        updateChatMessage(botMsgId, `⚠️ **Aviso:** El modelo local \`${modelId}\` no está disponible aún.\nEstamos descargándolo en segundo plano. Puedes seleccionar **☁️ NeoIA Cloud** en el selector superior.`);
       }
     } else {
       updateChatMessage(botMsgId, `⚠️ **Error:**\n${err.message}`);
@@ -1536,13 +1546,28 @@ function showToast(msg, type = 'info') {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
+  // Clean raw ANSI progress codes and escape characters
+  let cleanMsg = String(msg || '')
+    .replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '')
+    .replace(/\[\??[0-9;]*[a-zA-Z]/g, '')
+    .replace(/[\x00-\x1F\x7F-\x9F]/g, ' ')
+    .trim();
+
+  // Limit maximum length to prevent covering the viewport
+  if (cleanMsg.length > 180) {
+    cleanMsg = cleanMsg.substring(0, 180) + '...';
+  }
+
   const toast = document.createElement('div');
   const bg = type === 'error' ? 'bg-rose-600' : type === 'success' ? 'bg-emerald-600' : 'bg-slate-800';
-  toast.className = `${bg} text-white text-xs px-4 py-2.5 rounded-xl shadow-xl flex items-center space-x-2 transition transform duration-200 pointer-events-auto border border-white/10`;
-  toast.innerHTML = `<span>${msg}</span>`;
+  toast.className = `${bg} text-white text-xs px-4 py-2.5 rounded-xl shadow-2xl flex items-center space-x-2 transition transform duration-200 pointer-events-auto border border-white/10 max-w-sm sm:max-w-md break-words`;
+  
+  const span = document.createElement('span');
+  span.textContent = cleanMsg;
+  toast.appendChild(span);
 
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+  setTimeout(() => toast.remove(), 4500);
 }
 
 

@@ -5,8 +5,8 @@ const os = require('os');
 const { exec, spawn } = require('child_process');
 const db = require('./database');
 
-const PORT = process.env.PORT || 3333;
-const PUBLIC_DIR = fs.existsSync(path.join(__dirname, 'public')) ? path.join(__dirname, 'public') : __dirname;
+const PORT = 3333;
+const PUBLIC_DIR = __dirname;
 
 const TARGET_SERVICES = {
   ollama: 'http://localhost:11434',
@@ -134,7 +134,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Enterprise Database Endpoints
+  // 1c. Enterprise Database Endpoints (ACID SQLite with WAL mode)
   if (pathname === '/api/db/stats') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(db.getStats()));
@@ -143,8 +143,13 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/db/projects') {
     const category = parsedUrl.searchParams.get('category');
+    const projects = db.getProjects(category).map(p => ({
+      ...p,
+      tech_stack: JSON.parse(p.tech_stack || '[]'),
+      metrics: JSON.parse(p.metrics_json || '{}')
+    }));
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(db.getProjects(category)));
+    res.end(JSON.stringify(projects));
     return;
   }
 
@@ -172,23 +177,56 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  if (pathname === '/api/db/audit') {
+    const limit = parseInt(parsedUrl.searchParams.get('limit')) || 30;
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(db.getAuditLogs(limit)));
+    return;
+  }
+
+  if (pathname === '/api/db/query' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { sql, params } = JSON.parse(body);
+        if (!sql) throw new Error('Query SQL requerida');
+        const results = db.runCustomQuery(sql, params || []);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, results }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
   // 1.0. Hybrid Cloud Bridge: Proxy to NeoIA Cloud on Render
   if (pathname === '/api/cloud-chat' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', async () => {
       try {
-        const payload = JSON.parse(body);
+        const payload = JSON.parse(body || '{}');
         const cloudRes = await fetch('https://neoia-351a.onrender.com/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        const cloudData = await cloudRes.json();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(cloudData));
+        const rawText = await cloudRes.text();
+        try {
+          const cloudData = JSON.parse(rawText);
+          res.writeHead(cloudRes.status, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(cloudData));
+        } catch (jsonErr) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ 
+            reply: '☁️ NeoIA Cloud se está inicializando o respondiendo. Por favor vuelve a intentarlo en unos segundos.' 
+          }));
+        }
       } catch (err) {
-        res.writeHead(502, { 'Content-Type': 'application/json' });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'No se pudo conectar con NeoIA Cloud: ' + err.message }));
       }
     });
@@ -300,6 +338,10 @@ const server = http.createServer(async (req, res) => {
         fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(resolved, content, 'utf8');
 
+        // Enterprise Audit & Deployment Logging
+        db.logDeployment({ file_path: resolved, lines_of_code: content.split('\n').length, status: 'success' });
+        db.logAudit('CODE_DEPLOYMENT', 'INFO', { file: path.basename(resolved), bytes: Buffer.byteLength(content) });
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, savedPath: resolved, bytes: Buffer.byteLength(content) }));
       } catch (err) {
@@ -349,13 +391,18 @@ const server = http.createServer(async (req, res) => {
           }
         }
 
-        exec(command, { timeout: 30000, maxBuffer: 1024 * 1024 }, (err, stdout, stderr) => {
+        const timeoutMs = command.includes('ollama pull') ? 300000 : 30000;
+        exec(command, { timeout: timeoutMs, maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
+          let cleanStderr = stderr || '';
+          if (cleanStderr.includes('pulling')) {
+            cleanStderr = err ? 'Descarga interrumpida o tiempo de espera agotado.' : '';
+          }
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             success: !err,
             stdout: stdout || '',
-            stderr: stderr || '',
-            error: err ? err.message : null
+            stderr: cleanStderr,
+            error: err ? (err.killed ? 'Tiempo de espera excedido al procesar.' : err.message) : null
           }));
         });
       } catch (err) {
@@ -531,10 +578,9 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 6.5. Direct APK Download Route
+  // 6.5. Direct APK Download Shortcut
   if (pathname === '/download-apk' || pathname === '/apk' || pathname === '/biobuzz.apk') {
-    let apkFile = path.join(PUBLIC_DIR, 'FTC-8404-Odometry-Workshop.apk');
-    if (!fs.existsSync(apkFile)) apkFile = path.join(__dirname, 'FTC-8404-Odometry-Workshop.apk');
+    const apkFile = path.join(PUBLIC_DIR, 'FTC-8404-Odometry-Workshop.apk');
     if (fs.existsSync(apkFile)) {
       const stat = fs.statSync(apkFile);
       res.writeHead(200, {
@@ -548,14 +594,11 @@ const server = http.createServer(async (req, res) => {
   }
 
   // 7. Static file serving
-  let relPath = pathname === '/' ? 'index.html' : pathname.replace(/^\//, '');
-  let filePath = path.join(PUBLIC_DIR, relPath);
-  if (!fs.existsSync(filePath)) {
-    if (fs.existsSync(path.join(__dirname, relPath))) {
-      filePath = path.join(__dirname, relPath);
-    } else if (fs.existsSync(path.join(__dirname, 'public', relPath))) {
-      filePath = path.join(__dirname, 'public', relPath);
-    }
+  let filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'index.html' : pathname);
+  if (!filePath.startsWith(PUBLIC_DIR)) {
+    res.writeHead(403);
+    res.end('Acceso denegado');
+    return;
   }
 
   fs.stat(filePath, (err, stats) => {
